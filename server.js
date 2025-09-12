@@ -1,4 +1,5 @@
 import 'dotenv/config';
+console.log('JWT_SECRET:', process.env.JWT_SECRET ? 'Loaded' : 'Missing'); // Add this line
 import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -62,8 +63,8 @@ app.use(helmet({
         "https://pagead2.googlesyndication.com",
         "https://googleads.g.doubleclick.net",
         "https://d2mpatx37cqexb.cloudfront.net",
-        "https://use.fontawesome.com"
-      ],
+        "https://use.fontawesome.com",
+        "https://js.paystack.co"],
       "style-src": [
         "'self'",
         "'unsafe-inline'",
@@ -75,6 +76,7 @@ app.use(helmet({
         "https://embed.tawk.to",
         "https://cdn.tawk.to",
         "https://*.tawk.to"
+        
       ],
       "img-src": [
         "'self'",
@@ -104,8 +106,8 @@ app.use(helmet({
         "https://embed.tawk.to",
         "https://*.tawk.to",
         "https://pagead2.googlesyndication.com",
-        "https://googleads.g.doubleclick.net"
-      ],
+        "https://googleads.g.doubleclick.net",
+        "https://js.paystack.co"],
       "connect-src": [
         "'self'",
         "https://tawk.to",
@@ -114,8 +116,8 @@ app.use(helmet({
         "https://va.tawk.to",
         "https://*.tawk.to",
         "wss://*.tawk.to",
-        "https://ep1.adtrafficquality.google"
-      ]
+        "https://ep1.adtrafficquality.google",
+        "https://api.paystack.co"]
     }
   }
 }));
