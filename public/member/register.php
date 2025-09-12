@@ -147,7 +147,7 @@
         <div class="col-md-6">
           <label class="form-label">All Positions:</label>
           <select name="state" class="form-control" required>
-            <option value="" selected disabled>Select your Position</option>
+            <option value="" selected disabled>Select Position</option>
             <option>President</option>
             <option>Deputy President</option>
             <option>Vice President (North Central)</option>
@@ -175,6 +175,7 @@
             <option>State Financial Secretary</option>
             <option>State Treasurer</option>
             <option>Task Force</option>
+            <option>Old Member</option>
             <option>New Member</option>
           </select>
         </div>
