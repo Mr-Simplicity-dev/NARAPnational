@@ -76,6 +76,16 @@
           <input type="email" name="Businessl Address" class="form-control" required placeholder="Business Address">
         </div>
 
+        <div class="col-md-6">
+          <label class="form-label">Area of Specialization</label>
+          <select name="state" class="form-control" required>
+            <option value="" selected disabled>Select Area of Specialization</option>
+            <option>Air Conditioning</option>
+            <option>Refrigeration</option>
+            <option>Air Conditioning & Refrigeration</option>
+            </select>
+        </div>
+
 
         <div class="col-md-6">
           <label class="form-label">Residential Address:</label>
@@ -125,6 +135,7 @@
             <option>FCT (Abuja)</option>
           </select>
         </div>
+
         <div class="col-md-6">
           <label class="form-label">Zone:</label>
           <input name="Zone" class="form-control" placeholder="Zone">
