@@ -39,6 +39,20 @@ button[disabled], input[type="submit"][disabled] {
 <div class="col-lg-9">
 <h1 class="mb-4">Member Registration</h1>
 <form class="row g-3" enctype="multipart/form-data" id="memberForm">
+  
+  <div class="col-12">
+  <div class="alert alert-warning mb-3" role="alert">
+    <div class="fw-bold mb-1">Please read before filling this form</div>
+    <ul class="mb-0 ps-3 small">
+      <li>Enter your full legal name exactly as it should appear on NARAP records.</li>
+     <li>Use a valid email address and phone number; confirmations <span class="fw-bold fst-italic">may</span> be sent there.</li>
+     <li>Upload a clear, recent passport photograph (JPG/PNG).</li>
+      <li>Select your correct Date of Birth and state.</li>
+      <li>Double-check all spellings and numbers before submitting.</li>
+    </ul>
+  </div>
+</div>
+
 <div class="col-md-6">
 <label class="form-label">First Name:</label>
 <input class="form-control" name="firstName" required=""/>
