@@ -67,27 +67,6 @@
         </div>
 
         <div class="col-md-6">
-          <label class="form-label">Business Registered Name:</label>
-          <input type="email" name="Business Registered Name" class="form-control" required placeholder="Business Registered Name">
-        </div>
-
-         <div class="col-md-6">
-          <label class="form-label">Business Address:</label>
-          <input type="email" name="Businessl Address" class="form-control" required placeholder="Business Address">
-        </div>
-
-        <div class="col-md-6">
-          <label class="form-label">Area of Specialization</label>
-          <select name="state" class="form-control" required>
-            <option value="" selected disabled>Select Area of Specialization</option>
-            <option>Air Conditioning</option>
-            <option>Refrigeration</option>
-            <option>Air Conditioning & Refrigeration</option>
-            </select>
-        </div>
-
-
-        <div class="col-md-6">
           <label class="form-label">Residential Address:</label>
           <input type="email" name="Residential Address" class="form-control" required placeholder="Residential Address">
         </div>
@@ -144,10 +123,31 @@
           <label class="form-label">Ward:</label>
           <input name="Ward" class="form-control" placeholder="Ward">
         </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Business Registered Name:</label>
+          <input type="email" name="Business Registered Name" class="form-control" required placeholder="Business Registered Name">
+        </div>
+
+         <div class="col-md-6">
+          <label class="form-label">Business Address:</label>
+          <input type="email" name="Businessl Address" class="form-control" required placeholder="Business Address">
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Area of Specialization</label>
+          <select name="state" class="form-control" required>
+            <option value="" selected disabled>Select Area of Specialization</option>
+            <option>Air Conditioning</option>
+            <option>Refrigeration</option>
+            <option>Air Conditioning & Refrigeration</option>
+            </select>
+        </div>
+
         <div class="col-md-6">
           <label class="form-label">All Positions:</label>
           <select name="state" class="form-control" required>
-            <option value="" selected disabled>Positions</option>
+            <option value="" selected disabled>Select your Position</option>
             <option>President</option>
             <option>Deputy President</option>
             <option>Vice President (North Central)</option>
@@ -175,7 +175,7 @@
             <option>State Financial Secretary</option>
             <option>State Treasurer</option>
             <option>Task Force</option>
-            <option>Member</option>
+            <option>New Member</option>
           </select>
         </div>
         <div class="col-md-6">
