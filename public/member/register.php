@@ -183,11 +183,19 @@
           <label class="form-label">Password:</label>
           <input type="password" name="password" class="form-control" minlength="6" required placeholder="*******">
         </div>
+        
         <div class="col-md-6">
           <label class="form-label">Passport Photo:</label>
           <input type="file" name="passport" class="form-control" accept="image/*" required>
           <div class="form-hint">Upload a clear face photo (JPG/PNG).</div>
         </div>
+
+          <div class="col-md-6">
+          <label class="form-label">Signature:</label>
+          <input type="file" name="passport" class="form-control" accept="image/*" required>
+          <div class="form-hint">Upload a Signature.</div>
+        </div>
+
         <div class="col-12">
           <button class="btn btn-success" type="submit">Create Member Account</button>
         </div>
