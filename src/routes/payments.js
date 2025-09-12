@@ -1,6 +1,6 @@
 import express from 'express';
 import axios from 'axios';
-import Payment from '../models/Payment.js';
+import payment from '../models/Payment.js';
 import User from '../models/User.js';
 import { requireAuth } from '../middleware/auth.js';
 
@@ -17,31 +17,68 @@ router.get('/health', (_req, res) => res.json({ ok: true }));
  * Returns: { reference, amount, currency, purpose }
  */
 router.post('/init', requireAuth, async (req, res) => {
-  try{
-    const { amount, purpose = 'membership' } = req.body || {};
-    if(!amount || Number.isNaN(Number(amount))){
-      return res.status(400).json({ message: 'amount (kobo) required' });
+  try {
+    // Strict, server-side validation for amount
+    const amt = Math.round(Number(req.body?.amount));
+    const purposeRaw = String(req.body?.purpose || 'membership').toLowerCase();
+    const purpose = ['membership','idcard','certificate','other'].includes(purposeRaw)
+      ? purposeRaw : 'other';
+
+    if (!Number.isFinite(amt) || amt < 100) {
+      return res.status(400).json({ message: 'amount (kobo) must be a positive integer >= 100' });
     }
 
     const uid   = (req.user && (req.user.id || req.user.uid || req.user._id)) || undefined;
     const email = (req.user && req.user.email) || req.body.email || undefined;
 
-    const reference = 'NARAP-' + Date.now() + '-' + Math.floor(Math.random()*1e6);
+    // Generate unique reference with duplicate-key retry
+    const MAX_ATTEMPTS = 5;
+    let lastErr;
 
-    await Payment.create({
-      userId: uid,
-      email,
-      amount: Number(amount),
-      reference,
-      purpose,
-      status: 'initialised'
+    for (let i = 0; i < MAX_ATTEMPTS; i++) {
+      const reference = `NARAP-${Date.now()}-${Math.floor(Math.random() * 1e9)}`;
+
+      try {
+        await Payment.create({
+          userId: uid,
+          email,
+          amount: amt,
+          currency: 'NGN',
+          reference,
+          purpose,
+          status: 'initialised',
+        });
+
+        return res.json({ reference, amount: amt, currency: 'NGN', purpose });
+      } catch (e) {
+        // Duplicate key on reference? try again with a new reference
+        const isDup =
+          (e?.code === 11000 && e?.keyPattern && e.keyPattern.reference) ||
+          (typeof e?.message === 'string' && e.message.includes('E11000') && e.message.includes('reference'));
+
+        if (isDup) {
+          // brief jitter to avoid same-ms collisions
+          await new Promise(r => setTimeout(r, 5));
+          continue;
+        }
+
+        lastErr = e;
+        break; // non-duplicate error -> stop retrying
+      }
+    }
+
+    // If we’re here, retries exhausted OR non-duplicate error caught
+    console.error('[payments/init] error:', { name: lastErr?.name, code: lastErr?.code, message: lastErr?.message });
+    return res.status(500).json({
+      message: lastErr?.message || 'init failed',
+      code: lastErr?.code || 'INIT_ERROR'
     });
-
-    return res.json({ reference, amount: Number(amount), currency: 'NGN', purpose });
-  }catch(e){
-    return res.status(500).json({ message: e.message || 'init failed' });
+  } catch (e) {
+    console.error('[payments/init] unexpected error:', e);
+    return res.status(500).json({ message: e?.message || 'init failed' });
   }
 });
+
 
 /**
  * POST /api/payments/verify
