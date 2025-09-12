@@ -29,27 +29,50 @@
       <h1 class="mb-4">Member Registration</h1>
       <form id="memberForm" class="row g-3" enctype="multipart/form-data">
         <div class="col-md-6">
-          <label class="form-label">First Name</label>
+          <label class="form-label">First Name:</label>
           <input name="firstName" class="form-control" required>
         </div>
         <div class="col-md-6">
-          <label class="form-label">Last Name</label>
+          <label class="form-label">Last Name:</label>
           <input name="lastName" class="form-control" required>
         </div>
+
         <div class="col-md-6">
-          <label class="form-label">Sex</label>
+          <label class="form-label">Sex:</label>
           <select name="state" class="form-control" required>
           <option value="" selected disabled>Gender</option>
             <option>Male</option>
             <option>Female</option>
           </select>
         </div>
+
+
         <div class="col-md-6">
-          <label class="form-label">Email</label>
+          <label class="form-label">Marital Status:</label>
+          <select name="state" class="form-control" required>
+          <option value="" selected disabled>Select Status</option>
+            <option>Single</option>
+            <option>Married</option>
+          </select>
+        </div>
+        
+        <div class="col-md-6">
+          <label class="form-label">Mobile Number:</label>
+          <input type="email" name="Mobile Number" class="form-control" required placeholder="Phone Number">
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Email:</label>
           <input type="email" name="email" class="form-control" required placeholder="@gmail.com">
         </div>
+
+         <div class="col-md-6">
+          <label class="form-label">Residential Address:</label>
+          <input type="email" name="Residential Address" class="form-control" required placeholder="Residential Address">
+        </div>
+
         <div class="col-md-6">
-          <label class="form-label">State</label>
+          <label class="form-label">State:</label>
           <select name="state" class="form-control" required>
             <option value="" selected disabled>Select State</option>
             <option>Abia</option>
@@ -92,21 +115,19 @@
           </select>
         </div>
         <div class="col-md-6">
-          <label class="form-label">Zone</label>
+          <label class="form-label">Zone:</label>
           <input name="Zone" class="form-control" placeholder="Zone">
         </div>
         <div class="col-md-6">
-          <label class="form-label">Ward</label>
+          <label class="form-label">Ward:</label>
           <input name="Ward" class="form-control" placeholder="Ward">
         </div>
         <div class="col-md-6">
-          <label class="form-label">State</label>
+          <label class="form-label">All Positions:</label>
           <select name="state" class="form-control" required>
-            <option value="" selected disabled>All Positions</option>
+            <option value="" selected disabled>Positions</option>
             <option>President</option>
             <option>Deputy President</option>
-            <option>Vice President</option>
-            All Positions
             <option>Vice President (North Central)</option>
             <option>Vice President (North East)</option>
             <option>Vice President (North West)</option>
@@ -136,11 +157,11 @@
           </select>
         </div>
         <div class="col-md-6">
-          <label class="form-label">Password</label>
+          <label class="form-label">Password:</label>
           <input type="password" name="password" class="form-control" minlength="6" required placeholder="*******">
         </div>
         <div class="col-md-6">
-          <label class="form-label">Passport Photo</label>
+          <label class="form-label">Passport Photo:</label>
           <input type="file" name="passport" class="form-control" accept="image/*" required>
           <div class="form-hint">Upload a clear face photo (JPG/PNG).</div>
         </div>
