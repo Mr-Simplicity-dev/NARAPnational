@@ -37,6 +37,14 @@
           <input name="lastName" class="form-control" required>
         </div>
         <div class="col-md-6">
+          <label class="form-label">Sex</label>
+          <select name="state" class="form-control" required>
+          <option value="" selected disabled>Gender</option>
+            <option>Male</option>
+            <option>Female</option>
+          </select>
+        </div>
+        <div class="col-md-6">
           <label class="form-label">Email</label>
           <input type="email" name="email" class="form-control" required placeholder="@gmail.com">
         </div>
@@ -62,7 +70,7 @@
         </div>
         <div class="col-md-6">
           <label class="form-label">Ward</label>
-          <input name="Ward" class="form-control" placeholder="Zone">
+          <input name="Ward" class="form-control" placeholder="Ward">
         </div>
         <div class="col-md-6">
           <label class="form-label">State</label>
