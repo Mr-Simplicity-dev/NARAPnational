@@ -9,7 +9,6 @@
 <link href="/css/bootstrap.min.css" rel="stylesheet"/>
 <link href="/css/style.css" rel="stylesheet"/>
 <style>.form-hint{font-size:.9rem;color:#6b7280}</style>
-
 <style>
 /* Make disabled submits clearly inactive */
 button[disabled], input[type="submit"][disabled] {
@@ -20,6 +19,18 @@ button[disabled], input[type="submit"][disabled] {
   cursor: not-allowed !important;
   opacity: .65; /* mirrors Bootstrap default */
 }
+</style>
+<style>
+.input-group .toggle-password { min-width: 4.5rem; }
+</style>
+
+<style>
+.toggle-password i { pointer-events: none; } /* click goes to button */
+</style>
+<style>
+/* Inline SVG icon sizing & behavior */
+.toggle-password svg { width: 1.1em; height: 1.1em; pointer-events: none; }
+[hidden] { display: none !important; }
 </style></head>
 <body>
 <nav class="navbar navbar-expand-lg bg-white navbar-light sticky-top p-0 shadow-sm">
@@ -39,20 +50,18 @@ button[disabled], input[type="submit"][disabled] {
 <div class="col-lg-9">
 <h1 class="mb-4">Member Registration</h1>
 <form class="row g-3" enctype="multipart/form-data" id="memberForm">
-  
-  <div class="col-12">
-  <div class="alert alert-warning mb-3" role="alert">
-    <div class="fw-bold mb-1">Please read before filling this form</div>
-    <ul class="mb-0 ps-3 small">
-      <li>Enter your full legal name exactly as it should appear on NARAP records.</li>
-     <li>Use a valid email address and phone number; confirmations <span class="fw-bold fst-italic">may</span> be sent there.</li>
-     <li>Upload a clear, recent passport photograph (JPG/PNG).</li>
-      <li>Select your correct Date of Birth and state.</li>
-      <li>Double-check all spellings and numbers before submitting.</li>
-    </ul>
-  </div>
+<div class="col-12">
+<div class="alert alert-warning mb-3" role="alert">
+<div class="fw-bold mb-1">Please read before filling this form</div>
+<ul class="mb-0 ps-3 small">
+<li>Enter your full legal name exactly as it should appear on NARAP records.</li>
+<li>Use a valid email address and phone number; confirmations <span class="fw-bold fst-italic">may</span> be sent there.</li>
+<li>Upload a clear, recent passport photograph (JPG/PNG).</li>
+<li>Select your correct Date of Birth and state.</li>
+<li>Double-check all spellings and numbers before submitting.</li>
+</ul>
 </div>
-
+</div>
 <div class="col-md-6">
 <label class="form-label">First Name:</label>
 <input class="form-control" name="firstName" required=""/>
@@ -194,8 +203,24 @@ button[disabled], input[type="submit"][disabled] {
 </div>
 <div class="col-md-6">
 <label class="form-label">Password:</label>
-<input class="form-control" minlength="6" name="password" placeholder="*******" required="" type="password"/>
+<div class="input-group mb-2"><input class="form-control" id="password" minlength="6" name="password" placeholder="*******" required="" type="password"/><button aria-label="Show password" class="btn btn-outline-secondary toggle-password" data-target="#password" title="Show password" type="button"><svg aria-hidden="true" class="icon-eye" height="16" viewbox="0 0 16 16" width="16" xmlns="http://www.w3.org/2000/svg">
+<path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8z"></path>
+<path d="M8 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"></path>
+</svg><svg aria-hidden="true" class="icon-eye-slash" height="16" hidden="" viewbox="0 0 16 16" width="16" xmlns="http://www.w3.org/2000/svg">
+<path d="M13.359 11.238C11.93 12.5 10.1 13.5 8 13.5 3 13.5 0 8 0 8a17.6 17.6 0 0 1 3.11-3.66l-.97-.97a.75.75 0 1 1 1.06-1.06l12 12a.75.75 0 1 1-1.06 1.06l-0.78-0.78z"></path>
+<path d="M5.354 6.207A3 3 0 0 0 8 11a2.99 2.99 0 0 0 2.793-1.646l-5.44-5.44zM8 2.5C13 2.5 16 8 16 8c-.365.67-.81 1.32-1.32 1.93l-1.07-1.07C14.41 8.28 14.76 7.66 15 7.25 15 7.25 12 2.5 8 2.5 6.67 2.5 5.53 2.9 4.58 3.44l1.08 1.08C6.35 4.2 7.15 4 8 4z"></path>
+</svg><span class="visually-hidden">Show</span></button></div>
 </div>
+<div class="col-md-6">
+<label class="form-label">Confirm Password:</label>
+<div class="input-group mb-2"><input class="form-control" id="confirmPassword" minlength="6" name="confim password" placeholder="*******" required="" type="password"/><button aria-label="Show password" class="btn btn-outline-secondary toggle-password" data-target="#confirmPassword" title="Show password" type="button"><svg aria-hidden="true" class="icon-eye" height="16" viewbox="0 0 16 16" width="16" xmlns="http://www.w3.org/2000/svg">
+<path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8z"></path>
+<path d="M8 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"></path>
+</svg><svg aria-hidden="true" class="icon-eye-slash" height="16" hidden="" viewbox="0 0 16 16" width="16" xmlns="http://www.w3.org/2000/svg">
+<path d="M13.359 11.238C11.93 12.5 10.1 13.5 8 13.5 3 13.5 0 8 0 8a17.6 17.6 0 0 1 3.11-3.66l-.97-.97a.75.75 0 1 1 1.06-1.06l12 12a.75.75 0 1 1-1.06 1.06l-0.78-0.78z"></path>
+<path d="M5.354 6.207A3 3 0 0 0 8 11a2.99 2.99 0 0 0 2.793-1.646l-5.44-5.44zM8 2.5C13 2.5 16 8 16 8c-.365.67-.81 1.32-1.32 1.93l-1.07-1.07C14.41 8.28 14.76 7.66 15 7.25 15 7.25 12 2.5 8 2.5 6.67 2.5 5.53 2.9 4.58 3.44l1.08 1.08C6.35 4.2 7.15 4 8 4z"></path>
+</svg><span class="visually-hidden">Show</span></button></div>
+<div class="invalid-feedback">Passwords do not match.</div></div>
 <div class="col-md-6">
 <label class="form-label">Passport Photo:</label>
 <input accept="image/*" class="form-control" name="passport" required="" type="file"/>
@@ -207,7 +232,7 @@ button[disabled], input[type="submit"][disabled] {
 <div class="form-hint fst-italic">Upload a Signature.</div>
 </div>
 <div class="col-12">
-<label class="form-label fw-bold" >Declaration:</label>
+<label class="form-label fw-bold">Declaration:</label>
 <div class="mb-3"><div class="form-check"><input class="form-check-input" id="declareAgree" name="declare_agree" required="" type="checkbox"/><label class="form-check-label" for="declareAgree">I agree to become a member of the Nigerian Association of Refrigeration &amp; Air Conditioning Practitioners (NARAP) and confirm that all information supplied in this form is correct. I understand that any false information will lead to dismembership from the Association.</label></div></div><button aria-disabled="true" class="btn btn-success disabled" disabled="disabled" type="submit">Create Member Account</button>
 </div>
 </form>
@@ -301,6 +326,103 @@ document.addEventListener('DOMContentLoaded', function () {
 
   syncDisabled();
   checkbox.addEventListener('change', syncDisabled);
+});
+</script>
+\n<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var form = document.getElementById('registerForm') || document.querySelector('form');
+  if (!form) return;
+
+  var checkbox = form.querySelector('#declareAgree, [name="declare_agree"]');
+  var pass = form.querySelector('#password, [name="password"]');
+  var confirm = form.querySelector('#confirmPassword, [name="confirm_password"]');
+  var btns = Array.from(form.querySelectorAll('button[type="submit"], input[type="submit"]'));
+  var submitBtn = btns.find(function(el){
+    var t = (el.innerText || el.value || '').toLowerCase();
+    return t.includes('create member');
+  }) || btns[0];
+
+  // Icon-based toggle (inline SVG)
+  
+form.querySelectorAll('.toggle-password').forEach(function(btn){
+  var targetSel = btn.getAttribute('data-target');
+  var target = targetSel ? form.querySelector(targetSel) : null;
+  var eye = btn.querySelector('.icon-eye');
+  var eyeSlash = btn.querySelector('.icon-eye-slash');
+  var sr = btn.querySelector('.visually-hidden');
+  function render(){
+    var isPwd = target && target.type === 'password';
+    if (eye && eyeSlash){
+      eye.hidden = !isPwd;
+      eyeSlash.hidden = isPwd;
+    }
+    if (sr){ sr.textContent = isPwd ? 'Show' : 'Hide'; }
+    btn.setAttribute('aria-label', isPwd ? 'Show password' : 'Hide password');
+    btn.setAttribute('title', isPwd ? 'Show password' : 'Hide password');
+  }
+  render();
+  btn.addEventListener('click', function(){
+    if (!target) return;
+    target.type = (target.type === 'password') ? 'text' : 'password';
+    render();
+  });
+});
+// Validation for password match
+  function passwordsMatch(){
+    if (!pass || !confirm) return true;
+    if (!confirm.value || !pass.value) return false;
+    return pass.value === confirm.value;
+  }
+
+  function updateValidationUI(){
+    if (!pass || !confirm) return;
+    if (confirm.value.length === 0) {
+      confirm.classList.remove('is-invalid');
+      confirm.setCustomValidity('');
+      return;
+    }
+    if (passwordsMatch()){
+      confirm.classList.remove('is-invalid');
+      confirm.setCustomValidity('');
+    } else {
+      confirm.classList.add('is-invalid');
+      confirm.setCustomValidity('Passwords do not match');
+    }
+  }
+
+  function syncDisabled(){
+    if (!submitBtn) return;
+    var declOK = checkbox ? checkbox.checked : true;
+    var pwdOK = passwordsMatch();
+    var enabled = declOK && pwdOK;
+    submitBtn.disabled = !enabled;
+    if (submitBtn.tagName === 'BUTTON') {
+      submitBtn.setAttribute('aria-disabled', (!enabled).toString());
+    }
+    if (enabled) {
+      submitBtn.classList.remove('disabled');
+    } else {
+      if (!submitBtn.classList.contains('disabled')) submitBtn.classList.add('disabled');
+    }
+    var wrapper = submitBtn.closest ? submitBtn.closest('.tooltip-wrapper') : (submitBtn.parentElement && submitBtn.parentElement.classList.contains('tooltip-wrapper') ? submitBtn.parentElement : null);
+    if (wrapper) {
+      wrapper.setAttribute('data-disabled', (!enabled).toString());
+      if (!enabled) {
+        wrapper.setAttribute('data-tip', checkbox && !checkbox.checked ? 'Please agree to the declaration first' : 'Passwords must match');
+      } else {
+        wrapper.removeAttribute('data-tip');
+      }
+    }
+  }
+
+  ['input','change','blur','keyup'].forEach(function(ev){
+    if (pass) pass.addEventListener(ev, function(){ updateValidationUI(); syncDisabled(); });
+    if (confirm) confirm.addEventListener(ev, function(){ updateValidationUI(); syncDisabled(); });
+  });
+  if (checkbox) checkbox.addEventListener('change', syncDisabled);
+
+  updateValidationUI();
+  syncDisabled();
 });
 </script></body>
 </html>
