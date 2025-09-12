@@ -61,6 +61,56 @@
           <input name="Zone" class="form-control" placeholder="Zone">
         </div>
         <div class="col-md-6">
+          <label class="form-label">Ward</label>
+          <input name="Ward" class="form-control" placeholder="Zone">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">State</label>
+          <select name="state" class="form-control" required>
+            <option value="" selected disabled>All Positions</option>
+            <option>President</option>
+            <option>Deputy President</option>
+            <option>Vice President</option>
+            All Positions
+            <option>Vice President (North Central)</option>
+            <option>Vice President (North East)</option>
+            <option>Vice President (North West)</option>
+            <option>Vice President (South East)</option>
+            <option>Vice President (South South)</option>
+            <option>Vice President (South West)</option>
+            <option>Secretary</option>
+            <option>Assistant Secretary</option>
+            <option>Financial Secretary</option>
+            <option>Assistant Financial Secretary</option>
+            <option>Treasurer</option>
+            <option>Public Relation Officer (PRO)</option>
+            <option>Assistant Public Relation Officer (APRO)</option>
+            <option>Provost Marshal 1</option>
+            <option>Provost Marshal 2</option>
+            <option>State Welfare Coordinator</option>
+            <option>Coordinator</option>
+            <option>Assistant Coordinator</option>
+            <option>Chairman</option>
+            <option>Vice Chairman</option>
+            <option>State Secretary </option>
+        <option value="STATE ASSISTANT SECRETARY">
+         State Assistant Secretary
+        </option>
+        <option value="STATE FINANCIAL SECRETARY">
+         State Financial Secretary
+        </option>
+        <option value="STATE TREASURER">
+         State Treasurer
+        </option>
+        <option value="TASK FORCE">
+        Task Force
+        </option>
+        <option>
+         Member
+        </option>
+          </select>
+        </div>
+        <div class="col-md-6">
           <label class="form-label">Password</label>
           <input type="password" name="password" class="form-control" minlength="6" required placeholder="*******">
         </div>
