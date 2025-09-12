@@ -93,21 +93,11 @@
             <option>Chairman</option>
             <option>Vice Chairman</option>
             <option>State Secretary </option>
-        <option value="STATE ASSISTANT SECRETARY">
-         State Assistant Secretary
-        </option>
-        <option value="STATE FINANCIAL SECRETARY">
-         State Financial Secretary
-        </option>
-        <option value="STATE TREASURER">
-         State Treasurer
-        </option>
-        <option value="TASK FORCE">
-        Task Force
-        </option>
-        <option>
-         Member
-        </option>
+            <option>State Assistant Secretary</option>
+            <option>State Financial Secretary</option>
+            <option>State Treasurer</option>
+            <option>Task Force</option>
+            <option>Member</option>
           </select>
         </div>
         <div class="col-md-6">
