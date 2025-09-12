@@ -94,6 +94,29 @@
         .notification.show { transform: translateX(0); }
         .notification.success { background: var(--ok); }
         
+        /* Payment methods */
+        .payment-methods {
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            gap: 10px; margin: 15px 0;
+        }
+        .payment-method {
+            border: 2px solid #e9ecef; border-radius: 8px;
+            padding: 10px; text-align: center; cursor: pointer;
+            transition: all 0.3s;
+        }
+        .payment-method:hover {
+            border-color: var(--brand); transform: translateY(-3px);
+        }
+        .payment-method.active {
+            border-color: var(--brand); background: rgba(14, 165, 233, 0.05);
+        }
+        .payment-method h4 {
+            margin: 5px 0; font-size: 14px;
+        }
+        .payment-method p {
+            margin: 0; font-size: 12px; color: var(--muted);
+        }
+        
         /* Debug panel */
         .debug-panel {
             background: #f8f9fa; border: 1px solid #e9ecef;
@@ -200,6 +223,26 @@
             </div>
             <div class="panel">
                 <div style="font-weight:800;margin-bottom:8px">Payments</div>
+                
+                <!-- Payment Method Selection -->
+                <div style="margin-bottom: 20px;">
+                    <div style="font-weight: 600; margin-bottom: 8px;">Select Payment Method:</div>
+                    <div class="payment-methods">
+                        <div class="payment-method active" data-method="card">
+                            <h4>Card</h4>
+                            <p>Debit/Credit Card</p>
+                        </div>
+                        <div class="payment-method" data-method="bank">
+                            <h4>Bank Transfer</h4>
+                            <p>Direct Bank Transfer</p>
+                        </div>
+                        <div class="payment-method" data-method="ussd">
+                            <h4>USSD</h4>
+                            <p>USSD Code</p>
+                        </div>
+                    </div>
+                </div>
+                
                 <div class="pay-card">
                     <div class="h">Membership Fee</div>
                     <div class="a">Access member benefits and dashboard tools.</div>
@@ -301,6 +344,19 @@
             window.location.href = '/member/login.php';
         });
 
+        // Payment method selection
+        let selectedPaymentMethod = 'card';
+        document.querySelectorAll('.payment-method').forEach(method => {
+            method.addEventListener('click', function() {
+                document.querySelectorAll('.payment-method').forEach(m => {
+                    m.classList.remove('active');
+                });
+                this.classList.add('active');
+                selectedPaymentMethod = this.getAttribute('data-method');
+                addDebugLog(`Payment method selected: ${selectedPaymentMethod}`);
+            });
+        });
+
         function getToken(){
             const ls = localStorage.getItem('jwt') || localStorage.getItem('token') || localStorage.getItem('authToken');
             const ss = sessionStorage.getItem('jwt') || sessionStorage.getItem('token') || sessionStorage.getItem('authToken');
@@ -350,7 +406,7 @@
                 return Promise.reject(new Error('Invalid token'));
             }
             
-            addDebugLog(`Initializing payment: ${purpose}, Amount: ${amount}`);
+            addDebugLog(`Initializing payment: ${purpose}, Amount: ${amount}, Method: ${selectedPaymentMethod}`);
             
             return fetch('/api/payments/init', {
                 method:'POST',
@@ -358,7 +414,7 @@
                     'Content-Type':'application/json',
                     'Authorization':'Bearer ' + getToken()
                 },
-                body: JSON.stringify({ amount, purpose })
+                body: JSON.stringify({ amount, purpose, method: selectedPaymentMethod })
             })
             .then(response => {
                 addDebugLog(`Payment init response: ${response.status} ${response.statusText}`);
