@@ -66,7 +66,18 @@
           <input type="email" name="email" class="form-control" required placeholder="@gmail.com">
         </div>
 
+        <div class="col-md-6">
+          <label class="form-label">Business Registered Name:</label>
+          <input type="email" name="Business Registered Name" class="form-control" required placeholder="Business Registered Name">
+        </div>
+
          <div class="col-md-6">
+          <label class="form-label">Business Address:</label>
+          <input type="email" name="Businessl Address" class="form-control" required placeholder="Business Address">
+        </div>
+
+
+        <div class="col-md-6">
           <label class="form-label">Residential Address:</label>
           <input type="email" name="Residential Address" class="form-control" required placeholder="Residential Address">
         </div>
