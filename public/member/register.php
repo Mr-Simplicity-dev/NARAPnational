@@ -23,7 +23,6 @@ button[disabled], input[type="submit"][disabled] {
 <style>
 .input-group .toggle-password { min-width: 4.5rem; }
 </style>
-
 <style>
 .toggle-password i { pointer-events: none; } /* click goes to button */
 </style>
@@ -31,6 +30,18 @@ button[disabled], input[type="submit"][disabled] {
 /* Inline SVG icon sizing & behavior */
 .toggle-password svg { width: 1.1em; height: 1.1em; pointer-events: none; }
 [hidden] { display: none !important; }
+</style>
+<style>
+/* Make all placeholder text italic (cross-browser) */
+::placeholder { font-style: italic; }
+::-webkit-input-placeholder { font-style: italic; }
+:-ms-input-placeholder { font-style: italic; }
+::-ms-input-placeholder { font-style: italic; }
+:-moz-placeholder { font-style: italic; opacity: 1; }
+::-moz-placeholder { font-style: italic; opacity: 1; }
+
+/* For select elements that use a disabled/empty first option as a "placeholder": */
+.form-select.select-placeholder { font-style: italic; }
 </style></head>
 <body>
 <nav class="navbar navbar-expand-lg bg-white navbar-light sticky-top p-0 shadow-sm">
@@ -64,11 +75,11 @@ button[disabled], input[type="submit"][disabled] {
 </div>
 <div class="col-md-6">
 <label class="form-label">First Name:</label>
-<input class="form-control" name="firstName" required=""/>
+<input class="form-control" name="firstName" placeholder="Your name" required=""/>
 </div>
 <div class="col-md-6">
 <label class="form-label">Last Name:</label>
-<input class="form-control" name="lastName" required=""/>
+<input class="form-control" name="lastName" placeholder="Surname" required=""/>
 </div>
 <div class="col-md-6">
 <label class="form-label">Sex:</label>
@@ -423,6 +434,21 @@ form.querySelectorAll('.toggle-password').forEach(function(btn){
 
   updateValidationUI();
   syncDisabled();
+});
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var selects = Array.from(document.querySelectorAll('select.form-select'));
+  function syncPlaceholder(sel){
+    try {
+      var isPlaceholder = !sel.value || (sel.selectedOptions && sel.selectedOptions[0] && sel.selectedOptions[0].disabled);
+      sel.classList.toggle('select-placeholder', !!isPlaceholder);
+    } catch(_) {}
+  }
+  selects.forEach(function(sel){
+    syncPlaceholder(sel);
+    sel.addEventListener('change', function(){ syncPlaceholder(sel); });
+  });
 });
 </script></body>
 </html>
