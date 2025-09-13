@@ -2,6 +2,7 @@
 
 <html lang="en">
 <head>
+<link href="/uploads/slider/Narap.png" rel="icon" type="image/png"/>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
 <title>Register — Member</title>
@@ -42,9 +43,30 @@ button[disabled], input[type="submit"][disabled] {
 
 /* For select elements that use a disabled/empty first option as a "placeholder": */
 .form-select.select-placeholder { font-style: italic; }
+</style>
+<style>
+/* Use the EXISTING header as the positioning context */
+.reg-topbar{ position: relative; z-index: 1020; }
+/* Centered logo inside the existing header without blocking clicks */
+.reg-topbar .reg-top-logo{
+  position: absolute;
+  left: 50%; top: 50%;
+  transform: translate(-50%, -50%);
+  display: flex; align-items: center; justify-content: center;
+  pointer-events: none;
+}
+.reg-topbar .reg-top-logo .reg-logo{ max-height: 40px; width: auto; }
+/* Title spacing so it's not covered by the header */
+.reg-title{ margin-top: .75rem; }
+@media (min-width: 576px){ .reg-title{ margin-top: 1rem; } }
+</style>
+<style>
+/* NARAP | Back | Member Login link colors (NARAP green) */
+.reg-topbar a { color: #198754 !important; }              /* Bootstrap success green */
+.reg-topbar a:hover, .reg-topbar a:focus { color: #146c43 !important; text-decoration: none; }
 </style></head>
 <body>
-<nav class="navbar navbar-expand-lg bg-white navbar-light sticky-top p-0 shadow-sm">
+<nav class="navbar navbar-expand-lg bg-white navbar-light sticky-top p-0 shadow-sm reg-topbar">
 <a class="navbar-brand px-4" href="/index.php">NARAP</a>
 <button class="navbar-toggler me-4" data-bs-target="#navbarCollapse" data-bs-toggle="collapse" type="button">
 <span class="navbar-toggler-icon"></span>
@@ -55,11 +77,11 @@ button[disabled], input[type="submit"][disabled] {
 <a class="nav-item nav-link" href="/member/login.php">Member Login</a>
 </div>
 </div>
-</nav>
+<div class="reg-top-logo"><img alt="NARAP Logo" class="reg-logo img-fluid" src="/uploads/slider/Narap.png"/></div></nav>
 <div class="container py-5">
 <div class="row justify-content-center">
 <div class="col-lg-9">
-<h1 class="mb-4">Member Registration</h1>
+<h1 class="mb-4 reg-title">Member Registration</h1>
 <form class="row g-3" enctype="multipart/form-data" id="memberForm">
 <div class="col-12">
 <div class="alert alert-warning mb-3" role="alert">
@@ -232,6 +254,51 @@ button[disabled], input[type="submit"][disabled] {
 <path d="M5.354 6.207A3 3 0 0 0 8 11a2.99 2.99 0 0 0 2.793-1.646l-5.44-5.44zM8 2.5C13 2.5 16 8 16 8c-.365.67-.81 1.32-1.32 1.93l-1.07-1.07C14.41 8.28 14.76 7.66 15 7.25 15 7.25 12 2.5 8 2.5 6.67 2.5 5.53 2.9 4.58 3.44l1.08 1.08C6.35 4.2 7.15 4 8 4z"></path>
 </svg><span class="visually-hidden">Show</span></button></div>
 <div class="invalid-feedback">Passwords do not match.</div></div>
+<div class="col-md-6">
+<label class="form-label">Next of Kin:</label>
+<input class="form-control" name="Next of Kin" placeholder="Next of Kin"/>
+</div>
+<div class="col-md-6">
+<label class="form-label">Guarantor (<em>must be a practitioner</em>):</label>
+<input class="form-control" name="Guarantor" placeholder="Guarantor" required=""/>
+</div>
+<div class="col-md-6">
+<label class="form-label">Guarantor's Address:</label>
+<input class="form-control" name="Guarantor's Address" placeholder="Address" required=""/>
+</div>
+<div class="col-md-6">
+<label class="form-label">Guarantor's Position:</label>
+<select class="form-control" name="state" required="">
+<option disabled="" selected="" value="">Select Position</option>
+<option>Deputy President</option>
+<option>Vice President (North Central)</option>
+<option>Vice President (North East)</option>
+<option>Vice President (North West)</option>
+<option>Vice President (South East)</option>
+<option>Vice President (South South)</option>
+<option>Vice President (South West)</option>
+<option>Secretary</option>
+<option>Assistant Secretary</option>
+<option>Financial Secretary</option>
+<option>Assistant Financial Secretary</option>
+<option>Treasurer</option>
+<option>Public Relation Officer (PRO)</option>
+<option>Assistant Public Relation Officer (APRO)</option>
+<option>Provost Marshal 1</option>
+<option>Provost Marshal 2</option>
+<option>State Welfare Coordinator</option>
+<option>Coordinator</option>
+<option>Assistant Coordinator</option>
+<option>Chairman</option>
+<option>Vice Chairman</option>
+<option>State Secretary </option>
+<option>State Assistant Secretary</option>
+<option>State Financial Secretary</option>
+<option>State Treasurer</option>
+<option>Task Force</option>
+<option>Member</option>
+</select>
+</div>
 <div class="col-md-6">
 <label class="form-label">Passport Photo:</label>
 <input accept="image/*" class="form-control" name="passport" required="" type="file"/>

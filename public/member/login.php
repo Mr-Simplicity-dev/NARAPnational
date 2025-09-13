@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <link rel="icon" type="image/png" href="/uploads/slider/Narap.png"/>
   <meta charset="UTF-8">
   <title>Member Login</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
