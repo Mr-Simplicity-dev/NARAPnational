@@ -1,10 +1,11 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Member Dashboard · Payments</title>
-    <style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Member Dashboard · Payments</title>
+<style>
         :root {
             --brand: #0ea5e9; --ink: #0f172a; --muted: #64748b;
             --bg: #f8fafc; --card: #fff; --ok: #16a34a; --warn: #f59e0b; --err: #ef4444;
@@ -159,130 +160,217 @@
         .modal-actions {
             display: flex; gap: 12px; justify-content: flex-end;
         }
-    </style>
-</head>
+    
+/* --- Header dropdown for Account Settings --- */
+header .title { display:flex; align-items:center; gap:12px; position:relative; }
+header .title .menu { position:relative; }
+header .title .menu-toggle{
+  background: rgba(255,255,255,0.2); color:#fff; border:0; border-radius:10px;
+  padding:6px 10px; font-weight:700; cursor:pointer;
+}
+header .title .menu-toggle:focus{ outline: 2px solid rgba(255,255,255,.6); outline-offset:2px; }
+header .title .menu-list{
+  position:absolute; top:110%; left:0; min-width: 200px;
+  background:#fff; color: var(--ink); border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.15);
+  padding:8px; display:none; z-index: 200;
+}
+header .title .menu-list a{
+  display:block; padding:10px 12px; border-radius:8px; text-decoration:none;
+  color: var(--ink); font-weight:600;
+}
+header .title .menu-list a:hover{ background:#f1f5f9; }
+header .title .menu.open .menu-list{ display:block; }
+@media (max-width: 480px){
+  header .title .menu-toggle{ padding:6px 8px; font-size: 12px; }
+}
+
+/* --- Hide Account Settings section by default; reveal via header dropdown --- */
+#member-settings{ display:none; }
+#member-settings .settings-panel{ display:none; }
+#member-settings .settings-panel.active{ display:block; }
+</style>
+<style>
+#member-settings .icon-eye, #member-settings .icon-eye-slash { width: 1.1em; height: 1.1em; pointer-events: none; vertical-align: -2px; }
+#member-settings [hidden] { display: none !important; }
+#member-settings .card { border-radius: .75rem; }
+</style>
+<style>
+:root{
+  --narap-green: #198754;
+  --narap-green-dark: #146c43;
+  --narap-green-25: rgba(25,135,84,.25);
+}
+/* Section look */
+#member-settings .section-kicker{
+  font-size:.8rem; letter-spacing:.08em; color:var(--narap-green);
+  text-transform:uppercase; font-weight:700;
+}
+#member-settings h2.h4{ color: var(--narap-green); font-weight:700; }
+#member-settings .divider{ border-top: 2px solid var(--narap-green-25); }
+/* Cards */
+#member-settings .card{ border:1px solid var(--narap-green-25); border-radius:1rem; box-shadow:0 2px 8px rgba(0,0,0,.04); }
+#member-settings .card .h5{ color:#0f5132; font-weight:700; }
+/* Inputs & focus */
+#member-settings .form-label{ font-weight:600; }
+#member-settings .form-control:focus, #member-settings .form-select:focus{
+  border-color: var(--narap-green);
+  box-shadow: 0 0 0 .25rem var(--narap-green-25);
+}
+/* Buttons */
+#member-settings .btn-success{
+  background-color: var(--narap-green);
+  border-color: var(--narap-green);
+}
+#member-settings .btn-success:hover{
+  background-color: var(--narap-green-dark);
+  border-color: var(--narap-green-dark);
+}
+/* Password eye icon */
+#member-settings .icon-eye, #member-settings .icon-eye-slash {
+  width: 1.1em; height: 1.1em; pointer-events: none; vertical-align: -2px;
+}
+#member-settings [hidden]{ display:none !important; }
+#member-settings .passport-preview{ max-height:120px; width:auto; border:1px solid var(--narap-green-25); }
+
+/* --- Lightweight grid to mimic Bootstrap cols on the member settings section --- */
+#member-settings .row{ display:flex; flex-wrap:wrap; gap:1.5rem; }
+#member-settings .col-12{ flex:0 0 100%; max-width:100%; }
+#member-settings .col-lg-7, #member-settings .col-lg-5{ flex:0 0 100%; max-width:100%; }
+@media (min-width: 992px){
+  #member-settings .col-lg-7{ flex:0 0 58.3333%; max-width:58.3333%; }
+  #member-settings .col-lg-5{ flex:0 0 41.6667%; max-width:41.6667%; }
+}
+/* Ensure cards don't overlap and keep stacking context sane */
+#member-settings .card{ position:relative; z-index:1; }
+/* Avoid header overlap with sticky header */
+main, #member-settings{ padding-top: 8px; }
+</style></head>
 <body>
-    <header>
-        <div class="title">Member Dashboard</div>
-        <div class="actions">
-            <a class="btn" href="/">Back to Site</a>
-            <button class="btn" id="logoutBtn">Logout</button>
-        </div>
-    </header>
-
-    <div class="notification" id="notification">
-        <span id="notification-text"></span>
+<header>
+<div class="title">
+  <span>Member Dashboard</span>
+  <div class="menu" id="mdMenu">
+    <button class="menu-toggle" id="mdMenuToggle" aria-haspopup="true" aria-expanded="false">Account Settings ▾</button>
+    <div class="menu-list" role="menu" aria-labelledby="mdMenuToggle">
+      <a href="#" role="menuitem" id="linkEditProfile">Edit Profile</a>
+      <a href="#" role="menuitem" id="linkChangePassword">Change Password</a>
+      <a href="#" role="menuitem" id="linkShowAll">Show All</a>
+      <a href="#" role="menuitem" id="linkHide">Hide Settings</a>
     </div>
-
-    <!-- Token Expiration Modal -->
-    <div class="modal" id="tokenExpiredModal">
-        <div class="modal-content">
-            <div class="modal-title">Session Expired</div>
-            <div class="modal-message">
+  </div>
+</div>
+<div class="actions">
+<a class="btn" href="/">Back to Site</a>
+<button class="btn" id="logoutBtn">Logout</button>
+</div>
+</header>
+<div class="notification" id="notification">
+<span id="notification-text"></span>
+</div>
+<!-- Token Expiration Modal -->
+<div class="modal" id="tokenExpiredModal">
+<div class="modal-content">
+<div class="modal-title">Session Expired</div>
+<div class="modal-message">
                 Your session has expired. Please log in again to continue.
             </div>
-            <div class="modal-actions">
-                <button class="btn secondary" id="modalCancel">Cancel</button>
-                <button class="btn" id="modalLogin">Log In</button>
-            </div>
-        </div>
-    </div>
-
-    <div class="container">
-        <!-- Status Panel -->
-        <div class="status-panel">
-            <div class="status">
-                <div class="status-dot connected"></div>
-                <span>Server: Connected</span>
-            </div>
-            <div class="status">
-                <div class="status-dot connected" id="jwt-status"></div>
-                <span id="jwt-text">JWT: Valid</span>
-            </div>
-            <div class="status">
-                <div class="status-dot connected"></div>
-                <span>Paystack: Ready</span>
-            </div>
-        </div>
-
-        <div class="grid">
-            <div class="panel">
-                <div class="profile">
-                    <img alt="passport" id="avatar" src="/uploads/slider/Narap.png"/>
-                    <div>
-                        <div id="hello" style="font-weight:800">Welcome</div>
-                        <div class="muted"><span id="email"></span> · <span class="pill" id="rolePill">MEMBER</span></div>
-                    </div>
-                </div>
-                <div style="margin-top:16px">
-                    <div style="font-weight:800;margin-bottom:8px">Recent Activity</div>
-                    <div class="list" id="recentList">
-                        <div class="muted">No recent activity yet.</div>
-                    </div>
-                </div>
-            </div>
-            <div class="panel">
-                <div style="font-weight:800;margin-bottom:8px">Payments</div>
-                
-                <!-- Payment Method Selection -->
-                <div style="margin-bottom: 20px;">
-                    <div style="font-weight: 600; margin-bottom: 8px;">Select Payment Method:</div>
-                    <div class="payment-methods">
-                        <div class="payment-method active" data-method="card">
-                            <h4>Card</h4>
-                            <p>Debit/Credit Card</p>
-                        </div>
-                        <div class="payment-method" data-method="bank">
-                            <h4>Bank Transfer</h4>
-                            <p>Direct Bank Transfer</p>
-                        </div>
-                        <div class="payment-method" data-method="ussd">
-                            <h4>USSD</h4>
-                            <p>USSD Code</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="pay-card">
-                    <div class="h">Membership Fee</div>
-                    <div class="a">Access member benefits and dashboard tools.</div>
-                    <div class="price">₦5,000</div>
-                    <button class="btn" data-amount-kobo="500000" data-purpose="membership" id="payMembership">
-                        <span id="payMembershipText">Pay Membership</span>
-                        <span id="payMembershipLoader" class="loading" style="display: none;"></span>
-                    </button>
-                </div>
-                <div class="pay-card">
-                    <div class="h">ID Card Fee</div>
-                    <div class="a">Get your official member ID card.</div>
-                    <div class="price">₦3,000</div>
-                    <button class="btn" data-amount-kobo="300000" data-purpose="idcard" id="payIdCard">
-                        <span id="payIdCardText">Pay ID Card</span>
-                        <span id="payIdCardLoader" class="loading" style="display: none;"></span>
-                    </button>
-                </div>
-                <div class="pay-card">
-                    <div class="h">Certificate Fee</div>
-                    <div class="a">Generate and download membership certificate.</div>
-                    <div class="price">₦10,000</div>
-                    <button class="btn" data-amount-kobo="1000000" data-purpose="certificate" id="payCertificate">
-                        <span id="payCertificateText">Pay Certificate</span>
-                        <span id="payCertificateLoader" class="loading" style="display: none;"></span>
-                    </button>
-                </div>
-                
-                <!-- Debug Panel -->
-                <div class="debug-panel">
-                    <div class="debug-title">API Debug Log</div>
-                    <div id="debugLogs">
-                        <div class="debug-log">Dashboard initialized. Checking token status...</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
+<div class="modal-actions">
+<button class="btn secondary" id="modalCancel">Cancel</button>
+<button class="btn" id="modalLogin">Log In</button>
+</div>
+</div>
+</div>
+<div class="container">
+<!-- Status Panel -->
+<div class="status-panel">
+<div class="status">
+<div class="status-dot connected"></div>
+<span>Server: Connected</span>
+</div>
+<div class="status">
+<div class="status-dot connected" id="jwt-status"></div>
+<span id="jwt-text">JWT: Valid</span>
+</div>
+<div class="status">
+<div class="status-dot connected"></div>
+<span>Paystack: Ready</span>
+</div>
+</div>
+<div class="grid">
+<div class="panel">
+<div class="profile">
+<img alt="passport" id="avatar" src="/uploads/slider/Narap.png"/>
+<div>
+<div id="hello" style="font-weight:800">Welcome</div>
+<div class="muted"><span id="email"></span> · <span class="pill" id="rolePill">MEMBER</span></div>
+</div>
+</div>
+<div style="margin-top:16px">
+<div style="font-weight:800;margin-bottom:8px">Recent Activity</div>
+<div class="list" id="recentList">
+<div class="muted">No recent activity yet.</div>
+</div>
+</div>
+</div>
+<div class="panel">
+<div style="font-weight:800;margin-bottom:8px">Payments</div>
+<!-- Payment Method Selection -->
+<div style="margin-bottom: 20px;">
+<div style="font-weight: 600; margin-bottom: 8px;">Select Payment Method:</div>
+<div class="payment-methods">
+<div class="payment-method active" data-method="card">
+<h4>Card</h4>
+<p>Debit/Credit Card</p>
+</div>
+<div class="payment-method" data-method="bank">
+<h4>Bank Transfer</h4>
+<p>Direct Bank Transfer</p>
+</div>
+<div class="payment-method" data-method="ussd">
+<h4>USSD</h4>
+<p>USSD Code</p>
+</div>
+</div>
+</div>
+<div class="pay-card">
+<div class="h">Membership Fee</div>
+<div class="a">Access member benefits and dashboard tools.</div>
+<div class="price">₦5,000</div>
+<button class="btn" data-amount-kobo="500000" data-purpose="membership" id="payMembership">
+<span id="payMembershipText">Pay Membership</span>
+<span class="loading" id="payMembershipLoader" style="display: none;"></span>
+</button>
+</div>
+<div class="pay-card">
+<div class="h">ID Card Fee</div>
+<div class="a">Get your official member ID card.</div>
+<div class="price">₦3,000</div>
+<button class="btn" data-amount-kobo="300000" data-purpose="idcard" id="payIdCard">
+<span id="payIdCardText">Pay ID Card</span>
+<span class="loading" id="payIdCardLoader" style="display: none;"></span>
+</button>
+</div>
+<div class="pay-card">
+<div class="h">Certificate Fee</div>
+<div class="a">Generate and download membership certificate.</div>
+<div class="price">₦10,000</div>
+<button class="btn" data-amount-kobo="1000000" data-purpose="certificate" id="payCertificate">
+<span id="payCertificateText">Pay Certificate</span>
+<span class="loading" id="payCertificateLoader" style="display: none;"></span>
+</button>
+</div>
+<!-- Debug Panel -->
+<div class="debug-panel">
+<div class="debug-title">API Debug Log</div>
+<div id="debugLogs">
+<div class="debug-log">Dashboard initialized. Checking token status...</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<script>
     (function(){
         // Debug logging
         function addDebugLog(message, isError = false) {
@@ -513,5 +601,384 @@
         }
     })();
     </script>
-</body>
+<section class="container my-4" id="member-settings">
+<div class="row g-4">
+<div class="col-12">
+<div class="section-kicker">Member Dashboard</div>
+<h2 class="h4 mb-1">Account Settings</h2>
+<p class="text-muted small mb-2">Update your profile details or change your password.</p>
+<hr class="divider mt-2"/>
+</div>
+<!-- Profile Edit -->
+<div class="col-lg-7 settings-panel" data-panel="edit-profile">
+<div class="card shadow-sm">
+<div class="card-body">
+<h3 class="h5 mb-3">My Profile</h3>
+<div class="alert d-none" id="profileAlert" role="alert"></div>
+<form id="profileForm" novalidate="">
+<div class="row g-3">
+<div class="col-md-6">
+<label class="form-label">Surname</label>
+<input class="form-control" name="surname" placeholder="Surname" type="text"/>
+</div>
+<div class="col-md-6">
+<label class="form-label">Other Names</label>
+<input class="form-control" name="otherNames" placeholder="Other names" type="text"/>
+</div>
+<div class="col-md-6">
+<label class="form-label">Phone</label>
+<input class="form-control" name="phone" placeholder="Phone number" type="tel"/>
+</div>
+<div class="col-md-6">
+<label class="form-label">Email</label>
+<input class="form-control" name="email" placeholder="Email address" type="email"/>
+</div>
+<div class="col-md-6">
+<label class="form-label">State</label>
+<input class="form-control" name="state" placeholder="State" type="text"/>
+</div>
+<div class="col-md-6">
+<label class="form-label">Zone</label>
+<input class="form-control" name="zone" placeholder="Zone" type="text"/>
+</div>
+<div class="col-md-6">
+<label class="form-label">Guarantor</label>
+<input class="form-control" name="guarantor" placeholder="Guarantor (must be a practitioner)" type="text"/>
+</div>
+<div class="col-md-6">
+<label class="form-label">Date of Birth</label>
+<div class="row g-2">
+<div class="col-4">
+<select class="form-select" id="dob_day" name="dob_day">
+<option value="">Day</option>
+</select>
+</div>
+<div class="col-4">
+<select class="form-select" id="dob_month" name="dob_month">
+<option value="">Month</option>
+</select>
+</div>
+<div class="col-4">
+<select class="form-select" id="dob_year" name="dob_year">
+<option value="">Year</option>
+</select>
+</div>
+</div>
+</div>
+<div class="col-md-6">
+<label class="form-label">Passport Photo</label>
+<input accept="image/*" class="form-control" name="passport" type="file"/>
+<div class="form-text">Optional: upload a new passport photo (JPG/PNG). Max 5MB.</div>
+<img alt="Current passport photo preview" class="passport-preview mt-2 rounded d-none" id="passportPreview"/></div>
+<div class="col-12 d-flex gap-2">
+<button class="btn btn-success" id="btnSaveProfile" type="button">Save Profile</button>
+<button class="btn btn-outline-secondary" id="btnReloadProfile" type="button">Reload</button>
+</div>
+</div>
+</form>
+</div>
+</div>
+</div>
+<!-- Change Password -->
+<div class="col-lg-5 settings-panel" data-panel="change-password">
+<div class="card shadow-sm">
+<div class="card-body">
+<h3 class="h5 mb-3">Change Password</h3>
+<div class="alert d-none" id="pwdAlert" role="alert"></div>
+<form id="passwordForm" novalidate="">
+<div class="mb-3">
+<label class="form-label">Current Password</label>
+<div class="input-group">
+<input class="form-control" id="currentPassword" name="currentPassword" required="" type="password"/>
+<button aria-label="Show password" class="btn btn-outline-secondary toggle-password" data-target="#currentPassword" title="Show password" type="button"><svg aria-hidden="true" class="icon-eye" height="16" viewbox="0 0 16 16" width="16" xmlns="http://www.w3.org/2000/svg">
+<path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8z"></path>
+<path d="M8 5a3 3 0 1 1 0 6A3 3 0 0 1 8 5z"></path>
+</svg><svg aria-hidden="true" class="icon-eye-slash" height="16" hidden="" viewbox="0 0 16 16" width="16" xmlns="http://www.w3.org/2000/svg">
+<path d="M13.359 11.238C11.93 12.5 10.1 13.5 8 13.5 3 13.5 0 8 0 8s3-5.5 8-5.5c1.09 0 2.094.214 3 .6"></path>
+<path d="M3.35 3.35l9.3 9.3" stroke="currentColor" stroke-width="1.5"></path>
+<path d="M6.5 6.5a3 3 0 0 0 4.243 4.243"></path>
+</svg></button>
+</div>
+</div>
+<div class="mb-3">
+<label class="form-label">New Password</label>
+<div class="input-group">
+<input class="form-control" id="newPassword" name="newPassword" required="" type="password"/>
+<button aria-label="Show password" class="btn btn-outline-secondary toggle-password" data-target="#newPassword" title="Show password" type="button"><svg aria-hidden="true" class="icon-eye" height="16" viewbox="0 0 16 16" width="16" xmlns="http://www.w3.org/2000/svg">
+<path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8z"></path>
+<path d="M8 5a3 3 0 1 1 0 6A3 3 0 0 1 8 5z"></path>
+</svg><svg aria-hidden="true" class="icon-eye-slash" height="16" hidden="" viewbox="0 0 16 16" width="16" xmlns="http://www.w3.org/2000/svg">
+<path d="M13.359 11.238C11.93 12.5 10.1 13.5 8 13.5 3 13.5 0 8 0 8s3-5.5 8-5.5c1.09 0 2.094.214 3 .6"></path>
+<path d="M3.35 3.35l9.3 9.3" stroke="currentColor" stroke-width="1.5"></path>
+<path d="M6.5 6.5a3 3 0 0 0 4.243 4.243"></path>
+</svg></button>
+</div>
+</div>
+<div class="mb-3">
+<label class="form-label">Confirm New Password</label>
+<div class="input-group">
+<input class="form-control" id="confirmPassword" name="confirmPassword" required="" type="password"/>
+<button aria-label="Show password" class="btn btn-outline-secondary toggle-password" data-target="#confirmPassword" title="Show password" type="button"><svg aria-hidden="true" class="icon-eye" height="16" viewbox="0 0 16 16" width="16" xmlns="http://www.w3.org/2000/svg">
+<path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8z"></path>
+<path d="M8 5a3 3 0 1 1 0 6A3 3 0 0 1 8 5z"></path>
+</svg><svg aria-hidden="true" class="icon-eye-slash" height="16" hidden="" viewbox="0 0 16 16" width="16" xmlns="http://www.w3.org/2000/svg">
+<path d="M13.359 11.238C11.93 12.5 10.1 13.5 8 13.5 3 13.5 0 8 0 8s3-5.5 8-5.5c1.09 0 2.094.214 3 .6"></path>
+<path d="M3.35 3.35l9.3 9.3" stroke="currentColor" stroke-width="1.5"></path>
+<path d="M6.5 6.5a3 3 0 0 0 4.243 4.243"></path>
+</svg></button>
+</div>
+</div>
+<div class="d-flex gap-2">
+<button class="btn btn-success" id="btnChangePassword" type="button">Change Password</button>
+<button class="btn btn-outline-secondary" id="btnResetPasswordForm" type="button">Reset</button>
+</div>
+</form>
+</div>
+</div>
+</div>
+</div>
+</section>
+<script>
+(function(){
+  function getToken(){
+    return localStorage.getItem('token') || sessionStorage.getItem('token') || '';
+  }
+  function showAlert(el, type, msg){
+    el.classList.remove('d-none','alert-success','alert-danger','alert-warning');
+    el.classList.add('alert', 'alert-' + type);
+    el.textContent = msg;
+  }
+  function clearAlert(el){ if(!el) return; el.classList.add('d-none'); el.textContent = ''; }
+
+  // DOB selects
+  (function initDOB(){
+    var dSel = document.getElementById('dob_day');
+    var mSel = document.getElementById('dob_month');
+    var ySel = document.getElementById('dob_year');
+    if (!dSel || !mSel || !ySel) return;
+    for (var d=1; d<=31; d++){ var o=document.createElement('option'); o.value=d; o.textContent=d; dSel.appendChild(o); }
+    var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    for (var m=1; m<=12; m++){ var o=document.createElement('option'); o.value=m; o.textContent=months[m-1]; mSel.appendChild(o); }
+    var now=new Date().getFullYear(), latest=now-16;
+    for (var y=latest; y>=1930; y--){ var o=document.createElement('option'); o.value=y; o.textContent=y; ySel.appendChild(o); }
+  })();
+
+  // Toggle password visibility
+  document.querySelectorAll('#member-settings .toggle-password').forEach(function(btn){
+    var sel = btn.getAttribute('data-target');
+    var target = sel ? document.querySelector(sel) : null;
+    var eye = btn.querySelector('.icon-eye');
+    var slash = btn.querySelector('.icon-eye-slash');
+    function render(){
+      var isPwd = target && target.type === 'password';
+      if (eye && slash){ eye.hidden = !isPwd; slash.hidden = isPwd; }
+      btn.setAttribute('title', isPwd ? 'Show password' : 'Hide password');
+      btn.setAttribute('aria-label', isPwd ? 'Show password' : 'Hide password');
+    }
+    render();
+    btn.addEventListener('click', function(){
+      if (!target) return;
+      target.type = (target.type === 'password') ? 'text' : 'password';
+      render();
+    });
+  });
+
+  // Load profile
+  async function loadProfile(){
+    var alert = document.getElementById('profileAlert');
+    clearAlert(alert);
+    var token = getToken();
+    if (!token){
+      showAlert(alert, 'warning', 'You are not logged in. Please log in again.');
+      return;
+    }
+    try{
+      const res = await fetch('/api/auth/me', { headers: { Authorization: 'Bearer ' + token } });
+      if (!res.ok) throw new Error('Failed to load profile');
+      const user = await res.json();
+      const f = document.getElementById('profileForm');
+      if (!f) return;
+      f.surname.value     = user.surname || '';
+      f.otherNames.value  = user.otherNames || '';
+      f.phone.value       = user.phone || '';
+      f.email.value       = user.email || '';
+      f.state.value       = user.state || '';
+      f.zone.value        = user.zone || '';
+      f.guarantor.value   = user.guarantor || '';
+      if (user.dob){
+        const dt = new Date(user.dob);
+        if (!isNaN(dt)){
+          document.getElementById('dob_day').value = dt.getUTCDate();
+          document.getElementById('dob_month').value = dt.getUTCMonth()+1;
+          document.getElementById('dob_year').value = dt.getUTCFullYear();
+        }
+      }
+    }catch(e){
+      showAlert(document.getElementById('profileAlert'), 'danger', e.message || 'Could not load profile');
+    }
+  }
+
+  // Save profile
+  async function saveProfile(){
+    var token = getToken();
+    var alert = document.getElementById('profileAlert');
+    clearAlert(alert);
+    if (!token){
+      showAlert(alert, 'warning', 'You are not logged in. Please log in again.');
+      return;
+    }
+    const f = document.getElementById('profileForm');
+    const fd = new FormData(f);
+    if (!fd.get('dob_day') || !fd.get('dob_month') || !fd.get('dob_year')){
+      fd.delete('dob_day'); fd.delete('dob_month'); fd.delete('dob_year');
+    }
+    try{
+      const res = await fetch('/api/auth/me', {
+        method: 'PATCH',
+        headers: { Authorization: 'Bearer ' + token },
+        body: fd
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'Update failed');
+      showAlert(alert, 'success', 'Profile updated successfully.');
+      loadProfile();
+    }catch(e){
+      showAlert(alert, 'danger', e.message || 'Update failed');
+    }
+  }
+
+  // Change password
+  async function changePassword(){
+    var alert = document.getElementById('pwdAlert');
+    clearAlert(alert);
+    var token = getToken();
+    if (!token){
+      showAlert(alert, 'warning', 'You are not logged in. Please log in again.');
+      return;
+    }
+    const f = document.getElementById('passwordForm');
+    const currentPassword = f.currentPassword.value;
+    const newPassword = f.newPassword.value;
+    const confirmPassword = f.confirmPassword.value;
+    if (!currentPassword || !newPassword || !confirmPassword){
+      showAlert(alert,'warning','Please fill all password fields.');
+      return;
+    }
+    if (newPassword !== confirmPassword){
+      showAlert(alert,'warning','New passwords do not match.');
+      return;
+    }
+    try{
+      const res = await fetch('/api/auth/me/password', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+        body: JSON.stringify({ currentPassword, newPassword, confirmPassword })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'Password change failed');
+      showAlert(alert,'success','Password updated.');
+      f.reset();
+    }catch(e){
+      showAlert(alert,'danger', e.message || 'Password change failed');
+    }
+  }
+
+  document.getElementById('btnSaveProfile')?.addEventListener('click', saveProfile);
+  document.getElementById('btnReloadProfile')?.addEventListener('click', loadProfile);
+  document.getElementById('btnChangePassword')?.addEventListener('click', changePassword);
+  document.getElementById('btnResetPasswordForm')?.addEventListener('click', function(){
+    document.getElementById('passwordForm').reset();
+  });
+
+  loadProfile();
+})();
+</script>
+<script>
+(function(){
+  // Preview passport file selection immediately
+  const file = document.querySelector('#profileForm input[name="passport"]');
+  const preview = document.getElementById('passportPreview');
+  if (file && preview){
+    file.addEventListener('change', function(){
+      if (file.files && file.files[0]){
+        const url = URL.createObjectURL(file.files[0]);
+        preview.src = url;
+        preview.classList.remove('d-none');
+      }
+    });
+  }
+
+  // Monkey patch loadProfile to also show current passport preview if server provides it
+  const __origLoad = (typeof loadProfile === 'function') ? loadProfile : null;
+  if (__origLoad){
+    window.loadProfile = async function(){
+      await __origLoad();
+      try{
+        const token = (localStorage.getItem('token') || sessionStorage.getItem('token') || '');
+        if (!token) return;
+        const res = await fetch('/api/auth/me', { headers: { Authorization: 'Bearer ' + token } });
+        if (!res.ok) return;
+        const user = await res.json();
+        if (user && user.passportUrl && preview){
+          preview.src = user.passportUrl;
+          preview.classList.remove('d-none');
+        }
+      } catch(_){}
+    };
+  }
+})();
+
+  // --- Header Account Settings dropdown ---
+  (function(){
+    const menu = document.getElementById('mdMenu');
+    const toggle = document.getElementById('mdMenuToggle');
+    const link = document.getElementById('linkAccountSettings');
+    if (!menu || !toggle) return;
+    function close(){ menu.classList.remove('open'); toggle.setAttribute('aria-expanded','false'); }
+    function open(){ menu.classList.add('open'); toggle.setAttribute('aria-expanded','true'); }
+    toggle.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      if (menu.classList.contains('open')) close(); else open();
+    });
+    document.addEventListener('click', (e)=>{
+      if (!menu.contains(e.target)) close();
+    });
+    // Smooth scroll to Account Settings
+    function scrollToSettings(){
+      const section = document.getElementById('member-settings');
+      if (section){
+        section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      close();
+    }
+    link?.addEventListener('click', (e)=>{ e.preventDefault(); scrollToSettings(); });
+  })();
+
+  // --- Account Settings panel controller ---
+  (function(){
+    const section = document.getElementById('member-settings');
+    const panels = section ? Array.from(section.querySelectorAll('.settings-panel')) : [];
+    function activate(panelName){
+      if (!section) return;
+      section.style.display = 'block';
+      panels.forEach(p => p.classList.remove('active'));
+      if (panelName === 'all'){
+        panels.forEach(p => p.classList.add('active'));
+      } else {
+        const target = section.querySelector(`.settings-panel[data-panel="${panelName}"]`);
+        if (target) target.classList.add('active');
+      }
+      section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    function hideAll(){
+      if (!section) return;
+      section.style.display = 'none';
+      panels.forEach(p => p.classList.remove('active'));
+    }
+    document.getElementById('linkEditProfile')?.addEventListener('click', (e)=>{ e.preventDefault(); activate('edit-profile'); });
+    document.getElementById('linkChangePassword')?.addEventListener('click', (e)=>{ e.preventDefault(); activate('change-password'); });
+    document.getElementById('linkShowAll')?.addEventListener('click', (e)=>{ e.preventDefault(); activate('all'); });
+    document.getElementById('linkHide')?.addEventListener('click', (e)=>{ e.preventDefault(); hideAll(); });
+  })();
+</script></body>
 </html>

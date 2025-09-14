@@ -211,4 +211,98 @@ router.get('/me', requireAuth, async (req, res) => {
   }
 });
 
+// Update my profile (fields + optional new passport photo)
+router.patch('/me', requireAuth, uploadMember.single('passport'), async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select('-__v');
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    const b = req.body || {};
+
+    // Allow-list of fields the member may edit
+    const allowed = [
+      'surname','otherNames','name','phone','state','zone','guarantor','declare_agree'
+    ];
+
+    // Email change (optional, keep or remove this block)
+    if (typeof b.email === 'string' && b.email.trim()) {
+      const newEmail = b.email.trim().toLowerCase();
+      if (newEmail !== user.email) {
+        const clash = await User.exists({ _id: { $ne: user._id }, email: newEmail });
+        if (clash) return res.status(400).json({ message: 'Email already in use' });
+        user.email = newEmail;
+      }
+    }
+
+    // Simple fields
+    for (const key of allowed) {
+      if (b[key] !== undefined) {
+        // normalize boolean for declare_agree
+        if (key === 'declare_agree') {
+          const v = String(b[key]).toLowerCase();
+          user.declare_agree = ['1','true','on','yes','y'].includes(v);
+        } else {
+          user[key] = typeof b[key] === 'string' ? b[key].trim() : b[key];
+        }
+      }
+    }
+
+    // DOB support: either dob (ISO) OR split day/month/year
+    if (b.dob || (b.dob_year && b.dob_month && b.dob_day)) {
+      let dt;
+      if (b.dob) dt = new Date(b.dob);
+      else {
+        const y = String(b.dob_year);
+        const m = String(b.dob_month).padStart(2,'0');
+        const d = String(b.dob_day).padStart(2,'0');
+        dt = new Date(`${y}-${m}-${d}T00:00:00Z`);
+      }
+      if (!isNaN(dt.getTime())) user.dob = dt;
+    }
+
+    // New passport photo (multipart/form-data with field name "passport")
+    if (req.file) {
+      user.passportUrl = '/admin/uploads/passports/' + req.file.filename;
+    }
+
+    // If name not explicitly set, rebuild it from surname + otherNames
+    if (!b.name && (b.surname || b.otherNames)) {
+      const s = (user.surname || '').trim();
+      const o = (user.otherNames || '').trim();
+      const combined = `${s} ${o}`.trim();
+      if (combined) user.name = combined;
+    } else if (b.name) {
+      user.name = String(b.name).trim();
+    }
+
+    await user.save();
+    res.json(user.toJSON());
+  } catch (e) {
+    res.status(400).json({ message: e.message || 'Update failed' });
+  }
+});
+
+// Change my password (requires current password)
+router.patch('/me/password', requireAuth, async (req, res) => {
+  try {
+    const { currentPassword = '', newPassword = '', confirmPassword = '' } = req.body || {};
+    if (!currentPassword || !newPassword || newPassword !== confirmPassword) {
+      return res.status(400).json({ message: 'Provide currentPassword, newPassword and matching confirmPassword' });
+    }
+
+    const user = await User.findById(req.user.id).select('+password');
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    const ok = await user.comparePassword(currentPassword);
+    if (!ok) return res.status(400).json({ message: 'Current password is incorrect' });
+
+    user.password = newPassword; // will be hashed by the pre-save hook
+    await user.save();
+    res.json({ message: 'Password updated' });
+  } catch (e) {
+    res.status(400).json({ message: e.message || 'Password change failed' });
+  }
+});
+
+
 export default router;
