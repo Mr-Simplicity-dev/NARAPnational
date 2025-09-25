@@ -1,0 +1,110 @@
+{
+  "hero": {
+    "slides": [
+      {
+        "image": "/uploads/slider/slide1.jpg",
+        "kicker": "Providing Comfort",
+        "headline": "Across Sectors",
+        "text": "We deliver innovation, sustainability, and excellence.",
+        "cta1": {
+          "label": "Watch Video",
+          "href": "feature.php"
+        },
+        "cta2": {
+          "label": "Learn More",
+          "href": "/#about"
+        }
+      },
+      {
+        "image": "/uploads/slider/slide1.jpg",
+        "headline": "Welcome"
+      }
+    ]
+  },
+  "about": {
+    "title": "About Us – NARAP",
+    "headline": "The Nigerian Association of Refrigeration and Air conditioning Practitioners (NARAP)",
+    "paragraphs": [
+      "NARAP is a non-political, non-sectarian organization uniting practitioners across HVAC&R in Nigeria.",
+      "We promote professional ethics, awareness, and international best practices across refrigeration & air-conditioning."
+    ],
+    "image": "/uploads/slider/Narap.png"
+  },
+  "services": {
+    "title": "What We Do",
+    "subtitle": "We Provide the Best Service Offers",
+    "items": [
+      {
+        "title": "Agriculture and Agro Allied",
+        "text": "We are leaders in large-scale agriculture...",
+        "image": "admin/uploads/services/agro.jpg",
+        "href": "/#what-we-do"
+      }
+    ]
+  },
+  "projects": {
+    "title": "Our Projects",
+    "subtitle": "Here Are Our Recent Projects",
+    "items": [
+      {
+        "title": "Distribution of Fertilizer",
+        "text": "Fertilizer distribution to ...",
+        "image": "admin/uploads/portfolio/port1.jpg",
+        "category": "web"
+      }
+    ]
+  },
+  "features": {
+    "title": "Why Choose Us",
+    "headline": "NARAP & Beyond",
+    "items": [
+      {
+        "icon": "fas fa-chart-line",
+        "title": "Agro Supply",
+        "text": "High-quality grains ..."
+      }
+    ]
+  },
+  "offer": {
+    "title": "Our Offer",
+    "items": [
+      {
+        "tabTitle": "Trading & Procurement",
+        "headline": "Trading & Procurement",
+        "text": "We source, procure, and supply commodities ...",
+        "image": "uploads/offer/offer1.jpg"
+      }
+    ]
+  },
+  "blog": {
+    "title": "Our Blog & News",
+    "showCount": 3,
+    "items": []
+  },
+  "faqs": {
+    "title": "FAQs",
+    "image": "admin/uploads/sections/faq-side.jpg",
+    "items": [
+      {
+        "q": "What industries does NARAP operate in?",
+        "a": "NARAP operates within HVAC&R ..."
+      }
+    ]
+  },
+  "team": {
+    "title": "Meet Our Executive",
+    "items": [
+      {
+        "name": "Ahmed Salahudeen",
+        "role": "National President",
+        "image": "admin/uploads/team/team-1.jpg",
+        "social": {
+          "facebook": "#",
+          "twitter": "#",
+          "linkedin": "#",
+          "instagram": "#"
+        }
+      }
+    ]
+  }
+}

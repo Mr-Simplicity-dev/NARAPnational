@@ -1,4 +1,4 @@
-<?php /* admin/login.php — AJAX login (JWT in localStorage) */ ?>
+<?php /* admin/login.php — fixed AJAX login wired to your server */ ?>
 <!doctype html>
 <html lang="en">
 <head>
@@ -52,32 +52,20 @@
       </div>
     </form>
 
-    <div class="hint" style="margin-top:10px;">
-      Forgot password? <a href="/admin/forgot.php">Reset</a>
-    </div>
+    <div class="hint" style="margin-top:10px;">Forgot password? <a href="/admin/forgot.php">Reset</a></div>
   </main>
 
   <script>
   (function(){
-    // Clean any leaked query (?identifier=...&password=...) from URL bar
-    try { history.replaceState(null, '', location.pathname); } catch(_) {}
+    // clean any leaked query (?identifier=...&password=...) from URL bar
+    try { history.replaceState(null,'',location.pathname); } catch(_) {}
 
     const msg  = document.getElementById('loginMsg');
     const form = document.getElementById('loginForm');
     const btn  = document.getElementById('loginBtn');
 
-    // Common bases and paths — we'll try them until one works (avoid 404 loops)
-    const BASES = [
-      '',                         // same origin (recommended when proxied)
-      'http://localhost:5000',    // local dev API
-      'https://narap-backend.onrender.com', // your Render base (if used)
-    ];
-    const PATHS = [
-      '/api/auth/admin/login',
-      '/api/auth/login',
-      '/api/login',
-      '/api/users/login'
-    ];
+    const LOGIN_URL = '/api/auth/login';   // matches your server routes
+    const ME_URL    = '/api/auth/me';
 
     function show(type, text){
       msg.style.display = 'block';
@@ -86,66 +74,39 @@
     }
     function clearMsg(){ msg.style.display = 'none'; }
 
-    function saveJwt(tok){
-      try { if (tok) localStorage.setItem('jwt', tok); } catch(_) {}
-    }
+    function saveJwt(tok){ try { if (tok) localStorage.setItem('jwt', tok); } catch(_) {} }
 
-    async function tryEndpoint(url, email, password){
-      // If your backend expects "identifier", change to { identifier: email, password }
-      const payload = { email, password };
-      const res = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include', // allow cookie sessions too
-        body: JSON.stringify(payload)
-      });
-      // If 404/405/500 etc, let caller handle
-      let data = {};
-      try { data = await res.json(); } catch(_) {}
-      return { ok: res.ok, status: res.status, data };
+    async function verifyCookieThenGo(){
+      try {
+        const r = await fetch(ME_URL, { credentials: 'include' });
+        if (r.ok && !localStorage.getItem('jwt')) localStorage.setItem('jwt','cookie');
+      } catch(_){}
+      window.location.replace('/admin/dashboard.php');
     }
 
     async function login(email, password){
-      // Disable button to prevent double submits
-      btn.disabled = true;
-      clearMsg();
+      btn.disabled = true; clearMsg();
+      try{
+        const res = await fetch(LOGIN_URL, {
+          method:'POST',
+          headers:{ 'Content-Type':'application/json' },
+          credentials:'include',
+          body: JSON.stringify({ email, password })
+        });
+        const data = await res.json().catch(()=>({}));
+        if (!res.ok) throw new Error(data.message || 'Login failed');
 
-      // Try each base+path until a non-404 result
-      let lastErr = 'No matching login endpoint found.';
-      for (const base of BASES) {
-        for (const path of PATHS) {
-          const url = (base + path).replace(/([^:]\/)\/+/g,'$1'); // collapse //
-          try {
-            const r = await tryEndpoint(url, email, password);
-            if (r.status === 404) {
-              // try next path
-              continue;
-            }
-            if (!r.ok) {
-              // Non-404 error from this endpoint; capture message and stop trying others on same base/path
-              lastErr = r.data && (r.data.message || r.data.error) ? r.data.message || r.data.error : ('Login failed ('+r.status+')');
-              // If unauthorized, don't try other endpoints as auth likely correct path but bad creds
-              if (r.status === 401) throw new Error(lastErr);
-              // Otherwise keep trying other endpoints in case path mismatch
-              continue;
-            }
-            // Success
-            const tok = r.data && (r.data.token || r.data.jwt || (r.data.data && r.data.data.token));
-            saveJwt(tok || 'cookie'); // 'cookie' placeholder if backend uses httpOnly cookie-only auth
-            show('ok', 'Login successful. Redirecting…');
-            window.location.replace('/admin/dashboard.php');
-            return;
-          } catch (e) {
-            lastErr = e && e.message ? e.message : 'Network error';
-          }
-        }
+        saveJwt(data.token || data.jwt || (data.data && data.data.token));
+        show('ok','Login successful. Redirecting…');
+        await verifyCookieThenGo();
+      } catch(e){
+        show('err', e && e.message ? e.message : 'Login failed');
+        btn.disabled = false;
       }
-      show('err', lastErr);
-      btn.disabled = false;
     }
 
     form.addEventListener('submit', function(e){
-      e.preventDefault(); // stop full page reload (prevents flicker)
+      e.preventDefault();
       const email = document.getElementById('loginIdentifier').value.trim();
       const password = document.getElementById('loginPassword').value;
       if (!email || !password) { show('err','Enter your email and password.'); return; }

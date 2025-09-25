@@ -1,3 +1,8 @@
+<?php
+header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+header('Pragma: no-cache');
+?>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -46,32 +51,39 @@
 <link href="css/style.css" rel="stylesheet"/>
 <!-- google adsense -->
 <script async="" crossorigin="anonymous" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8202473052675329"></script>
-<script async="" src="https://d2mpatx37cqexb.cloudfront.net/delightchat-whatsapp-widget/embeds/embed.min.js"></script>
-<script>
-          var wa_btnSetting = {"btnColor":"#16BE45","ctaText":"WhatsApp Us","cornerRadius":40,"marginBottom":20,"marginLeft":20,"marginRight":20,"btnPosition":"left","whatsAppNumber":"+2347063877219","welcomeMessage":"Hello! Welcome to Time360 Farms LTD.. How can I assist you today? 😊","zIndex":999999,"btnColorScheme":"light"};
-          var wa_widgetSetting = {"title":"Time360 Farms","subTitle":"Typically replies in a minute","headerBackgroundColor":"#d9ebb9","headerColorScheme":"dark","greetingText":"Hi there! \nHow can I help you?","ctaText":"Start Chat","btnColor":"#00ffff","cornerRadius":40,"welcomeMessage":"Hello","btnColorScheme":"light","brandImage":"https://uploads-ssl.webflow.com/5f68a65cd5188c058e27c898/6204c4267b92625c9770f687_whatsapp-chat-widget-dummy-logo.png","darkHeaderColorScheme":{"title":"#333333","subTitle":"#4F4F4F"}};  
-          window.onload = () => {
-            _waEmbed(wa_btnSetting, wa_widgetSetting);
-          };
-        </script>
-</link></link></link></link></link></link><link crossorigin="" href="https://use.fontawesome.com" rel="preconnect"/><script src="https://js.paystack.co/v1/inline.js"></script><script>window.PAYSTACK_PUBLIC = window.PAYSTACK_PUBLIC || 'pk_test_xxx_replace_me';</script></head>
+
+</link></link></link></link></link></link><link crossorigin="" href="https://use.fontawesome.com" rel="preconnect"/>
+</head>
 <body>
 <div class="container" style="max-width:1200px;margin:40px auto;padding:20px;">
 <h2 style="margin-bottom:10px;">Admin Dashboard</h2>
 <div id="status" style="margin-bottom:20px;color:#888;font-size:14px;"></div>
 <nav style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;">
-<button class="btn" onclick="showTab('sliders')">Sliders</button>
-<button class="btn" onclick="showTab('services')">Services</button>
-<button class="btn" onclick="showTab('products')">Products</button>
-<button class="btn" onclick="showTab('portfolio')">Portfolio</button>
-<button class="btn" onclick="showTab('team')">Team</button>
-<button class="btn" onclick="showTab('blogs')">Blogs</button>
-<button class="btn" onclick="showTab('faqs')">FAQs</button>
-<button class="btn" onclick="showTab('offers')">Offers</button>
-<button class="btn" onclick="showTab('features')">Features</button>
-<button class="btn" onclick="logout()" style="margin-left:auto;">Logout</button>
+<button class="btn" data-tab="sliders">Sliders</button>
+<button class="btn" data-tab="services">Services</button>
+<button class="btn" data-tab="products">Products</button>
+<button class="btn" data-tab="portfolio">Portfolio</button>
+<button class="btn" data-tab="team">Team</button>
+<button class="btn" data-tab="blogs">Blogs</button>
+<button class="btn" data-tab="faqs">FAQs</button>
+<button class="btn" data-tab="offers">Offers</button>
+<button class="btn" data-tab="features">Features</button>
+<!-- In your dashboard.php -->
+<button class="btn" data-tab="paid">Paid Members</button>
+<button class="btn" data-tab="registrations">Registrations</button>
+
+
+<button class="btn" data-logout="true" style="margin-left:auto;">Logout</button>
 </nav>
 <section class="tab" id="tab-sliders">
+  <div class="alert alert-info" data-example="sliders" style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin:10px 0;">
+    <div><strong>Illustration:</strong> Add/edit items here; visitors will see them on the homepage.</div>
+    <div class="btn-group">
+      <button class="btn btn-sm" data-seed="sliders">Insert sample</button>
+      <button class="btn btn-sm" data-clear="sliders">Clear sliders</button>
+      <a class="btn btn-sm" href="/" target="_blank" rel="noopener">Open homepage</a>
+    </div>
+  </div>
 <h4>Sliders</h4>
 <form class="card" onsubmit="return createItem(event,'sliders');">
 <input class="form-control" name="imageUrl" placeholder="Image URL (/admin/uploads/slider/..)"/>
@@ -87,6 +99,14 @@
 <div data-list="sliders"></div>
 </section>
 <section class="tab" id="tab-services" style="display:none">
+  <div class="alert alert-info" data-example="services" style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin:10px 0;">
+    <div><strong>Illustration:</strong> Add/edit items here; visitors will see them on the homepage.</div>
+    <div class="btn-group">
+      <button class="btn btn-sm" data-seed="services">Insert sample</button>
+      <button class="btn btn-sm" data-clear="services">Clear services</button>
+      <a class="btn btn-sm" href="/" target="_blank" rel="noopener">Open homepage</a>
+    </div>
+  </div>
 <h4>Services</h4>
 <form class="card" onsubmit="return createItem(event,'services');">
 <input class="form-control" name="title" placeholder="Title"/>
@@ -97,6 +117,14 @@
 <div data-list="services"></div>
 </section>
 <section class="tab" id="tab-products" style="display:none">
+  <div class="alert alert-info" data-example="products" style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin:10px 0;">
+    <div><strong>Illustration:</strong> Add/edit items here; visitors will see them on the homepage.</div>
+    <div class="btn-group">
+      <button class="btn btn-sm" data-seed="products">Insert sample</button>
+      <button class="btn btn-sm" data-clear="products">Clear products</button>
+      <a class="btn btn-sm" href="/" target="_blank" rel="noopener">Open homepage</a>
+    </div>
+  </div>
 <h4>Products</h4>
 <form class="card" onsubmit="return createItem(event,'products');">
 <input class="form-control" name="title" placeholder="Title"/>
@@ -108,6 +136,14 @@
 <div data-list="products"></div>
 </section>
 <section class="tab" id="tab-portfolio" style="display:none">
+  <div class="alert alert-info" data-example="portfolio" style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin:10px 0;">
+    <div><strong>Illustration:</strong> Add/edit items here; visitors will see them on the homepage.</div>
+    <div class="btn-group">
+      <button class="btn btn-sm" data-seed="portfolio">Insert sample</button>
+      <button class="btn btn-sm" data-clear="portfolio">Clear portfolio</button>
+      <a class="btn btn-sm" href="/" target="_blank" rel="noopener">Open homepage</a>
+    </div>
+  </div>
 <h4>Portfolio</h4>
 <form class="card" onsubmit="return createItem(event,'portfolio');">
 <input class="form-control" name="title" placeholder="Title"/>
@@ -119,6 +155,14 @@
 <div data-list="portfolio"></div>
 </section>
 <section class="tab" id="tab-team" style="display:none">
+  <div class="alert alert-info" data-example="team" style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin:10px 0;">
+    <div><strong>Illustration:</strong> Add/edit items here; visitors will see them on the homepage.</div>
+    <div class="btn-group">
+      <button class="btn btn-sm" data-seed="team">Insert sample</button>
+      <button class="btn btn-sm" data-clear="team">Clear team</button>
+      <a class="btn btn-sm" href="/" target="_blank" rel="noopener">Open homepage</a>
+    </div>
+  </div>
 <h4>Team</h4>
 <form class="card" onsubmit="return createItem(event,'team');">
 <input class="form-control" name="name" placeholder="Name"/>
@@ -129,6 +173,14 @@
 <div data-list="team"></div>
 </section>
 <section class="tab" id="tab-blogs" style="display:none">
+  <div class="alert alert-info" data-example="blogs" style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin:10px 0;">
+    <div><strong>Illustration:</strong> Add/edit items here; visitors will see them on the homepage.</div>
+    <div class="btn-group">
+      <button class="btn btn-sm" data-seed="blogs">Insert sample</button>
+      <button class="btn btn-sm" data-clear="blogs">Clear blogs</button>
+      <a class="btn btn-sm" href="/" target="_blank" rel="noopener">Open homepage</a>
+    </div>
+  </div>
 <h4>Blogs</h4>
 <form class="card" onsubmit="return createItem(event,'blogs');">
 <input class="form-control" name="title" placeholder="Title"/>
@@ -141,6 +193,14 @@
 <div data-list="blogs"></div>
 </section>
 <section class="tab" id="tab-faqs" style="display:none">
+  <div class="alert alert-info" data-example="faqs" style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin:10px 0;">
+    <div><strong>Illustration:</strong> Add/edit items here; visitors will see them on the homepage.</div>
+    <div class="btn-group">
+      <button class="btn btn-sm" data-seed="faqs">Insert sample</button>
+      <button class="btn btn-sm" data-clear="faqs">Clear faqs</button>
+      <a class="btn btn-sm" href="/" target="_blank" rel="noopener">Open homepage</a>
+    </div>
+  </div>
 <h4>FAQs</h4>
 <form class="card" onsubmit="return createItem(event,'faqs');">
 <input class="form-control" name="question" placeholder="Question"/>
@@ -150,6 +210,14 @@
 <div data-list="faqs"></div>
 </section>
 <section class="tab" id="tab-offers" style="display:none">
+  <div class="alert alert-info" data-example="offers" style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin:10px 0;">
+    <div><strong>Illustration:</strong> Add/edit items here; visitors will see them on the homepage.</div>
+    <div class="btn-group">
+      <button class="btn btn-sm" data-seed="offers">Insert sample</button>
+      <button class="btn btn-sm" data-clear="offers">Clear offers</button>
+      <a class="btn btn-sm" href="/" target="_blank" rel="noopener">Open homepage</a>
+    </div>
+  </div>
 <h4>Offers</h4>
 <form class="card" onsubmit="return createItem(event,'offers');">
 <input class="form-control" name="title" placeholder="Title"/>
@@ -160,6 +228,14 @@
 <div data-list="offers"></div>
 </section>
 <section class="tab" id="tab-features" style="display:none">
+  <div class="alert alert-info" data-example="features" style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin:10px 0;">
+    <div><strong>Illustration:</strong> Add/edit items here; visitors will see them on the homepage.</div>
+    <div class="btn-group">
+      <button class="btn btn-sm" data-seed="features">Insert sample</button>
+      <button class="btn btn-sm" data-clear="features">Clear features</button>
+      <a class="btn btn-sm" href="/" target="_blank" rel="noopener">Open homepage</a>
+    </div>
+  </div>
 <h4>Features</h4>
 <form class="card" onsubmit="return createItem(event,'features');">
 <input class="form-control" name="title" placeholder="Title"/>
@@ -181,76 +257,252 @@
 </div>
 </section>
 
-<div class="panel" id="paymentsPanel" style="max-width:420px;margin-left:auto;margin-top:16px">
-<div style="font-weight:800;margin-bottom:8px">Payments</div>
-<div class="pay-card" style="display:flex;flex-direction:column;gap:6px;border:1px dashed #e5e7eb;border-radius:12px;padding:12px">
-<div class="h">Membership Fee</div>
-<div class="a" style="font-size:14px;color:#64748b">Access member benefits and dashboard tools.</div>
-<div class="price" style="font-size:22px;font-weight:900">₦5,000</div>
-<button class="btn btn-primary" data-amount-kobo="500000" data-purpose="membership">Pay Membership</button>
-</div>
-<div class="pay-card" style="display:flex;flex-direction:column;gap:6px;border:1px dashed #e5e7eb;border-radius:12px;padding:12px;margin-top:10px">
-<div class="h">ID Card Fee</div>
-<div class="a" style="font-size:14px;color:#64748b">Get your official member ID card.</div>
-<div class="price" style="font-size:22px;font-weight:900">₦3,000</div>
-<button class="btn btn-primary" data-amount-kobo="300000" data-purpose="idcard">Pay ID Card</button>
-</div>
-<div class="pay-card" style="display:flex;flex-direction:column;gap:6px;border:1px dashed #e5e7eb;border-radius:12px;padding:12px;margin-top:10px">
-<div class="h">Certificate Fee</div>
-<div class="a" style="font-size:14px;color:#64748b">Generate and download membership certificate.</div>
-<div class="price" style="font-size:22px;font-weight:900">₦10,000</div>
-<button class="btn btn-primary" data-amount-kobo="1000000" data-purpose="certificate">Pay Certificate</button>
-</div>
-<div class="muted" style="margin-top:10px;color:#64748b;font-size:13px">
-    After successful payment, you’ll be redirected here and your status will update automatically.
+<section class="tab" id="tab-paid" style="display:none">
+  <h4>Paid Members</h4>
+  <div class="card">
+    <div id="paidMsg" class="mb-2" style="color:#6b7280;"></div>
+    <div class="table-responsive">
+      <table class="table table-striped" id="paidTable">
+        <thead><tr>
+          <th>Name</th><th>Member Code</th><th>Phone</th><th>Email</th><th>State</th><th>Joined</th>
+        </tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
   </div>
-</div>
-</div>
-<script src="/admin/admin.js"></script>
+</section>
+
+<section class="tab" id="tab-registrations" style="display:none">
+  <h4>Registrations (All submitted forms)</h4>
+  <div class="card">
+    <div id="regMsg" class="mb-2" style="color:#6b7280;"></div>
+    <div class="table-responsive">
+      <table class="table table-bordered" id="regTable">
+        <thead><tr><th>Name</th><th>Gender</th><th>Phone</th><th>Email</th><th>State</th><th>State Code</th><th>LGA</th><th>Address</th><th>Created</th><th>View</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <p class="text-muted mt-2">Passwords are masked for security; use "Reset password" when necessary.</p>
+  </div>
+</section>
+
+
+
+
+
 <script>
 (function(){
-  const token = localStorage.getItem('jwt') || localStorage.getItem('token');
-  function initRef(amount){
-    return fetch('/api/payments/init', {
-      method:'POST',
-      headers:{ 'Content-Type':'application/json', 'Authorization':'Bearer ' + (token||'') },
-      body: JSON.stringify({ amount })
-    }).then(r => r.ok ? r.json() : r.json().then(x=>Promise.reject(x)));
+  function fmtDate(s){ try{ return new Date(s).toLocaleString(); }catch(_){ return s||''; } }
+  function text(x){ return (x==null?'':String(x)); }
+  function safeName(u){ return text(u?.name || (u?.firstName? (u.firstName+' '+(u.lastName||'')) : '')); }
+
+  async function fetchJSON(url){
+    const token = localStorage.getItem('jwt') || localStorage.getItem('token') || '';
+    const res = await fetch(url, { headers: token ? { 'Authorization':'Bearer '+token } : {} });
+    if(!res.ok){ throw new Error((await res.text()) || ('HTTP '+res.status)); }
+    return res.json();
   }
-  function verify(reference){
-    return fetch('/api/payments/verify', {
-      method:'POST',
-      headers:{ 'Content-Type':'application/json', 'Authorization':'Bearer ' + (token||'') },
-      body: JSON.stringify({ reference })
-    }).then(r => r.ok ? r.json() : r.json().then(x=>Promise.reject(x)));
-  }
-  function pay(amount, purpose){
-    const email = (JSON.parse(localStorage.getItem('user')||'{}').email) || 'test@example.com';
-    initRef(amount).then(({ reference }) => {
-      const handler = PaystackPop.setup({
-        key: (window.PAYSTACK_PUBLIC || ''),
-        email, amount, currency:'NGN', ref: reference,
-        metadata: { custom_fields: [{ display_name:'Purpose', variable_name:'purpose', value: purpose }]},
-        callback: function(resp){
-          verify(resp.reference).then(v => {
-            if(v.ok){ alert('Payment successful!'); location.reload(); }
-            else{ alert('Payment not verified: ' + (v.status||'failed')); }
-          }).catch(e => alert('Verify failed: ' + (e?.message||'error')));
-        },
-        onClose: function(){ /* closed */ }
+
+  async function loadPaid(){
+    const msg = document.getElementById('paidMsg');
+    const tbody = document.querySelector('#paidTable tbody');
+    tbody.innerHTML = '<tr><td colspan="6">Loading…</td></tr>';
+    try{
+      const data = await fetchJSON('/api/members?status=paid');
+      const list = Array.isArray(data) ? data : (data.items || data.data || []);
+      if(!list.length){ tbody.innerHTML = '<tr><td colspan="6">No paid members yet.</td></tr>'; return; }
+      tbody.innerHTML = '';
+      list.forEach(u => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = '<td>'+safeName(u)+'</td>' +
+                       '<td>'+text(u.memberCode||u.code)+'</td>' +
+                       '<td>'+text(u.phone||u.phoneNumber)+'</td>' +
+                       '<td>'+text(u.email)+'</td>' +
+                       '<td>'+text(u.state||u.stateOfResidence||u.stateCode)+'</td>' +
+                       '<td>'+fmtDate(u.createdAt||u.joinedAt)+'</td>';
+        tbody.appendChild(tr);
       });
-      handler.openIframe();
-    }).catch(e => alert(e?.message || 'Unable to start payment'));
+      msg.textContent = 'Loaded '+list.length+' paid member(s).';
+    }catch(e){
+      msg.textContent = 'Failed to load paid members: '+(e.message||e);
+    }
   }
-  document.querySelectorAll('#paymentsPanel .btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const amt = Number(btn.getAttribute('data-amount-kobo')||0);
-      const purpose = btn.getAttribute('data-purpose') || 'membership';
-      if(!amt) return alert('Amount missing');
-      if(!window.PaystackPop){ return alert('Paystack script blocked. Contact admin.'); }
-      pay(amt, purpose);
-    });
-  });
+
+  async function loadRegs(){
+    const msg = document.getElementById('regMsg');
+    const tbody = document.querySelector('#regTable tbody');
+    tbody.innerHTML = '<tr><td colspan="6">Loading…</td></tr>';
+    try{
+      const data = await fetchJSON('/api/registrations');
+      const list = Array.isArray(data) ? data : (data.items || data.data || []);
+      if(!list.length){ tbody.innerHTML = '<tr><td colspan="6">No registrations found.</td></tr>'; return; }
+      tbody.innerHTML = '';
+      list.forEach(u => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = '<td>'+safeName(u)+'</td>' +
+                       '<td>'+text(u.phone||u.phoneNumber)+'</td>' +
+                       '<td>'+text(u.email)+'</td>' +
+                       '<td>'+text(u.state||u.stateOfResidence||u.stateCode)+'</td>' +
+                       '<td>'+fmtDate(u.createdAt)+'</td>' +
+                       '<td><button class="btn btn-sm" data-view-id="'+(u._id||u.id||'')+'">View</button></td>';
+        tbody.appendChild(tr);
+      });
+      // View handler: show full JSON except password
+      tbody.querySelectorAll('button[data-view-id]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const id = btn.getAttribute('data-view-id');
+          const user = (list.find(x => (x._id||x.id||'')===id)) || {};
+          const clone = JSON.parse(JSON.stringify(user));
+          Object.keys(clone).forEach(k => {
+            const lk = k.toLowerCase();
+            if (lk.includes('password') || lk === 'pass' || lk === 'passwd') clone[k] = '[hidden]';
+          });
+          alert('Registration details:
+
+'+JSON.stringify(clone, null, 2));
+        });
+      });
+      msg.textContent = 'Loaded '+list.length+' registration(s).';
+    }catch(e){
+      msg.textContent = 'Failed to load registrations: '+(e.message||e);
+    }
+  }
+
+  // Extend existing showTab (if defined); otherwise provide a basic one
+  const prevShowTab = window.showTab;
+  window.showTab = function(id){
+    if (prevShowTab) prevShowTab(id);
+    if (!prevShowTab) {
+      document.querySelectorAll('.tab').forEach(s => s.style.display = 'none');
+      const el = document.getElementById('tab-'+id) || document.getElementById(id);
+      if(el) el.style.display = '';
+    }
+    if(id==='paid') loadPaid();
+    if(id==='registrations') loadRegs();
+  };
 })();
-</script></body>
+</script>
+
+<script>
+(function(){
+  function bindNav(){
+    // Tabs
+    document.querySelectorAll('nav [data-tab]').forEach(function(btn){
+      btn.addEventListener('click', function(ev){
+        ev.preventDefault();
+        var tab = btn.getAttribute('data-tab');
+        if (typeof window.showTab === 'function') {
+          window.showTab(tab);
+        } else {
+          // basic fallback
+          document.querySelectorAll('.tab').forEach(function(s){ s.style.display = 'none'; });
+          var el = document.getElementById('tab-' + tab) || document.getElementById(tab);
+          if (el) el.style.display = '';
+        }
+      });
+    });
+    // Logout
+    document.querySelectorAll('nav [data-logout]').forEach(function(btn){
+      btn.addEventListener('click', function(ev){
+        ev.preventDefault();
+        if (typeof window.logout === 'function') logout();
+      });
+    });
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', bindNav);
+  } else {
+    bindNav();
+  }
+})();
+</script>
+<script>
+(function(){
+  function token(){ return localStorage.getItem('jwt') || localStorage.getItem('token') || ''; }
+  async function api(url, opts){
+    opts = opts || {};
+    const headers = Object.assign(
+      { 'Accept':'application/json','Content-Type':'application/json' },
+      (opts.headers || {}),
+      (token() ? { 'Authorization':'Bearer ' + token() } : {})
+    );
+    const res = await fetch(url, Object.assign({}, opts, { headers }));
+    let data = null;
+    try { data = await res.json(); } catch(_){}
+    if (!res.ok) throw new Error((data && (data.message||data.error)) || ('HTTP '+res.status));
+    return data==null?{}:data;
+  }
+
+  // Demo samples for illustration
+  const DEMO = {
+    sliders: [{ smallTitle:'Welcome to NARAP', bigTitle:'Cooling the Nation', paragraph:'Professional refrigeration & AC services across Nigeria.', primaryBtnText:'Join Now', primaryBtnLink:'/admin/register.php' }],
+    services: [
+      { title:'Installation & Maintenance', description:'Expert setup and servicing of HVAC systems.' },
+      { title:'Cold Chain Solutions', description:'Food & pharma cold chain design and support.' }
+    ],
+    products: [
+      { title:'Inverter AC (1.5HP)', description:'Energy-efficient split unit.', price:280000 },
+      { title:'Deep Freezer 250L', description:'Reliable storage for cold rooms.', price:350000 }
+    ],
+    portfolio: [ { title:'Cold Room Build - Abuja' }, { title:'Office HVAC Upgrade - Lagos' } ],
+    team: [ { name:'Engr. Adaobi N.', role:'Senior Technician' }, { name:'Umar Faruk', role:'Field Engineer' } ],
+    blogs: [ { title:'Reduce Energy Costs with Inverter ACs', excerpt:'Five practical tips for homes & SMEs.', slug:'reduce-energy-costs' } ],
+    faqs: [ { question:'Do you offer nationwide service?', answer:'Yes, across all states via NARAP members.' } ],
+    offers: [ { title:'Seasonal Maintenance Promo', description:'15% off service plans this month.' } ],
+    features: [ { title:'Certified Professionals', description:'Trained, vetted, and insured technicians.' } ]
+  };
+
+  async function seedResource(resource){
+    const samples = DEMO[resource] || [];
+    if (!samples.length) return alert('No demo samples for ' + resource);
+    for (const s of samples){
+      await api('/api/' + resource, { method:'POST', body: JSON.stringify(s) });
+    }
+    alert('Inserted ' + samples.length + ' sample ' + resource + ' item(s). Open the homepage to see them.');
+    if (window.loadList) try { loadList(resource); } catch(_){}
+  }
+
+  async function clearResource(resource){
+    if (!confirm('Delete all items in ' + resource + '?')) return;
+    const data = await api('/api/' + resource);
+    const list = Array.isArray(data) ? data : (data.data || data.items || []);
+    for (const it of list){
+      const id = it._id || it.id;
+      if (!id) continue;
+      await api('/api/' + resource + '/' + id, { method:'DELETE' });
+    }
+    alert('Cleared ' + resource + '.');
+    if (window.loadList) try { loadList(resource); } catch(_){}
+  }
+
+  function bindDemoButtons(){
+    document.querySelectorAll('[data-seed]').forEach(btn => {
+      btn.addEventListener('click', (ev) => { ev.preventDefault(); seedResource(btn.getAttribute('data-seed')); });
+    });
+    document.querySelectorAll('[data-clear]').forEach(btn => {
+      btn.addEventListener('click', (ev) => { ev.preventDefault(); clearResource(btn.getAttribute('data-clear')); });
+    });
+    // Bind nav tabs (CSP-safe)
+    document.querySelectorAll('nav [data-tab]').forEach(btn => {
+      btn.addEventListener('click', (ev) => {
+        ev.preventDefault();
+        const t = btn.getAttribute('data-tab');
+        if (typeof window.showTab === 'function') window.showTab(t);
+        else {
+          document.querySelectorAll('.tab').forEach(s => s.style.display = 'none');
+          const el = document.getElementById('tab-' + t) || document.getElementById(t);
+          if (el) el.style.display = 'block';
+        }
+      });
+    });
+    document.querySelectorAll('nav [data-logout]').forEach(btn => {
+      btn.addEventListener('click', (ev) => { ev.preventDefault(); if (typeof window.logout === 'function') logout(); });
+    });
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bindDemoButtons);
+  else bindDemoButtons();
+})();
+</script>
+</body>
 </html>

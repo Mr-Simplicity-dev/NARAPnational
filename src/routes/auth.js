@@ -305,4 +305,14 @@ router.patch('/me/password', requireAuth, async (req, res) => {
 });
 
 
+// Logout route
+router.post('/logout', async (req, res) => {
+  try {
+    // You might want to blacklist the token or clear session data
+    res.json({ message: 'Logged out successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Logout failed' });
+  }
+});
+
 export default router;
