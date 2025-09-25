@@ -1,508 +1,767 @@
-<?php
-header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
-header('Pragma: no-cache');
-?>
-
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="en">
 <head>
-<!-- Basic Meta Tags -->
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>NARAP – Agro Supply, Construction, ICT, Procurement, Oil &amp; Gas, and Mining Solutions</title>
-<meta content="NARAP is a powerhouse company delivering high-quality solutions in agriculture, construction, ICT, procurement, oil &amp; gas, and mining. We empower businesses with reliable services and innovative strategies for sustainable growth." name="description"/>
-<meta content="Time360 Farms, mytime360, mytime, farms, song, yola, Nigeria, dumne agriculture, agro supply, agriculture, construction, ICT, procurement, oil and gas, mining, sustainable solutions, business services Nigeria" name="keywords"/>
-<!-- Open Graph (for social sharing) -->
-<meta content="Time360 Farms– Agro Supply, Construction, ICT, Procurement, Oil &amp; Gas, and Mining Solutions" property="og:title"/>
-<meta content="A powerhouse company offering expert solutions in agriculture, construction, ICT, procurement, oil &amp; gas, and mining. Trusted for sustainable growth." property="og:description"/>
-<meta content="https://mytime360.com" property="og:url"/>
-<meta content="website" property="og:type"/>
-<meta content="https://mytime360.com/uploads/times.jpg" property="og:image"/>
-<!-- Twitter Card -->
-<meta content="summary_large_image" name="twitter:card"/>
-<meta content="NARAP – Agro Supply, Construction, ICT, Procurement, Oil &amp; Gas, and Mining Solutions" name="twitter:title"/>
-<meta content="Delivering high-quality solutions in agriculture, construction, ICT, procurement, oil &amp; gas, and mining for sustainable growth." name="twitter:description"/>
-<meta content="https://mytime360.com/uploads/times.jpg" name="twitter:image"/>
-<!-- Google Web Fonts -->
-<link href="https://fonts.googleapis.com" rel="preconnect"/>
-<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;family=Roboto:wght@400;500;700;900&amp;display=swap" rel="stylesheet"/>
-<meta content="ca-pub-8202473052675329" name="google-adsense-account"/>
-<!-- Icon Font Stylesheet -->
-<link href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet"/>
-<!-- Libraries Stylesheet -->
-<link href="lib/animate/animate.min.css" rel="stylesheet">
-<link href="lib/lightbox/css/lightbox.min.css" rel="stylesheet"/>
-<link href="lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet"/>
-<!-- owrul Stylesheet -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css" rel="stylesheet"/>
-<link href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.theme.default.min.css" rel="stylesheet"/>
-<link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
-<link href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css" rel="stylesheet"/>
-<link href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.theme.default.min.css" rel="stylesheet"/>
-<link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
-<link href="https://cdnjs.cloudflare.com/ajax/libs/owl-carousel/1.3.3/owl.carousel.min.css" rel="stylesheet">
-<link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
-<!-- Customized Bootstrap Stylesheet -->
-<link href="css/bootstrap.min.css" rel="stylesheet"/>
-<!-- Template Stylesheet -->
-<link href="css/style.css" rel="stylesheet"/>
-<!-- google adsense -->
-<script async="" crossorigin="anonymous" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8202473052675329"></script>
-
-</link></link></link></link></link></link><link crossorigin="" href="https://use.fontawesome.com" rel="preconnect"/>
+  <meta charset="utf-8" />
+  <title>NARAP Admin Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <style>
+    :root{ --brand:#0a7f41; }
+    body { background:#f7f8fa }
+    .nav-pills .nav-link.active{ background:var(--brand) }
+    .btn-brand { background:var(--brand); color:#fff }
+    .btn-brand:hover { filter:brightness(0.95) }
+    .card{ border-radius:14px; box-shadow:0 6px 18px rgba(0,0,0,.06) }
+    .img-thumb{ width:84px; height:56px; object-fit:cover; border-radius:8px; border:1px solid #e5e7eb }
+    .sticky-actions{ position:sticky; bottom:0; background:#fff; padding:12px 0; border-top:1px solid #eee }
+    .req::after { content:" *"; color:#e11d48; font-weight:600 }
+    .table td, .table th { vertical-align: middle; }
+    .shadow-sm-soft{ box-shadow:0 10px 28px rgba(10,127,65,.08) }
+  </style>
 </head>
 <body>
-<div class="container" style="max-width:1200px;margin:40px auto;padding:20px;">
-<h2 style="margin-bottom:10px;">Admin Dashboard</h2>
-<div id="status" style="margin-bottom:20px;color:#888;font-size:14px;"></div>
-<nav style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;">
-<button class="btn" data-tab="sliders">Sliders</button>
-<button class="btn" data-tab="services">Services</button>
-<button class="btn" data-tab="products">Products</button>
-<button class="btn" data-tab="portfolio">Portfolio</button>
-<button class="btn" data-tab="team">Team</button>
-<button class="btn" data-tab="blogs">Blogs</button>
-<button class="btn" data-tab="faqs">FAQs</button>
-<button class="btn" data-tab="offers">Offers</button>
-<button class="btn" data-tab="features">Features</button>
-<!-- In your dashboard.php -->
-<button class="btn" data-tab="paid">Paid Members</button>
-<button class="btn" data-tab="registrations">Registrations</button>
+<div class="container py-4">
+  <div class="d-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 m-0">Admin Dashboard</h1>
+    <div>
+      <button class="btn btn-outline-secondary btn-sm" id="logoutBtn">Logout</button>
+    </div>
+  </div>
 
+  <!-- Tabs -->
+  <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+    <li class="nav-item" role="presentation"><button class="nav-link active" id="tab-home-settings" data-bs-toggle="pill" data-bs-target="#pane-home-settings" type="button" role="tab">Home Settings</button></li>
+    <li class="nav-item" role="presentation"><button class="nav-link" id="tab-sliders" data-bs-toggle="pill" data-bs-target="#pane-sliders" type="button" role="tab">Sliders</button></li>
+    <li class="nav-item" role="presentation"><button class="nav-link" id="tab-services" data-bs-toggle="pill" data-bs-target="#pane-services" type="button" role="tab">Services</button></li>
+    <li class="nav-item" role="presentation"><button class="nav-link" id="tab-projects" data-bs-toggle="pill" data-bs-target="#pane-projects" type="button" role="tab">Projects</button></li>
+    <li class="nav-item" role="presentation"><button class="nav-link" id="tab-features" data-bs-toggle="pill" data-bs-target="#pane-features" type="button" role="tab">Features</button></li>
+    <li class="nav-item" role="presentation"><button class="nav-link" id="tab-offers" data-bs-toggle="pill" data-bs-target="#pane-offers" type="button" role="tab">Offers</button></li>
+    <li class="nav-item" role="presentation"><button class="nav-link" id="tab-blogs" data-bs-toggle="pill" data-bs-target="#pane-blogs" type="button" role="tab">Blogs</button></li>
+    <li class="nav-item" role="presentation"><button class="nav-link" id="tab-faqs" data-bs-toggle="pill" data-bs-target="#pane-faqs" type="button" role="tab">FAQs</button></li>
+    <li class="nav-item" role="presentation"><button class="nav-link" id="tab-team" data-bs-toggle="pill" data-bs-target="#pane-team" type="button" role="tab">Team</button></li>
+    <li class="nav-item" role="presentation"><button class="nav-link" id="tab-members-all" data-bs-toggle="pill" data-bs-target="#pane-members-all" type="button" role="tab">Registrations</button></li>
+    <li class="nav-item" role="presentation"><button class="nav-link" id="tab-members-paid" data-bs-toggle="pill" data-bs-target="#pane-members-paid" type="button" role="tab">Paid Members</button></li>
+    <li class="nav-item" role="presentation"><button class="nav-link" id="tab-members-unpaid" data-bs-toggle="pill" data-bs-target="#pane-members-unpaid" type="button" role="tab">Unpaid Members</button></li>
+  </ul>
 
-<button class="btn" data-logout="true" style="margin-left:auto;">Logout</button>
-</nav>
-<section class="tab" id="tab-sliders">
-  <div class="alert alert-info" data-example="sliders" style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin:10px 0;">
-    <div><strong>Illustration:</strong> Add/edit items here; visitors will see them on the homepage.</div>
-    <div class="btn-group">
-      <button class="btn btn-sm" data-seed="sliders">Insert sample</button>
-      <button class="btn btn-sm" data-clear="sliders">Clear sliders</button>
-      <a class="btn btn-sm" href="/" target="_blank" rel="noopener">Open homepage</a>
+  <div class="tab-content" id="pills-tabContent">
+
+    <!-- HOME SETTINGS -->
+    <div class="tab-pane fade show active" id="pane-home-settings" role="tabpanel">
+      <div class="card shadow-sm-soft mb-4">
+        <div class="card-body">
+          <h5 class="mb-3">About Section</h5>
+          <form id="form-home-about" class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label req">About Title</label>
+              <input name="about.title" class="form-control" placeholder="About Us">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label req">About Headline</label>
+              <input name="about.headline" class="form-control" placeholder="Keeping you Cool, in Every Step">
+            </div>
+            <div class="col-12">
+              <label class="form-label">Paragraphs (one per line)</label>
+              <textarea name="about.paragraphs" class="form-control" rows="4" placeholder="Line 1&#10;Line 2"></textarea>
+              <div class="form-text text-muted">Each line becomes a paragraph on the homepage.</div>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">About Image URL</label>
+              <input name="about.image" class="form-control" placeholder="/uploads/about.jpg">
+            </div>
+            <div class="col-12 sticky-actions">
+              <button class="btn btn-brand" type="submit">Save About</button>
+              <small class="ms-2 text-muted" id="aboutStatus"></small>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div class="card shadow-sm-soft">
+        <div class="card-body">
+          <h5 class="mb-3">Section Titles & Subtitles</h5>
+          <form id="form-home-sections" class="row g-3">
+            <div class="col-md-4"><label class="form-label req">Services Title</label><input name="services.title" class="form-control" placeholder="What We Do"></div>
+            <div class="col-md-8"><label class="form-label">Services Subtitle</label><input name="services.subtitle" class="form-control"></div>
+            <div class="col-md-4"><label class="form-label req">Projects Title</label><input name="projects.title" class="form-control" placeholder="Our Projects"></div>
+            <div class="col-md-8"><label class="form-label">Projects Subtitle</label><input name="projects.subtitle" class="form-control"></div>
+            <div class="col-md-4"><label class="form-label req">Features Title</label><input name="features.title" class="form-control" placeholder="Why Choose Us"></div>
+            <div class="col-md-8"><label class="form-label">Features Headline</label><input name="features.headline" class="form-control"></div>
+            <div class="col-md-4"><label class="form-label">Offer Title</label><input name="offer.title" class="form-control"></div>
+            <div class="col-md-4"><label class="form-label">Blog Title</label><input name="blog.title" class="form-control" placeholder="Our Blog & News"></div>
+            <div class="col-md-4"><label class="form-label">Blog Show Count</label><input name="blog.showCount" type="number" min="1" max="12" class="form-control" placeholder="3"></div>
+            <div class="col-md-4"><label class="form-label">FAQs Title</label><input name="faqs.title" class="form-control" placeholder="Frequently Asked Questions"></div>
+            <div class="col-md-8"><label class="form-label">FAQs Side Image URL</label><input name="faqs.image" class="form-control" placeholder="/uploads/faqs.jpg"></div>
+            <div class="col-md-4"><label class="form-label">Team Title</label><input name="team.title" class="form-control" placeholder="Meet Our Executive"></div>
+            <div class="col-12 sticky-actions">
+              <button class="btn btn-brand" type="submit">Save Sections</button>
+              <small class="ms-2 text-muted" id="sectionsStatus"></small>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
-  </div>
-<h4>Sliders</h4>
-<form class="card" onsubmit="return createItem(event,'sliders');">
-<input class="form-control" name="imageUrl" placeholder="Image URL (/admin/uploads/slider/..)"/>
-<input class="form-control" name="smallTitle" placeholder="Small Title"/>
-<input class="form-control" name="bigTitle" placeholder="Big Title"/>
-<input class="form-control" name="paragraph" placeholder="Paragraph"/>
-<input class="form-control" name="primaryBtnText" placeholder="Primary Button Text"/>
-<input class="form-control" name="primaryBtnLink" placeholder="Primary Button Link"/>
-<input class="form-control" name="secondaryBtnText" placeholder="Secondary Button Text"/>
-<input class="form-control" name="secondaryBtnLink" placeholder="Secondary Button Link"/>
-<button class="btn">Create</button>
-</form>
-<div data-list="sliders"></div>
-</section>
-<section class="tab" id="tab-services" style="display:none">
-  <div class="alert alert-info" data-example="services" style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin:10px 0;">
-    <div><strong>Illustration:</strong> Add/edit items here; visitors will see them on the homepage.</div>
-    <div class="btn-group">
-      <button class="btn btn-sm" data-seed="services">Insert sample</button>
-      <button class="btn btn-sm" data-clear="services">Clear services</button>
-      <a class="btn btn-sm" href="/" target="_blank" rel="noopener">Open homepage</a>
+
+    <!-- SLIDERS -->
+    <div class="tab-pane fade" id="pane-sliders" role="tabpanel">
+      <div class="card mb-4"><div class="card-body">
+        <h5 class="mb-3">Add / Edit Slider</h5>
+        <form id="form-slider" class="row g-3">
+          <input type="hidden" name="_id">
+          <div class="col-md-4"><label class="form-label req">Kicker</label><input name="kicker" class="form-control" placeholder="Providing Comfort"></div>
+          <div class="col-md-8"><label class="form-label req">Headline</label><input name="headline" class="form-control" placeholder="Across Sectors"></div>
+          <div class="col-12"><label class="form-label">Text</label><textarea name="text" class="form-control" rows="3"></textarea></div>
+          <div class="col-md-6"><label class="form-label">CTA1 Label</label><input name="cta1.label" class="form-control" placeholder="Watch Video"></div>
+          <div class="col-md-6"><label class="form-label">CTA1 Href</label><input name="cta1.href" class="form-control" placeholder="#video"></div>
+          <div class="col-md-6"><label class="form-label">CTA2 Label</label><input name="cta2.label" class="form-control" placeholder="Contact Us"></div>
+          <div class="col-md-6"><label class="form-label">CTA2 Href</label><input name="cta2.href" class="form-control" placeholder="#contact"></div>
+          <div class="col-md-8"><label class="form-label req">Image URL</label><input name="image" class="form-control" placeholder="/uploads/slider/slide1.jpg"></div>
+          <div class="col-md-4"><label class="form-label">Order</label><input name="order" type="number" class="form-control" placeholder="1"></div>
+          <div class="col-12 sticky-actions">
+            <button class="btn btn-brand" type="submit">Save Slider</button>
+            <button class="btn btn-outline-secondary" type="button" id="resetSliderForm">Reset</button>
+            <small class="ms-2 text-muted" id="sliderStatus"></small>
+          </div>
+        </form>
+      </div></div>
+      <div class="card"><div class="card-body">
+        <h5 class="mb-3">All Slides</h5>
+        <div class="table-responsive">
+          <table class="table align-middle">
+            <thead><tr><th>#</th><th>Preview</th><th>Kicker</th><th>Headline</th><th>Buttons</th><th>Order</th><th></th></tr></thead>
+            <tbody id="list-sliders"></tbody>
+          </table>
+        </div>
+      </div></div>
     </div>
-  </div>
-<h4>Services</h4>
-<form class="card" onsubmit="return createItem(event,'services');">
-<input class="form-control" name="title" placeholder="Title"/>
-<textarea class="form-control" name="description" placeholder="Description"></textarea>
-<input class="form-control" name="imageUrl" placeholder="Image URL (/admin/uploads/services/...)"/>
-<button class="btn">Create</button>
-</form>
-<div data-list="services"></div>
-</section>
-<section class="tab" id="tab-products" style="display:none">
-  <div class="alert alert-info" data-example="products" style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin:10px 0;">
-    <div><strong>Illustration:</strong> Add/edit items here; visitors will see them on the homepage.</div>
-    <div class="btn-group">
-      <button class="btn btn-sm" data-seed="products">Insert sample</button>
-      <button class="btn btn-sm" data-clear="products">Clear products</button>
-      <a class="btn btn-sm" href="/" target="_blank" rel="noopener">Open homepage</a>
+
+    <!-- SERVICES -->
+    <div class="tab-pane fade" id="pane-services" role="tabpanel">
+      <div class="card mb-4"><div class="card-body">
+        <h5 class="mb-3">Service</h5>
+        <form id="form-service" class="row g-3">
+          <input type="hidden" name="_id">
+          <div class="col-md-6"><label class="form-label req">Title</label><input name="title" class="form-control"></div>
+          <div class="col-md-6"><label class="form-label">Image URL</label><input name="image" class="form-control" placeholder="/uploads/services/1.jpg"></div>
+          <div class="col-12"><label class="form-label">Description</label><textarea name="description" class="form-control" rows="3"></textarea></div>
+          <div class="col-md-6"><label class="form-label">Link (optional)</label><input name="link" class="form-control" placeholder="/services#install"></div>
+          <div class="col-12 sticky-actions">
+            <button class="btn btn-brand" type="submit">Save Service</button>
+            <button class="btn btn-outline-secondary" type="button" data-reset="#form-service">Reset</button>
+            <small class="ms-2 text-muted" id="serviceStatus"></small>
+          </div>
+        </form>
+      </div></div>
+      <div class="card"><div class="card-body">
+        <h5 class="mb-3">All Services</h5>
+        <div class="table-responsive">
+          <table class="table align-middle"><thead><tr><th>#</th><th>Preview</th><th>Title</th><th>Description</th><th>Link</th><th></th></tr></thead><tbody id="list-services"></tbody></table>
+        </div>
+      </div></div>
     </div>
-  </div>
-<h4>Products</h4>
-<form class="card" onsubmit="return createItem(event,'products');">
-<input class="form-control" name="title" placeholder="Title"/>
-<textarea class="form-control" name="description" placeholder="Description"></textarea>
-<input class="form-control" name="price" placeholder="Price (optional)" step="0.01" type="number"/>
-<input class="form-control" name="imageUrl" placeholder="Image URL (/admin/uploads/products/...)"/>
-<button class="btn">Create</button>
-</form>
-<div data-list="products"></div>
-</section>
-<section class="tab" id="tab-portfolio" style="display:none">
-  <div class="alert alert-info" data-example="portfolio" style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin:10px 0;">
-    <div><strong>Illustration:</strong> Add/edit items here; visitors will see them on the homepage.</div>
-    <div class="btn-group">
-      <button class="btn btn-sm" data-seed="portfolio">Insert sample</button>
-      <button class="btn btn-sm" data-clear="portfolio">Clear portfolio</button>
-      <a class="btn btn-sm" href="/" target="_blank" rel="noopener">Open homepage</a>
+
+    <!-- PROJECTS -->
+    <div class="tab-pane fade" id="pane-projects" role="tabpanel">
+      <div class="card mb-4"><div class="card-body">
+        <h5 class="mb-3">Project</h5>
+        <form id="form-project" class="row g-3">
+          <input type="hidden" name="_id">
+          <div class="col-md-6"><label class="form-label req">Title</label><input name="title" class="form-control"></div>
+          <div class="col-md-6"><label class="form-label">Category</label><input name="category" class="form-control" placeholder="HVAC"></div>
+          <div class="col-md-6"><label class="form-label">Image URL</label><input name="image" class="form-control" placeholder="/uploads/projects/1.jpg"></div>
+          <div class="col-md-6"><label class="form-label">Link</label><input name="link" class="form-control" placeholder="/projects/slug"></div>
+          <div class="col-12"><label class="form-label">Description</label><textarea name="description" class="form-control" rows="3"></textarea></div>
+          <div class="col-12 sticky-actions">
+            <button class="btn btn-brand" type="submit">Save Project</button>
+            <button class="btn btn-outline-secondary" type="button" data-reset="#form-project">Reset</button>
+            <small class="ms-2 text-muted" id="projectStatus"></small>
+          </div>
+        </form>
+      </div></div>
+      <div class="card"><div class="card-body">
+        <h5 class="mb-3">All Projects</h5>
+        <div class="table-responsive">
+          <table class="table align-middle"><thead><tr><th>#</th><th>Preview</th><th>Title</th><th>Category</th><th>Link</th><th></th></tr></thead><tbody id="list-projects"></tbody></table>
+        </div>
+      </div></div>
     </div>
-  </div>
-<h4>Portfolio</h4>
-<form class="card" onsubmit="return createItem(event,'portfolio');">
-<input class="form-control" name="title" placeholder="Title"/>
-<input class="form-control" name="category" placeholder="Category (e.g., web)"/>
-<textarea class="form-control" name="description" placeholder="Description"></textarea>
-<input class="form-control" name="imageUrl" placeholder="Image URL (/admin/uploads/portfolio/...)"/>
-<button class="btn">Create</button>
-</form>
-<div data-list="portfolio"></div>
-</section>
-<section class="tab" id="tab-team" style="display:none">
-  <div class="alert alert-info" data-example="team" style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin:10px 0;">
-    <div><strong>Illustration:</strong> Add/edit items here; visitors will see them on the homepage.</div>
-    <div class="btn-group">
-      <button class="btn btn-sm" data-seed="team">Insert sample</button>
-      <button class="btn btn-sm" data-clear="team">Clear team</button>
-      <a class="btn btn-sm" href="/" target="_blank" rel="noopener">Open homepage</a>
+
+    <!-- FEATURES -->
+    <div class="tab-pane fade" id="pane-features" role="tabpanel">
+      <div class="card mb-4"><div class="card-body">
+        <h5 class="mb-3">Feature</h5>
+        <form id="form-feature" class="row g-3">
+          <input type="hidden" name="_id">
+          <div class="col-md-6"><label class="form-label req">Title</label><input name="title" class="form-control"></div>
+          <div class="col-md-6"><label class="form-label">Subtitle</label><input name="subtitle" class="form-control"></div>
+          <div class="col-md-6"><label class="form-label">Icon (class or URL)</label><input name="icon" class="form-control" placeholder="fa-solid fa-snowflake"></div>
+          <div class="col-12"><label class="form-label">Description</label><textarea name="description" class="form-control" rows="3"></textarea></div>
+          <div class="col-12 sticky-actions">
+            <button class="btn btn-brand" type="submit">Save Feature</button>
+            <button class="btn btn-outline-secondary" type="button" data-reset="#form-feature">Reset</button>
+            <small class="ms-2 text-muted" id="featureStatus"></small>
+          </div>
+        </form>
+      </div></div>
+      <div class="card"><div class="card-body">
+        <h5 class="mb-3">All Features</h5>
+        <div class="table-responsive">
+          <table class="table align-middle"><thead><tr><th>#</th><th>Icon</th><th>Title</th><th>Subtitle</th><th></th></tr></thead><tbody id="list-features"></tbody></table>
+        </div>
+      </div></div>
     </div>
-  </div>
-<h4>Team</h4>
-<form class="card" onsubmit="return createItem(event,'team');">
-<input class="form-control" name="name" placeholder="Name"/>
-<input class="form-control" name="role" placeholder="Role"/>
-<input class="form-control" name="imageUrl" placeholder="Image URL (/admin/uploads/team/...)"/>
-<button class="btn">Create</button>
-</form>
-<div data-list="team"></div>
-</section>
-<section class="tab" id="tab-blogs" style="display:none">
-  <div class="alert alert-info" data-example="blogs" style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin:10px 0;">
-    <div><strong>Illustration:</strong> Add/edit items here; visitors will see them on the homepage.</div>
-    <div class="btn-group">
-      <button class="btn btn-sm" data-seed="blogs">Insert sample</button>
-      <button class="btn btn-sm" data-clear="blogs">Clear blogs</button>
-      <a class="btn btn-sm" href="/" target="_blank" rel="noopener">Open homepage</a>
+
+    <!-- OFFERS -->
+    <div class="tab-pane fade" id="pane-offers" role="tabpanel">
+      <div class="card mb-4"><div class="card-body">
+        <h5 class="mb-3">Offer</h5>
+        <form id="form-offer" class="row g-3">
+          <input type="hidden" name="_id">
+          <div class="col-md-6"><label class="form-label req">Title</label><input name="title" class="form-control"></div>
+          <div class="col-md-6"><label class="form-label">Image URL</label><input name="image" class="form-control" placeholder="/uploads/offers/1.jpg"></div>
+          <div class="col-12"><label class="form-label">Description</label><textarea name="description" class="form-control" rows="3"></textarea></div>
+          <div class="col-12 sticky-actions">
+            <button class="btn btn-brand" type="submit">Save Offer</button>
+            <button class="btn btn-outline-secondary" type="button" data-reset="#form-offer">Reset</button>
+            <small class="ms-2 text-muted" id="offerStatus"></small>
+          </div>
+        </form>
+      </div></div>
+      <div class="card"><div class="card-body">
+        <h5 class="mb-3">All Offers</h5>
+        <div class="table-responsive">
+          <table class="table align-middle"><thead><tr><th>#</th><th>Preview</th><th>Title</th><th></th></tr></thead><tbody id="list-offers"></tbody></table>
+        </div>
+      </div></div>
     </div>
-  </div>
-<h4>Blogs</h4>
-<form class="card" onsubmit="return createItem(event,'blogs');">
-<input class="form-control" name="title" placeholder="Title"/>
-<input class="form-control" name="slug" placeholder="Slug (unique)"/>
-<input class="form-control" name="excerpt" placeholder="Excerpt"/>
-<textarea class="form-control" name="content" placeholder="HTML content"></textarea>
-<input class="form-control" name="imageUrl" placeholder="Image URL (/admin/uploads/blogs/...)"/>
-<button class="btn">Create</button>
-</form>
-<div data-list="blogs"></div>
-</section>
-<section class="tab" id="tab-faqs" style="display:none">
-  <div class="alert alert-info" data-example="faqs" style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin:10px 0;">
-    <div><strong>Illustration:</strong> Add/edit items here; visitors will see them on the homepage.</div>
-    <div class="btn-group">
-      <button class="btn btn-sm" data-seed="faqs">Insert sample</button>
-      <button class="btn btn-sm" data-clear="faqs">Clear faqs</button>
-      <a class="btn btn-sm" href="/" target="_blank" rel="noopener">Open homepage</a>
+
+    <!-- BLOGS -->
+    <div class="tab-pane fade" id="pane-blogs" role="tabpanel">
+      <div class="card mb-4"><div class="card-body">
+        <h5 class="mb-3">Blog</h5>
+        <form id="form-blog" class="row g-3">
+          <input type="hidden" name="_id">
+          <div class="col-md-6"><label class="form-label req">Title</label><input name="title" class="form-control"></div>
+          <div class="col-md-6"><label class="form-label">Slug</label><input name="slug" class="form-control" placeholder="auto-generated if blank"></div>
+          <div class="col-12"><label class="form-label">Excerpt</label><textarea name="excerpt" class="form-control" rows="2"></textarea></div>
+          <div class="col-12"><label class="form-label">Content (HTML or Markdown)</label><textarea name="content" class="form-control" rows="6"></textarea></div>
+          <div class="col-md-6"><label class="form-label">Image URL</label><input name="image" class="form-control" placeholder="/uploads/blog/1.jpg"></div>
+          <div class="col-12 sticky-actions">
+            <button class="btn btn-brand" type="submit">Save Blog</button>
+            <button class="btn btn-outline-secondary" type="button" data-reset="#form-blog">Reset</button>
+            <small class="ms-2 text-muted" id="blogStatus"></small>
+          </div>
+        </form>
+      </div></div>
+      <div class="card"><div class="card-body">
+        <h5 class="mb-3">All Blogs</h5>
+        <div class="table-responsive">
+          <table class="table align-middle"><thead><tr><th>#</th><th>Preview</th><th>Title</th><th>Slug</th><th></th></tr></thead><tbody id="list-blogs"></tbody></table>
+        </div>
+      </div></div>
     </div>
-  </div>
-<h4>FAQs</h4>
-<form class="card" onsubmit="return createItem(event,'faqs');">
-<input class="form-control" name="question" placeholder="Question"/>
-<textarea class="form-control" name="answer" placeholder="Answer"></textarea>
-<button class="btn">Create</button>
-</form>
-<div data-list="faqs"></div>
-</section>
-<section class="tab" id="tab-offers" style="display:none">
-  <div class="alert alert-info" data-example="offers" style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin:10px 0;">
-    <div><strong>Illustration:</strong> Add/edit items here; visitors will see them on the homepage.</div>
-    <div class="btn-group">
-      <button class="btn btn-sm" data-seed="offers">Insert sample</button>
-      <button class="btn btn-sm" data-clear="offers">Clear offers</button>
-      <a class="btn btn-sm" href="/" target="_blank" rel="noopener">Open homepage</a>
+
+    <!-- FAQS -->
+    <div class="tab-pane fade" id="pane-faqs" role="tabpanel">
+      <div class="card mb-4"><div class="card-body">
+        <h5 class="mb-3">FAQ</h5>
+        <form id="form-faq" class="row g-3">
+          <input type="hidden" name="_id">
+          <div class="col-md-6"><label class="form-label req">Question</label><input name="question" class="form-control"></div>
+          <div class="col-12"><label class="form-label req">Answer</label><textarea name="answer" class="form-control" rows="3"></textarea></div>
+          <div class="col-12 sticky-actions">
+            <button class="btn btn-brand" type="submit">Save FAQ</button>
+            <button class="btn btn-outline-secondary" type="button" data-reset="#form-faq">Reset</button>
+            <small class="ms-2 text-muted" id="faqStatus"></small>
+          </div>
+        </form>
+      </div></div>
+      <div class="card"><div class="card-body">
+        <h5 class="mb-3">All FAQs</h5>
+        <div class="table-responsive">
+          <table class="table align-middle"><thead><tr><th>#</th><th>Question</th><th>Answer</th><th></th></tr></thead><tbody id="list-faqs"></tbody></table>
+        </div>
+      </div></div>
     </div>
-  </div>
-<h4>Offers</h4>
-<form class="card" onsubmit="return createItem(event,'offers');">
-<input class="form-control" name="title" placeholder="Title"/>
-<textarea class="form-control" name="description" placeholder="Description"></textarea>
-<input class="form-control" name="imageUrl" placeholder="Image URL (/admin/uploads/offer/...)"/>
-<button class="btn">Create</button>
-</form>
-<div data-list="offers"></div>
-</section>
-<section class="tab" id="tab-features" style="display:none">
-  <div class="alert alert-info" data-example="features" style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin:10px 0;">
-    <div><strong>Illustration:</strong> Add/edit items here; visitors will see them on the homepage.</div>
-    <div class="btn-group">
-      <button class="btn btn-sm" data-seed="features">Insert sample</button>
-      <button class="btn btn-sm" data-clear="features">Clear features</button>
-      <a class="btn btn-sm" href="/" target="_blank" rel="noopener">Open homepage</a>
+
+    <!-- TEAM -->
+    <div class="tab-pane fade" id="pane-team" role="tabpanel">
+      <div class="card mb-4"><div class="card-body">
+        <h5 class="mb-3">Team Member</h5>
+        <form id="form-team" class="row g-3">
+          <input type="hidden" name="_id">
+          <div class="col-md-4"><label class="form-label req">Name</label><input name="name" class="form-control"></div>
+          <div class="col-md-4"><label class="form-label req">Role</label><input name="role" class="form-control"></div>
+          <div class="col-md-4"><label class="form-label">Image URL</label><input name="image" class="form-control" placeholder="/uploads/team/1.jpg"></div>
+          <div class="col-md-4"><label class="form-label">Facebook</label><input name="facebook" class="form-control" placeholder="https://facebook.com/..."></div>
+          <div class="col-md-4"><label class="form-label">Twitter</label><input name="twitter" class="form-control" placeholder="https://twitter.com/..."></div>
+          <div class="col-md-4"><label class="form-label">LinkedIn</label><input name="linkedin" class="form-control" placeholder="https://linkedin.com/in/..."></div>
+          <div class="col-12 sticky-actions">
+            <button class="btn btn-brand" type="submit">Save Member</button>
+            <button class="btn btn-outline-secondary" type="button" data-reset="#form-team">Reset</button>
+            <small class="ms-2 text-muted" id="teamStatus"></small>
+          </div>
+        </form>
+      </div></div>
+      <div class="card"><div class="card-body">
+        <h5 class="mb-3">All Team</h5>
+        <div class="table-responsive">
+          <table class="table align-middle"><thead><tr><th>#</th><th>Preview</th><th>Name</th><th>Role</th><th></th></tr></thead><tbody id="list-team"></tbody></table>
+        </div>
+      </div></div>
     </div>
+
+    <!-- REGISTRATIONS (ALL MEMBERS) -->
+    <div class="tab-pane fade" id="pane-members-all" role="tabpanel">
+      <div class="card mb-3"><div class="card-body">
+        <div class="row g-3 align-items-end">
+          <div class="col-md-6">
+            <label class="form-label">Search (name/email/member ID/state)</label>
+            <input id="allSearch" class="form-control" placeholder="Search…">
+          </div>
+          <div class="col-md-6 text-md-end">
+            <button class="btn btn-brand" id="btnReloadAll">Reload</button>
+            <button class="btn btn-outline-secondary" id="btnExportAll">Export CSV</button>
+          </div>
+        </div>
+        <small class="text-muted d-block mt-2">Shows everyone who completed signup and has a dashboard.</small>
+      </div></div>
+      <div class="card"><div class="card-body">
+        <div class="table-responsive">
+          <table class="table align-middle">
+            <thead>
+              <tr><th>#</th><th>Name</th><th>Email</th><th>Member ID</th><th>State</th><th>Created</th></tr>
+            </thead>
+            <tbody id="list-members-all"></tbody>
+          </table>
+        </div>
+        <div class="d-flex justify-content-between align-items-center mt-2">
+          <small class="text-muted" id="allCount"></small>
+          <div class="btn-group">
+            <button class="btn btn-sm btn-outline-secondary" id="allPrev">Prev</button>
+            <button class="btn btn-sm btn-outline-secondary" id="allNext">Next</button>
+          </div>
+        </div>
+      </div></div>
+    </div>
+
+    <!-- PAID MEMBERS -->
+    <div class="tab-pane fade" id="pane-members-paid" role="tabpanel">
+      <div class="card mb-3"><div class="card-body">
+        <div class="row g-3 align-items-end">
+          <div class="col-md-4">
+            <label class="form-label">Search (name/email/member ID/state)</label>
+            <input id="paidSearch" class="form-control" placeholder="Search…">
+          </div>
+          <div class="col-md-5">
+            <label class="form-label">Count as “Paid” if…</label>
+            <div class="d-flex gap-3 flex-wrap">
+              <div class="form-check"><input class="form-check-input" type="checkbox" id="paidFeeMembership" checked><label class="form-check-label" for="paidFeeMembership">Membership fee</label></div>
+              <div class="form-check"><input class="form-check-input" type="checkbox" id="paidFeeCertificate" checked><label class="form-check-label" for="paidFeeCertificate">Certificate</label></div>
+              <div class="form-check"><input class="form-check-input" type="checkbox" id="paidFeeIdcard" checked><label class="form-check-label" for="paidFeeIdcard">ID card</label></div>
+            </div>
+            <div class="form-check mt-2">
+              <input class="form-check-input" type="checkbox" id="paidLogicAll">
+              <label class="form-check-label" for="paidLogicAll">Require <strong>all selected</strong> fees (unchecked = any one)</label>
+            </div>
+          </div>
+          <div class="col-md-3 text-md-end">
+            <button class="btn btn-brand" id="btnReloadPaid">Reload</button>
+            <button class="btn btn-outline-secondary" id="btnExportPaid">Export CSV</button>
+          </div>
+        </div>
+      </div></div>
+      <div class="card"><div class="card-body">
+        <div class="table-responsive">
+          <table class="table align-middle">
+            <thead><tr><th>#</th><th>Name</th><th>Email</th><th>Member ID</th><th>State</th><th>Paid</th></tr></thead>
+            <tbody id="list-members-paid"></tbody>
+          </table>
+        </div>
+        <div class="d-flex justify-content-between align-items-center mt-2">
+          <small class="text-muted" id="paidCount"></small>
+          <div class="btn-group">
+            <button class="btn btn-sm btn-outline-secondary" id="paidPrev">Prev</button>
+            <button class="btn btn-sm btn-outline-secondary" id="paidNext">Next</button>
+          </div>
+        </div>
+      </div></div>
+    </div>
+
+    <!-- UNPAID MEMBERS -->
+    <div class="tab-pane fade" id="pane-members-unpaid" role="tabpanel">
+      <div class="card mb-3"><div class="card-body">
+        <div class="row g-3 align-items-end">
+          <div class="col-md-6">
+            <label class="form-label">Search (name/email/member ID/state)</label>
+            <input id="unpaidSearch" class="form-control" placeholder="Search…">
+          </div>
+          <div class="col-md-6 text-md-end">
+            <button class="btn btn-brand" id="btnReloadUnpaid">Reload</button>
+            <button class="btn btn-outline-secondary" id="btnExportUnpaid">Export CSV</button>
+          </div>
+        </div>
+        <small class="text-muted d-block mt-2">Shows users who completed signup (have dashboards) but have not paid membership, certificate, or ID card fees.</small>
+      </div></div>
+      <div class="card"><div class="card-body">
+        <div class="table-responsive">
+          <table class="table align-middle">
+            <thead><tr><th>#</th><th>Name</th><th>Email</th><th>Member ID</th><th>State</th><th>Unpaid Fees</th></tr></thead>
+            <tbody id="list-members-unpaid"></tbody>
+          </table>
+        </div>
+        <div class="d-flex justify-content-between align-items-center mt-2">
+          <small class="text-muted" id="unpaidCount"></small>
+          <div class="btn-group">
+            <button class="btn btn-sm btn-outline-secondary" id="unpaidPrev">Prev</button>
+            <button class="btn btn-sm btn-outline-secondary" id="unpaidNext">Next</button>
+          </div>
+        </div>
+      </div></div>
+    </div>
+
   </div>
-<h4>Features</h4>
-<form class="card" onsubmit="return createItem(event,'features');">
-<input class="form-control" name="title" placeholder="Title"/>
-<input class="form-control" name="subtitle" placeholder="Subtitle"/>
-<textarea class="form-control" name="description" placeholder="Description"></textarea>
-<input class="form-control" name="icon" placeholder="Icon class (optional)"/>
-<button class="btn">Create</button>
-</form>
-<div data-list="features"></div>
-</section>
-<hr style="margin:30px 0"/>
-<section>
-<h4>Uploader</h4>
-<div class="card">
-<input id="upload-file" type="file"/>
-<input id="upload-folder" placeholder="folder (blogs|services|products|portfolio|team|sections|offer|slider|about|features)"/>
-<button class="btn" onclick="doUpload()">Upload</button>
-<div class="small" id="upload-result" style="margin-top:10px;color:#555"></div>
 </div>
-</section>
 
-<section class="tab" id="tab-paid" style="display:none">
-  <h4>Paid Members</h4>
-  <div class="card">
-    <div id="paidMsg" class="mb-2" style="color:#6b7280;"></div>
-    <div class="table-responsive">
-      <table class="table table-striped" id="paidTable">
-        <thead><tr>
-          <th>Name</th><th>Member Code</th><th>Phone</th><th>Email</th><th>State</th><th>Joined</th>
-        </tr></thead>
-        <tbody></tbody>
-      </table>
-    </div>
-  </div>
-</section>
-
-<section class="tab" id="tab-registrations" style="display:none">
-  <h4>Registrations (All submitted forms)</h4>
-  <div class="card">
-    <div id="regMsg" class="mb-2" style="color:#6b7280;"></div>
-    <div class="table-responsive">
-      <table class="table table-bordered" id="regTable">
-        <thead><tr><th>Name</th><th>Gender</th><th>Phone</th><th>Email</th><th>State</th><th>State Code</th><th>LGA</th><th>Address</th><th>Created</th><th>View</th></tr></thead>
-        <tbody></tbody>
-      </table>
-    </div>
-    <p class="text-muted mt-2">Passwords are masked for security; use "Reset password" when necessary.</p>
-  </div>
-</section>
-
-
-
-
-
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-(function(){
-  function fmtDate(s){ try{ return new Date(s).toLocaleString(); }catch(_){ return s||''; } }
-  function text(x){ return (x==null?'':String(x)); }
-  function safeName(u){ return text(u?.name || (u?.firstName? (u.firstName+' '+(u.lastName||'')) : '')); }
+// ===== BASE AUTH & HELPERS =====
+const API_BASE = '/api';
+const token = localStorage.getItem('token');
+if(!token){ window.location.href = './login.php'; }
+document.getElementById('logoutBtn')?.addEventListener('click', () => {
+  localStorage.removeItem('token'); window.location.href = './login.php';
+});
+const authFetch = (url, opts = {}) => {
+  const headers = Object.assign({'Content-Type':'application/json','Authorization':'Bearer ' + token}, opts.headers || {});
+  return fetch(url, Object.assign({}, opts, { headers }));
+};
+const PAGE_SIZE = 20;
+let paidPage = 1, unpaidPage = 1, allPage = 1;
 
-  async function fetchJSON(url){
-    const token = localStorage.getItem('jwt') || localStorage.getItem('token') || '';
-    const res = await fetch(url, { headers: token ? { 'Authorization':'Bearer '+token } : {} });
-    if(!res.ok){ throw new Error((await res.text()) || ('HTTP '+res.status)); }
-    return res.json();
-  }
-
-  async function loadPaid(){
-    const msg = document.getElementById('paidMsg');
-    const tbody = document.querySelector('#paidTable tbody');
-    tbody.innerHTML = '<tr><td colspan="6">Loading…</td></tr>';
-    try{
-      const data = await fetchJSON('/api/members?status=paid');
-      const list = Array.isArray(data) ? data : (data.items || data.data || []);
-      if(!list.length){ tbody.innerHTML = '<tr><td colspan="6">No paid members yet.</td></tr>'; return; }
-      tbody.innerHTML = '';
-      list.forEach(u => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = '<td>'+safeName(u)+'</td>' +
-                       '<td>'+text(u.memberCode||u.code)+'</td>' +
-                       '<td>'+text(u.phone||u.phoneNumber)+'</td>' +
-                       '<td>'+text(u.email)+'</td>' +
-                       '<td>'+text(u.state||u.stateOfResidence||u.stateCode)+'</td>' +
-                       '<td>'+fmtDate(u.createdAt||u.joinedAt)+'</td>';
-        tbody.appendChild(tr);
-      });
-      msg.textContent = 'Loaded '+list.length+' paid member(s).';
-    }catch(e){
-      msg.textContent = 'Failed to load paid members: '+(e.message||e);
+// ===== HOME SETTINGS =====
+async function loadHomeSettings(){
+  try{
+    const res = await authFetch(\`\${API_BASE}/settings/home\`);
+    if(!res.ok) return;
+    const data = await res.json();
+    document.querySelector('[name="about.title"]').value = data?.about?.title || '';
+    document.querySelector('[name="about.headline"]').value = data?.about?.headline || '';
+    document.querySelector('[name="about.paragraphs"]').value = Array.isArray(data?.about?.paragraphs) ? data.about.paragraphs.join('\\n') : (data?.about?.paragraphs || '');
+    document.querySelector('[name="about.image"]').value = data?.about?.image || '';
+    const pairs = [
+      ['services','title'],['services','subtitle'],
+      ['projects','title'],['projects','subtitle'],
+      ['features','title'],['features','headline'],
+      ['offer','title'],
+      ['blog','title'],['blog','showCount'],
+      ['faqs','title'],['faqs','image'],
+      ['team','title']
+    ];
+    pairs.forEach(([k1,k2])=>{
+      const el = document.querySelector(\`[name="\${k1}.\${k2}"]\`);
+      if(el) el.value = data?.[k1]?.[k2] ?? '';
+    });
+  }catch(e){}
+}
+document.getElementById('form-home-about').addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  const fd = new FormData(e.target);
+  const payload = {
+    about:{
+      title:fd.get('about.title')||'',
+      headline:fd.get('about.headline')||'',
+      paragraphs:(fd.get('about.paragraphs')||'').split('\\n').filter(Boolean),
+      image:fd.get('about.image')||''
     }
-  }
-
-  async function loadRegs(){
-    const msg = document.getElementById('regMsg');
-    const tbody = document.querySelector('#regTable tbody');
-    tbody.innerHTML = '<tr><td colspan="6">Loading…</td></tr>';
-    try{
-      const data = await fetchJSON('/api/registrations');
-      const list = Array.isArray(data) ? data : (data.items || data.data || []);
-      if(!list.length){ tbody.innerHTML = '<tr><td colspan="6">No registrations found.</td></tr>'; return; }
-      tbody.innerHTML = '';
-      list.forEach(u => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = '<td>'+safeName(u)+'</td>' +
-                       '<td>'+text(u.phone||u.phoneNumber)+'</td>' +
-                       '<td>'+text(u.email)+'</td>' +
-                       '<td>'+text(u.state||u.stateOfResidence||u.stateCode)+'</td>' +
-                       '<td>'+fmtDate(u.createdAt)+'</td>' +
-                       '<td><button class="btn btn-sm" data-view-id="'+(u._id||u.id||'')+'">View</button></td>';
-        tbody.appendChild(tr);
-      });
-      // View handler: show full JSON except password
-      tbody.querySelectorAll('button[data-view-id]').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const id = btn.getAttribute('data-view-id');
-          const user = (list.find(x => (x._id||x.id||'')===id)) || {};
-          const clone = JSON.parse(JSON.stringify(user));
-          Object.keys(clone).forEach(k => {
-            const lk = k.toLowerCase();
-            if (lk.includes('password') || lk === 'pass' || lk === 'passwd') clone[k] = '[hidden]';
-          });
-          alert('Registration details:
-
-'+JSON.stringify(clone, null, 2));
-        });
-      });
-      msg.textContent = 'Loaded '+list.length+' registration(s).';
-    }catch(e){
-      msg.textContent = 'Failed to load registrations: '+(e.message||e);
-    }
-  }
-
-  // Extend existing showTab (if defined); otherwise provide a basic one
-  const prevShowTab = window.showTab;
-  window.showTab = function(id){
-    if (prevShowTab) prevShowTab(id);
-    if (!prevShowTab) {
-      document.querySelectorAll('.tab').forEach(s => s.style.display = 'none');
-      const el = document.getElementById('tab-'+id) || document.getElementById(id);
-      if(el) el.style.display = '';
-    }
-    if(id==='paid') loadPaid();
-    if(id==='registrations') loadRegs();
   };
-})();
-</script>
-
-<script>
-(function(){
-  function bindNav(){
-    // Tabs
-    document.querySelectorAll('nav [data-tab]').forEach(function(btn){
-      btn.addEventListener('click', function(ev){
-        ev.preventDefault();
-        var tab = btn.getAttribute('data-tab');
-        if (typeof window.showTab === 'function') {
-          window.showTab(tab);
-        } else {
-          // basic fallback
-          document.querySelectorAll('.tab').forEach(function(s){ s.style.display = 'none'; });
-          var el = document.getElementById('tab-' + tab) || document.getElementById(tab);
-          if (el) el.style.display = '';
-        }
-      });
-    });
-    // Logout
-    document.querySelectorAll('nav [data-logout]').forEach(function(btn){
-      btn.addEventListener('click', function(ev){
-        ev.preventDefault();
-        if (typeof window.logout === 'function') logout();
-      });
-    });
-  }
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', bindNav);
-  } else {
-    bindNav();
-  }
-})();
-</script>
-<script>
-(function(){
-  function token(){ return localStorage.getItem('jwt') || localStorage.getItem('token') || ''; }
-  async function api(url, opts){
-    opts = opts || {};
-    const headers = Object.assign(
-      { 'Accept':'application/json','Content-Type':'application/json' },
-      (opts.headers || {}),
-      (token() ? { 'Authorization':'Bearer ' + token() } : {})
-    );
-    const res = await fetch(url, Object.assign({}, opts, { headers }));
-    let data = null;
-    try { data = await res.json(); } catch(_){}
-    if (!res.ok) throw new Error((data && (data.message||data.error)) || ('HTTP '+res.status));
-    return data==null?{}:data;
-  }
-
-  // Demo samples for illustration
-  const DEMO = {
-    sliders: [{ smallTitle:'Welcome to NARAP', bigTitle:'Cooling the Nation', paragraph:'Professional refrigeration & AC services across Nigeria.', primaryBtnText:'Join Now', primaryBtnLink:'/admin/register.php' }],
-    services: [
-      { title:'Installation & Maintenance', description:'Expert setup and servicing of HVAC systems.' },
-      { title:'Cold Chain Solutions', description:'Food & pharma cold chain design and support.' }
-    ],
-    products: [
-      { title:'Inverter AC (1.5HP)', description:'Energy-efficient split unit.', price:280000 },
-      { title:'Deep Freezer 250L', description:'Reliable storage for cold rooms.', price:350000 }
-    ],
-    portfolio: [ { title:'Cold Room Build - Abuja' }, { title:'Office HVAC Upgrade - Lagos' } ],
-    team: [ { name:'Engr. Adaobi N.', role:'Senior Technician' }, { name:'Umar Faruk', role:'Field Engineer' } ],
-    blogs: [ { title:'Reduce Energy Costs with Inverter ACs', excerpt:'Five practical tips for homes & SMEs.', slug:'reduce-energy-costs' } ],
-    faqs: [ { question:'Do you offer nationwide service?', answer:'Yes, across all states via NARAP members.' } ],
-    offers: [ { title:'Seasonal Maintenance Promo', description:'15% off service plans this month.' } ],
-    features: [ { title:'Certified Professionals', description:'Trained, vetted, and insured technicians.' } ]
+  const res = await authFetch(\`\${API_BASE}/settings/home\`, { method:'PUT', body: JSON.stringify(payload) });
+  document.getElementById('aboutStatus').textContent = res.ok ? 'Saved.' : 'Failed.';
+  if(res.ok) loadHomeSettings();
+});
+document.getElementById('form-home-sections').addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  const fd = new FormData(e.target);
+  const payload = {
+    services:{ title:fd.get('services.title')||'', subtitle:fd.get('services.subtitle')||'' },
+    projects:{ title:fd.get('projects.title')||'', subtitle:fd.get('projects.subtitle')||'' },
+    features:{ title:fd.get('features.title')||'', headline:fd.get('features.headline')||'' },
+    offer:{ title:fd.get('offer.title')||'' },
+    blog:{ title:fd.get('blog.title')||'', showCount:Number(fd.get('blog.showCount')||3) },
+    faqs:{ title:fd.get('faqs.title')||'', image:fd.get('faqs.image')||'' },
+    team:{ title:fd.get('team.title')||'' }
   };
+  const res = await authFetch(\`\${API_BASE}/settings/home\`, { method:'PUT', body: JSON.stringify(payload) });
+  document.getElementById('sectionsStatus').textContent = res.ok ? 'Saved.' : 'Failed.';
+  if(res.ok) loadHomeSettings();
+});
 
-  async function seedResource(resource){
-    const samples = DEMO[resource] || [];
-    if (!samples.length) return alert('No demo samples for ' + resource);
-    for (const s of samples){
-      await api('/api/' + resource, { method:'POST', body: JSON.stringify(s) });
+// ===== GENERIC CRUD (content sections) =====
+const resources = {
+  sliders:{ endpoint:'/sliders', listEl:'#list-sliders', form:'#form-slider', status:'#sliderStatus',
+    toPayload:(fd)=>{
+      const kicker = fd.get('kicker')||''; const headline = fd.get('headline')||''; const text = fd.get('text')||'';
+      const c1Label = fd.get('cta1.label')||''; const c1Href = fd.get('cta1.href')||'';
+      const c2Label = fd.get('cta2.label')||''; const c2Href = fd.get('cta2.href')||'';
+      const image = fd.get('image')||''; const order = Number(fd.get('order')||0);
+      return { smallTitle:kicker, bigTitle:headline, paragraph:text,
+        primaryBtnText:c1Label, primaryBtnLink:c1Href, secondaryBtnText:c2Label, secondaryBtnLink:c2Href,
+        imageUrl:image, order };
+    },
+    renderRow:(item,i)=>{
+      const img = item.image || item.imageUrl || '';
+      const kicker = item.kicker || item.smallTitle || '';
+      const head = item.headline || item.bigTitle || '';
+      const c1 = (item.cta1 && item.cta1.label) || item.primaryBtnText || '';
+      const c2 = (item.cta2 && item.cta2.label) || item.secondaryBtnText || '';
+      return \`<tr><td>\${i+1}</td><td>\${img?'<img class="img-thumb" src="'+img+'">':''}</td><td>\${kicker}</td><td>\${head}</td><td>\${[c1,c2].filter(Boolean).join(' / ')}</td><td>\${item.order??''}</td>
+      <td class="text-end"><button class="btn btn-sm btn-outline-primary" data-edit="sliders" data-id="\${item._id}">Edit</button>
+      <button class="btn btn-sm btn-outline-danger" data-del="sliders" data-id="\${item._id}">Delete</button></td></tr>\`;
     }
-    alert('Inserted ' + samples.length + ' sample ' + resource + ' item(s). Open the homepage to see them.');
-    if (window.loadList) try { loadList(resource); } catch(_){}
+  },
+  services:{ endpoint:'/services', listEl:'#list-services', form:'#form-service', status:'#serviceStatus',
+    toPayload:(fd)=>({ title:fd.get('title')||'', description:fd.get('description')||'', image:fd.get('image')||'', link:fd.get('link')||'' }),
+    renderRow:(item,i)=>\`<tr><td>\${i+1}</td><td>\${item.image?'<img class="img-thumb" src="'+item.image+'">':''}</td><td>\${item.title||''}</td><td>\${item.description||''}</td><td>\${item.link||''}</td>
+    <td class="text-end"><button class="btn btn-sm btn-outline-primary" data-edit="services" data-id="\${item._id}">Edit</button>
+    <button class="btn btn-sm btn-outline-danger" data-del="services" data-id="\${item._id}">Delete</button></td></tr>\`
+  },
+  projects:{ endpoint:'/projects', listEl:'#list-projects', form:'#form-project', status:'#projectStatus',
+    toPayload:(fd)=>({ title:fd.get('title')||'', category:fd.get('category')||'', description:fd.get('description')||'', image:fd.get('image')||'', link:fd.get('link')||'' }),
+    renderRow:(item,i)=>\`<tr><td>\${i+1}</td><td>\${item.image?'<img class="img-thumb" src="'+item.image+'">':''}</td><td>\${item.title||''}</td><td>\${item.category||''}</td><td>\${item.link||''}</td>
+    <td class="text-end"><button class="btn btn-sm btn-outline-primary" data-edit="projects" data-id="\${item._id}">Edit</button>
+    <button class="btn btn-sm btn-outline-danger" data-del="projects" data-id="\${item._id}">Delete</button></td></tr>\`
+  },
+  features:{ endpoint:'/features', listEl:'#list-features', form:'#form-feature', status:'#featureStatus',
+    toPayload:(fd)=>({ title:fd.get('title')||'', subtitle:fd.get('subtitle')||'', description:fd.get('description')||'', icon:fd.get('icon')||'' }),
+    renderRow:(item,i)=>\`<tr><td>\${i+1}</td><td>\${item.icon||''}</td><td>\${item.title||''}</td><td>\${item.subtitle||''}</td>
+    <td class="text-end"><button class="btn btn-sm btn-outline-primary" data-edit="features" data-id="\${item._id}">Edit</button>
+    <button class="btn btn-sm btn-outline-danger" data-del="features" data-id="\${item._id}">Delete</button></td></tr>\`
+  },
+  offers:{ endpoint:'/offers', listEl:'#list-offers', form:'#form-offer', status:'#offerStatus',
+    toPayload:(fd)=>({ title:fd.get('title')||'', description:fd.get('description')||'', image:fd.get('image')||'' }),
+    renderRow:(item,i)=>\`<tr><td>\${i+1}</td><td>\${item.image?'<img class="img-thumb" src="'+item.image+'">':''}</td><td>\${item.title||''}</td>
+    <td class="text-end"><button class="btn btn-sm btn-outline-primary" data-edit="offers" data-id="\${item._id}">Edit</button>
+    <button class="btn btn-sm btn-outline-danger" data-del="offers" data-id="\${item._id}">Delete</button></td></tr>\`
+  },
+  blogs:{ endpoint:'/blogs', listEl:'#list-blogs', form:'#form-blog', status:'#blogStatus',
+    toPayload:(fd)=>({ title:fd.get('title')||'', slug:fd.get('slug')||'', excerpt:fd.get('excerpt')||'', content:fd.get('content')||'', image:fd.get('image')||'' }),
+    renderRow:(item,i)=>\`<tr><td>\${i+1}</td><td>\${item.image?'<img class="img-thumb" src="'+item.image+'">':''}</td><td>\${item.title||''}</td><td>\${item.slug||''}</td>
+    <td class="text-end"><button class="btn btn-sm btn-outline-primary" data-edit="blogs" data-id="\${item._id}">Edit</button>
+    <button class="btn btn-sm btn-outline-danger" data-del="blogs" data-id="\${item._id}">Delete</button></td></tr>\`
+  },
+  faqs:{ endpoint:'/faqs', listEl:'#list-faqs', form:'#form-faq', status:'#faqStatus',
+    toPayload:(fd)=>({ question:fd.get('question')||'', answer:fd.get('answer')||'' }),
+    renderRow:(item,i)=>\`<tr><td>\${i+1}</td><td>\${item.question||''}</td><td>\${item.answer||''}</td>
+    <td class="text-end"><button class="btn btn-sm btn-outline-primary" data-edit="faqs" data-id="\${item._id}">Edit</button>
+    <button class="btn btn-sm btn-outline-danger" data-del="faqs" data-id="\${item._id}">Delete</button></td></tr>\`
+  },
+  team:{ endpoint:'/team', listEl:'#list-team', form:'#form-team', status:'#teamStatus',
+    toPayload:(fd)=>({ name:fd.get('name')||'', role:fd.get('role')||'', image:fd.get('image')||'', facebook:fd.get('facebook')||'', twitter:fd.get('twitter')||'', linkedin:fd.get('linkedin')||'' }),
+    renderRow:(item,i)=>\`<tr><td>\${i+1}</td><td>\${item.image?'<img class="img-thumb" src="'+item.image+'">':''}</td><td>\${item.name||''}</td><td>\${item.role||''}</td>
+    <td class="text-end"><button class="btn btn-sm btn-outline-primary" data-edit="team" data-id="\${item._id}">Edit</button>
+    <button class="btn btn-sm btn-outline-danger" data-del="team" data-id="\${item._id}">Delete</button></td></tr>\`
   }
+};
+async function loadList(key){
+  const cfg = resources[key];
+  const res = await authFetch(\`\${API_BASE}\${cfg.endpoint}\`);
+  if(!res.ok) return;
+  const items = await res.json();
+  document.querySelector(cfg.listEl).innerHTML = (items || []).sort((a,b)=> (a.order??0)-(b.order??0)).map(cfg.renderRow).join('');
+}
+function resetForm(sel){ const f=document.querySelector(sel); if(f){ f.reset(); const id=f.querySelector('[name=\"_id\"]'); if(id) id.value=''; } }
+function fillFormFromItem(formSel, item){
+  const form = document.querySelector(formSel);
+  if(!form) return;
+  Object.keys(item||{}).forEach(k=>{ const el=form.querySelector(\`[name="\${k}"]\`); if(el) el.value=item[k]??''; });
+  if(formSel==='#form-slider'){
+    const map = {
+      'kicker': item.kicker ?? item.smallTitle ?? '',
+      'headline': item.headline ?? item.bigTitle ?? '',
+      'text': item.text ?? item.paragraph ?? '',
+      'cta1.label': item.cta1?.label ?? item.primaryBtnText ?? '',
+      'cta1.href':  item.cta1?.href  ?? item.primaryBtnLink ?? '',
+      'cta2.label': item.cta2?.label ?? item.secondaryBtnText ?? '',
+      'cta2.href':  item.cta2?.href  ?? item.secondaryBtnLink ?? '',
+      'image': item.image ?? item.imageUrl ?? '',
+      'order': item.order ?? 0
+    };
+    Object.entries(map).forEach(([name,val])=>{ const el=form.querySelector(\`[name="\${name}"]\`); if(el) el.value=val??''; });
+  }
+}
+async function createOrUpdate(e, key){
+  e.preventDefault();
+  const cfg = resources[key];
+  const fd = new FormData(e.target);
+  const id = fd.get('_id');
+  const method = id ? 'PUT' : 'POST';
+  const url = id ? \`\${API_BASE}\${cfg.endpoint}/\${id}\` : \`\${API_BASE}\${cfg.endpoint}\`;
+  const payload = cfg.toPayload(fd);
+  const res = await authFetch(url, { method, body: JSON.stringify(payload) });
+  document.querySelector(cfg.status).textContent = res.ok ? 'Saved.' : 'Failed.';
+  if(res.ok){ resetForm(cfg.form); loadList(key); }
+}
+async function deleteItem(key, id){
+  if(!confirm('Delete this item?')) return;
+  const cfg = resources[key];
+  const res = await authFetch(\`\${API_BASE}\${cfg.endpoint}/\${id}\`, { method:'DELETE' });
+  if(res.ok) loadList(key);
+}
+Object.keys(resources).forEach(key=>{
+  document.querySelector(resources[key].form)?.addEventListener('submit', (e)=>createOrUpdate(e,key));
+});
+document.body.addEventListener('click', async (e)=>{
+  const editBtn = e.target.closest('[data-edit]'); const delBtn = e.target.closest('[data-del]');
+  if(editBtn){
+    const key = editBtn.getAttribute('data-edit'); const id = editBtn.getAttribute('data-id');
+    const res = await authFetch(\`\${API_BASE}\${resources[key].endpoint}/\${id}\`); if(!res.ok) return;
+    const item = await res.json(); fillFormFromItem(resources[key].form, item);
+  }
+  if(delBtn){
+    const key = delBtn.getAttribute('data-del'); const id = delBtn.getAttribute('data-id');
+    deleteItem(key, id);
+  }
+});
+document.getElementById('resetSliderForm')?.addEventListener('click', ()=>resetForm('#form-slider'));
+document.querySelectorAll('[data-reset]')?.forEach(btn=>btn.addEventListener('click', ()=> resetForm(btn.getAttribute('data-reset'))));
 
-  async function clearResource(resource){
-    if (!confirm('Delete all items in ' + resource + '?')) return;
-    const data = await api('/api/' + resource);
-    const list = Array.isArray(data) ? data : (data.data || data.items || []);
-    for (const it of list){
-      const id = it._id || it.id;
-      if (!id) continue;
-      await api('/api/' + resource + '/' + id, { method:'DELETE' });
+// ===== MEMBERS (All / Paid / Unpaid) =====
+function toCSV(rows){
+  if(!rows.length) return ''; const headers = Object.keys(rows[0]);
+  const esc = v => '\"' + String(v ?? '').replace(/\"/g,'\"\"') + '\"';
+  return [headers.join(','), ...rows.map(r => headers.map(h => esc(r[h])).join(','))].join('\\n');
+}
+function summarizePaidFlags(m){
+  const paid = { membership:false, certificate:false, idcard:false };
+  if (Array.isArray(m.payments)) {
+    for (const p of m.payments) {
+      const type = (p.type||'').toLowerCase();
+      if (['membership','certificate','idcard'].includes(type) && (p.status==='success' || p.status==='paid')) paid[type] = true;
     }
-    alert('Cleared ' + resource + '.');
-    if (window.loadList) try { loadList(resource); } catch(_){}
   }
+  if (m.hasPaidMembership) paid.membership = true;
+  if (m.hasPaidCertificate) paid.certificate = true;
+  if (m.hasPaidIdCard || m.hasPaidIdcard) paid.idcard = true;
+  return paid;
+}
+function unpaidListFromFlags(flags){
+  const missing = [];
+  if(!flags.membership) missing.push('Membership');
+  if(!flags.certificate) missing.push('Certificate');
+  if(!flags.idcard) missing.push('ID Card');
+  return missing.join(', ');
+}
+async function fetchMembers(kind, {logic='any', fees=['membership','certificate','idcard'], search='', page=1, limit=PAGE_SIZE}){
+  const params = new URLSearchParams({ filter: kind, logic, fees: fees.join(','), search, page, limit }).toString();
+  let res = await authFetch(\`/api/members?\${params}\`);
+  if (res.ok) return await res.json();
+  // Fallback basic endpoints
+  res = await authFetch(\`/api/members/\${kind==='all'?'':kind}\`); // e.g., /members/paid or /members/unpaid
+  if (!res.ok) return { items: [], total: 0, page, limit };
+  const items = await res.json();
+  const filtered = items.filter(m=>{
+    const flags = summarizePaidFlags(m);
+    const feeList = fees; const count = feeList.filter(f => flags[f]).length;
+    const isPaid = (logic==='all') ? (count===feeList.length) : (count>=1);
+    const s = (search||'').trim().toLowerCase();
+    const hay = [m.name, m.email, m.memberId||m.memberCode||'', m.state||m.lga||''].join(' ').toLowerCase();
+    const match = !s || hay.includes(s);
+    if(kind==='paid') return isPaid && match;
+    if(kind==='unpaid') return (!flags.membership && !flags.certificate && !flags.idcard) && match;
+    return match && (m.isRegistered !== false);
+  });
+  const start=(page-1)*limit, end=start+limit;
+  return { items: filtered.slice(start,end), total: filtered.length, page, limit };
+}
 
-  function bindDemoButtons(){
-    document.querySelectorAll('[data-seed]').forEach(btn => {
-      btn.addEventListener('click', (ev) => { ev.preventDefault(); seedResource(btn.getAttribute('data-seed')); });
-    });
-    document.querySelectorAll('[data-clear]').forEach(btn => {
-      btn.addEventListener('click', (ev) => { ev.preventDefault(); clearResource(btn.getAttribute('data-clear')); });
-    });
-    // Bind nav tabs (CSP-safe)
-    document.querySelectorAll('nav [data-tab]').forEach(btn => {
-      btn.addEventListener('click', (ev) => {
-        ev.preventDefault();
-        const t = btn.getAttribute('data-tab');
-        if (typeof window.showTab === 'function') window.showTab(t);
-        else {
-          document.querySelectorAll('.tab').forEach(s => s.style.display = 'none');
-          const el = document.getElementById('tab-' + t) || document.getElementById(t);
-          if (el) el.style.display = 'block';
-        }
-      });
-    });
-    document.querySelectorAll('nav [data-logout]').forEach(btn => {
-      btn.addEventListener('click', (ev) => { ev.preventDefault(); if (typeof window.logout === 'function') logout(); });
-    });
-  }
+// All
+let allSearchInput = document.getElementById('allSearch');
+async function loadAllMembers(){
+  const search = allSearchInput?.value?.trim() || '';
+  const { items, total } = await fetchMembers('all', { search, page: allPage });
+  const tbody = document.getElementById('list-members-all');
+  tbody.innerHTML = items.map((m,i)=>{
+    const created = m.createdAt ? new Date(m.createdAt).toLocaleDateString() : '';
+    return \`<tr>
+      <td>\${(allPage-1)*PAGE_SIZE + i + 1}</td>
+      <td>\${m.name||''}</td>
+      <td>\${m.email||''}</td>
+      <td>\${m.memberId||m.memberCode||''}</td>
+      <td>\${m.state||m.lga||''}</td>
+      <td>\${created}</td>
+    </tr>\`;
+  }).join('');
+  document.getElementById('allCount').textContent = \`\${total} result(s)\`;
+}
 
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bindDemoButtons);
-  else bindDemoButtons();
-})();
+// Paid
+async function loadPaidMembers(){
+  const fees = [];
+  if (document.getElementById('paidFeeMembership').checked) fees.push('membership');
+  if (document.getElementById('paidFeeCertificate').checked) fees.push('certificate');
+  if (document.getElementById('paidFeeIdcard').checked) fees.push('idcard');
+  const logic = document.getElementById('paidLogicAll').checked ? 'all' : 'any';
+  const search = document.getElementById('paidSearch').value.trim();
+  const { items, total } = await fetchMembers('paid', { logic, fees, search, page: paidPage });
+  const tbody = document.getElementById('list-members-paid');
+  tbody.innerHTML = items.map((m,i)=>{
+    const f = summarizePaidFlags(m);
+    const paidList = [f.membership?'Membership':'', f.certificate?'Certificate':'', f.idcard?'ID Card':''].filter(Boolean).join(' / ');
+    return \`<tr>
+      <td>\${(paidPage-1)*PAGE_SIZE + i + 1}</td>
+      <td>\${m.name||''}</td>
+      <td>\${m.email||''}</td>
+      <td>\${m.memberId||m.memberCode||''}</td>
+      <td>\${m.state||m.lga||''}</td>
+      <td>\${paidList||'-'}</td>
+    </tr>\`;
+  }).join('');
+  document.getElementById('paidCount').textContent = \`\${total} result(s)\`;
+}
+
+// Unpaid
+async function loadUnpaidMembers(){
+  const search = document.getElementById('unpaidSearch').value.trim();
+  const { items, total } = await fetchMembers('unpaid', { search, page: unpaidPage });
+  const tbody = document.getElementById('list-members-unpaid');
+  tbody.innerHTML = items.map((m,i)=>{
+    const missing = unpaidListFromFlags(summarizePaidFlags(m));
+    return \`<tr>
+      <td>\${(unpaidPage-1)*PAGE_SIZE + i + 1}</td>
+      <td>\${m.name||''}</td>
+      <td>\${m.email||''}</td>
+      <td>\${m.memberId||m.memberCode||''}</td>
+      <td>\${m.state||m.lga||''}</td>
+      <td>\${missing||'All paid'}</td>
+    </tr>\`;
+  }).join('');
+  document.getElementById('unpaidCount').textContent = \`\${total} result(s)\`;
+}
+
+// Events
+document.getElementById('btnReloadAll')?.addEventListener('click', ()=>{ allPage=1; loadAllMembers(); });
+document.getElementById('btnReloadPaid')?.addEventListener('click', ()=>{ paidPage=1; loadPaidMembers(); });
+document.getElementById('btnReloadUnpaid')?.addEventListener('click', ()=>{ unpaidPage=1; loadUnpaidMembers(); });
+document.getElementById('allSearch')?.addEventListener('input', ()=>{ allPage=1; loadAllMembers(); });
+document.getElementById('paidSearch')?.addEventListener('input', ()=>{ paidPage=1; loadPaidMembers(); });
+document.getElementById('unpaidSearch')?.addEventListener('input', ()=>{ unpaidPage=1; loadUnpaidMembers(); });
+document.getElementById('allPrev')?.addEventListener('click', ()=>{ if(allPage>1){ allPage--; loadAllMembers(); }});
+document.getElementById('allNext')?.addEventListener('click', ()=>{ allPage++; loadAllMembers(); });
+document.getElementById('paidPrev')?.addEventListener('click', ()=>{ if(paidPage>1){ paidPage--; loadPaidMembers(); }});
+document.getElementById('paidNext')?.addEventListener('click', ()=>{ paidPage++; loadPaidMembers(); });
+document.getElementById('unpaidPrev')?.addEventListener('click', ()=>{ if(unpaidPage>1){ unpaidPage--; loadUnpaidMembers(); }});
+document.getElementById('unpaidNext')?.addEventListener('click', ()=>{ unpaidPage++; loadUnpaidMembers(); });
+['paidFeeMembership','paidFeeCertificate','paidFeeIdcard','paidLogicAll'].forEach(id=>{
+  document.getElementById(id)?.addEventListener('change', ()=>{ paidPage=1; loadPaidMembers(); });
+});
+
+document.getElementById('tab-members-all')?.addEventListener('shown.bs.tab', loadAllMembers);
+document.getElementById('tab-members-paid')?.addEventListener('shown.bs.tab', loadPaidMembers);
+document.getElementById('tab-members-unpaid')?.addEventListener('shown.bs.tab', loadUnpaidMembers);
+
+// initial loads for content CRUD + settings
+loadHomeSettings();
+['sliders','services','projects','features','offers','blogs','faqs','team'].forEach(loadList);
 </script>
 </body>
 </html>
