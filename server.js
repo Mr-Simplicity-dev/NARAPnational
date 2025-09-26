@@ -1,5 +1,5 @@
 import 'dotenv/config';
-console.log('JWT_SECRET:', process.env.JWT_SECRET ? 'Loaded' : 'Missing'); // Add this line
+console.log('JWT_SECRET:', process.env.JWT_SECRET ? 'Loaded' : 'Missing');
 import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -28,8 +28,6 @@ import commentRoutes from './src/routes/comments.js';
 import paymentRoutes from './src/routes/payments.js';
 import memberRoutes from './src/routes/member.js';
 import registrationsRoutes from './src/routes/registrations.js';
-import paidMembersRoutes from './src/routes/paid.js';
-import unpaidMembersRoutes from './src/routes/unpaid.js';
 
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
@@ -157,7 +155,6 @@ app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
 // Map legacy PHP links to single-page anchors
 app.get('/about.php', (req, res) => res.redirect('/#about'));
 
-
 // APIs
 app.use('/api/auth', authRoutes);
 app.use('/api/blogs', blogRoutes);
@@ -176,10 +173,6 @@ app.use('/api/comments', commentRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/member', requireAuth, memberRoutes);
 app.use('/api/members', requireAuth, requireAdmin, registrationsRoutes);
-app.use('/api/members/paid', requireAuth, requireAdmin, paidMembersRoutes);
-app.use('/api/members/unpaid', requireAuth, requireAdmin, unpaidMembersRoutes);
-
-
 
 // Health
 app.get('/healthz', (_req,res)=>res.json({ ok:true }));
