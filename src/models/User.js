@@ -2,6 +2,15 @@ import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 
 const UserSchema = new mongoose.Schema({
+  passportUrl: { type:String },
+  signatureUrl: { type:String },
+  profileCompleted: { type:Boolean, default:false },
+  membershipActive: { type: Boolean, default: false },
+  hasPaidMembership: { type: Boolean, default: false },
+  certificatePaid: { type: Boolean, default: false },
+  hasPaidCertificate: { type: Boolean, default: false },
+  idCardPaid: { type: Boolean, default: false },
+  hasPaidIdCard: { type: Boolean, default: false },
   name:        { type: String, trim: true },
   surname:     { type: String, trim: true },
   otherNames:  { type: String, trim: true },

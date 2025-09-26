@@ -4,8 +4,8 @@ import mongoose from 'mongoose';
 const router = express.Router();
 
 /**
- * Returns members who have paid membership.
- * Source of truth: users collection; role in ['member','user','registrant'] and membershipActive/hasPaidMembership true.
+ * Returns members who have NOT paid membership.
+ * membershipActive !== true and hasPaidMembership !== true, role in ['member','user','registrant']
  */
 router.get('/', async (_req, res) => {
   try {
@@ -13,14 +13,14 @@ router.get('/', async (_req, res) => {
     const usersCol = db.collection('users');
     const list = await usersCol.find({
       role: { $in: ['member', 'user', 'registrant'] },
-      $or: [
-        { membershipActive: true },
-        { hasPaidMembership: true }
+      $and: [
+        { $or: [ { membershipActive: { $ne: true } }, { membershipActive: { $exists: false } } ] },
+        { $or: [ { hasPaidMembership: { $ne: true } }, { hasPaidMembership: { $exists: false } } ] }
       ]
     }).project({ password: 0 }).sort({ createdAt: -1 }).toArray();
     res.json(list);
   } catch (e) {
-    res.status(500).json({ message: e.message || 'Failed to load paid members' });
+    res.status(500).json({ message: e.message || 'Failed to load unpaid members' });
   }
 });
 

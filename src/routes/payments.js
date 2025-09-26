@@ -125,9 +125,9 @@ router.post('/verify', requireAuth, async (req, res) => {
       if(uid && status === 'success'){
         const set = {};
         const p = purposeFromMeta || 'membership';
-        if(p === 'membership') set['membershipActive'] = true;
-        if(p === 'idcard')     set['idCardPaid'] = true;
-        if(p === 'certificate')set['certificatePaid'] = true;
+        if (p === 'membership') { set['membershipActive'] = true; set['hasPaidMembership'] = true; }
+        if (p === 'idcard')     { set['idCardPaid']       = true; set['hasPaidIdCard']     = true; }
+        if (p === 'certificate'){ set['certificatePaid']  = true; set['hasPaidCertificate']= true; }
         if(Object.keys(set).length){
           await User.findByIdAndUpdate(uid, { $set: set });
         }

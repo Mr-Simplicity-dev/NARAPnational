@@ -22,9 +22,14 @@ import featureRoutes from './src/routes/features.js';
 import settingsRoutes from './src/routes/settings.js';
 import uploadRoutes from './src/routes/upload.js';
 import { requireAuth } from './src/middleware/auth.js';
+import requireAdmin from './src/middleware/requireAdmin.js';
 import eventRoutes from './src/routes/events.js';
 import commentRoutes from './src/routes/comments.js';
 import paymentRoutes from './src/routes/payments.js';
+import memberRoutes from './src/routes/member.js';
+import registrationsRoutes from './src/routes/registrations.js';
+import paidMembersRoutes from './src/routes/paid.js';
+import unpaidMembersRoutes from './src/routes/unpaid.js';
 
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
@@ -169,6 +174,11 @@ app.use('/api/upload', requireAuth, uploadRoutes);
 app.use('/api/events', eventRoutes);
 app.use('/api/comments', commentRoutes);
 app.use('/api/payments', paymentRoutes);
+app.use('/api/member', requireAuth, memberRoutes);
+app.use('/api/members', requireAuth, requireAdmin, registrationsRoutes);
+app.use('/api/members/paid', requireAuth, requireAdmin, paidMembersRoutes);
+app.use('/api/members/unpaid', requireAuth, requireAdmin, unpaidMembersRoutes);
+
 
 
 // Health

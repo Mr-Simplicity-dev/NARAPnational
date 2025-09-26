@@ -207,6 +207,13 @@
 
   <script>
     (function(){
+      function getAuthHeaders(){
+        const token = localStorage.getItem('jwt') || localStorage.getItem('token') || sessionStorage.getItem('jwt') || sessionStorage.getItem('token');
+        const headers = {};
+        if (token) headers['Authorization'] = 'Bearer ' + token;
+        return headers;
+      }
+
       const steps = ['personal','contact','professional','documents'];
       let current = 0;
       const form = document.getElementById('profileForm');
@@ -247,7 +254,7 @@
       }
 
       async function patch(url, body){
-        const res = await fetch(url, { method:'PATCH', body });
+        const res = await fetch(url, { method:'PATCH', body, headers: getAuthHeaders(), credentials:'include' });
         const data = await res.json().catch(()=>({}));
         if (!res.ok) throw new Error(data.message||'Save failed');
         return data;
@@ -317,7 +324,7 @@
       // Prefill
       async function prefill(){
         try{
-          const res = await fetch('/api/member/profile');
+          const res = await fetch('/api/member/profile', { headers: getAuthHeaders(), credentials:'include' });
           const data = await res.json();
           if (data && typeof data === 'object'){
             Object.entries(data).forEach(([k,v])=>{
