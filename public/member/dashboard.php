@@ -282,26 +282,14 @@ main, #member-settings{ padding-top: 8px; }
 </div>
 </div>
 <div class="container">
-<!-- Status Panel -->
-<div class="status-panel">
-<div class="status">
-<div class="status-dot connected"></div>
-<span>Server: Connected</span>
-</div>
-<div class="status">
-<div class="status-dot connected" id="jwt-status"></div>
-<span id="jwt-text">JWT: Valid</span>
-</div>
-<div class="status">
-<div class="status-dot connected"></div>
-<span>Paystack: Ready</span>
-</div>
-</div>
+
 <div class="grid">
 <div class="panel">
 <div class="profile">
-<img alt="passport" id="avatar" src="/uploads/slider/Narap.png"/>
+<img alt="passport" id="avatar" src="/uploads/slider/Narap.png" data-fallback="/uploads/slider/Narap.png"/>
 <div>
+
+
 <div id="hello" style="font-weight:800">Welcome</div>
 <div class="muted"><span id="email"></span> · <span class="pill" id="rolePill">MEMBER</span></div>
 </div>
@@ -793,13 +781,13 @@ main, #member-settings{ padding-top: 8px; }
       return;
     }
     try{
-      const res = await fetch('/api/auth/me', { headers: { Authorization: 'Bearer ' + token } });
+      const res = await fetch('/api/member/profile', { headers: { Authorization: 'Bearer ' + token } });
       if (!res.ok) throw new Error('Failed to load profile');
       const user = await res.json();
       const f = document.getElementById('profileForm');
       if (!f) return;
-      f.surname.value     = user.surname || '';
-      f.otherNames.value  = user.otherNames || '';
+      f.surname.value     = user.surname || user.lastName || '';
+      f.otherNames.value  = user.otherNames || user.firstName || '';
       f.phone.value       = user.phone || '';
       f.email.value       = user.email || '';
       f.state.value       = user.state || '';
@@ -833,7 +821,7 @@ main, #member-settings{ padding-top: 8px; }
       fd.delete('dob_day'); fd.delete('dob_month'); fd.delete('dob_year');
     }
     try{
-      const res = await fetch('/api/auth/me', {
+      const res = await fetch('/api/member/profile', {
         method: 'PATCH',
         headers: { Authorization: 'Bearer ' + token },
         body: fd
@@ -842,6 +830,8 @@ main, #member-settings{ padding-top: 8px; }
       if (!res.ok) throw new Error(data.message || 'Update failed');
       showAlert(alert, 'success', 'Profile updated successfully.');
       loadProfile();
+      // Refresh the avatar after profile update
+      loadDashboardAvatar();
     }catch(e){
       showAlert(alert, 'danger', e.message || 'Update failed');
     }
@@ -869,7 +859,7 @@ main, #member-settings{ padding-top: 8px; }
       return;
     }
     try{
-      const res = await fetch('/api/auth/me/password', {
+      const res = await fetch('/api/member/profile/password', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
         body: JSON.stringify({ currentPassword, newPassword, confirmPassword })
@@ -916,7 +906,7 @@ main, #member-settings{ padding-top: 8px; }
       try{
         const token = (localStorage.getItem('token') || sessionStorage.getItem('token') || '');
         if (!token) return;
-        const res = await fetch('/api/auth/me', { headers: { Authorization: 'Bearer ' + token } });
+        const res = await fetch('/api/member/profile', { headers: { Authorization: 'Bearer ' + token } });
         if (!res.ok) return;
         const user = await res.json();
         if (user && user.passportUrl && preview){
@@ -932,7 +922,6 @@ main, #member-settings{ padding-top: 8px; }
   (function(){
     const menu = document.getElementById('mdMenu');
     const toggle = document.getElementById('mdMenuToggle');
-    const link = document.getElementById('linkAccountSettings');
     if (!menu || !toggle) return;
     function close(){ menu.classList.remove('open'); toggle.setAttribute('aria-expanded','false'); }
     function open(){ menu.classList.add('open'); toggle.setAttribute('aria-expanded','true'); }
@@ -943,15 +932,6 @@ main, #member-settings{ padding-top: 8px; }
     document.addEventListener('click', (e)=>{
       if (!menu.contains(e.target)) close();
     });
-    // Smooth scroll to Account Settings
-    function scrollToSettings(){
-      const section = document.getElementById('member-settings');
-      if (section){
-        section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-      close();
-    }
-    link?.addEventListener('click', (e)=>{ e.preventDefault(); scrollToSettings(); });
   })();
 
   // --- Account Settings panel controller ---
@@ -980,5 +960,119 @@ main, #member-settings{ padding-top: 8px; }
     document.getElementById('linkShowAll')?.addEventListener('click', (e)=>{ e.preventDefault(); activate('all'); });
     document.getElementById('linkHide')?.addEventListener('click', (e)=>{ e.preventDefault(); hideAll(); });
   })();
-</script></body>
+</script>
+
+<script>
+// Fixed function to load dashboard avatar from profile setup
+(function () {
+  const API_BASE = window.API_BASE || '/api';
+
+  // Auth fetch that reads the latest token on each call
+  function authFetch(url, opts = {}) {
+    const jwt = localStorage.getItem('jwt') || localStorage.getItem('token');
+    const headers = Object.assign(
+      { 'Content-Type': 'application/json' },
+      jwt ? { 'Authorization': 'Bearer ' + jwt } : {},
+      opts.headers || {}
+    );
+    return fetch(url, Object.assign({}, opts, { headers, credentials: 'include' }));
+  }
+
+  // Load user profile and update dashboard avatar
+  async function loadDashboardAvatar() {
+    try {
+      const img = document.getElementById('avatar');
+      if (!img) return;
+
+      // Try multiple endpoints for compatibility
+      const endpoints = [
+        `${API_BASE}/member/profile`,
+        `${API_BASE}/auth/me`,
+        `${API_BASE}/me`,
+        `${API_BASE}/users/me`,
+        `${API_BASE}/members/me`
+      ];
+      
+      let user = null;
+      for (const endpoint of endpoints) {
+        try {
+          const res = await authFetch(endpoint);
+          if (res && res.ok) {
+            user = await res.json();
+            break;
+          }
+        } catch (err) {
+          console.warn(`Failed to fetch from ${endpoint}:`, err);
+          continue;
+        }
+      }
+
+      if (!user) {
+        console.log('No user data found');
+        return;
+      }
+
+      // Try multiple possible field names for the passport image
+      const passportUrl = 
+        user.passportUrl ||
+        user.passport ||
+        (user.profile && user.profile.passportUrl) ||
+        (user.profile && user.profile.passport) ||
+        user.avatar ||
+        user.avatarUrl ||
+        user.photoUrl ||
+        user.image;
+
+      if (passportUrl && typeof passportUrl === 'string') {
+        // Create a new image to test if the URL is valid
+        const testImage = new Image();
+        testImage.onload = function() {
+          // Image loaded successfully, use it
+          img.src = passportUrl;
+          console.log('Dashboard avatar updated successfully');
+        };
+        testImage.onerror = function() {
+          // Image failed to load, use fallback
+          img.src = img.getAttribute('data-fallback') || '/uploads/slider/Narap.png';
+          console.log('Failed to load passport image, using fallback');
+        };
+        testImage.src = passportUrl;
+      } else {
+        // No passport image found, use fallback
+        img.src = img.getAttribute('data-fallback') || '/uploads/slider/Narap.png';
+        console.log('No passport image found, using fallback');
+      }
+      
+      // Also update welcome message and email if available
+      if (user.email) {
+        document.getElementById('email').textContent = user.email;
+      }
+      if (user.firstName || user.surname || user.otherNames) {
+        const name = user.firstName || user.otherNames || '';
+        const surname = user.surname || user.lastName || '';
+        document.getElementById('hello').textContent = `Welcome, ${name} ${surname}`.trim();
+      }
+      
+    } catch (err) {
+      console.error('Error loading dashboard avatar:', err);
+    }
+  }
+
+  // Make function globally available for manual refresh
+  window.loadDashboardAvatar = loadDashboardAvatar;
+
+  // Load avatar when page loads
+  document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(loadDashboardAvatar, 100); // Small delay to ensure DOM is ready
+  });
+
+  // Also load when coming back from profile setup
+  if (sessionStorage.getItem('profileUpdated')) {
+    sessionStorage.removeItem('profileUpdated');
+    setTimeout(loadDashboardAvatar, 500);
+  }
+})();
+</script>
+
+</body>
 </html>
