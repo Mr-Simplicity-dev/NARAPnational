@@ -64,7 +64,7 @@ s0.parentNode.insertBefore(s1,s0);
             <h3>Member</h3>
             <p>Create a member account to access the member dashboard, complete your profile, and manage your membership.
             </p>
-            <a href="/admin/register.php" class="btn btn-brand w-100" id="goMember">
+           <a href="/register.php" class="btn btn-brand w-100" id="goMember">
               Continue as Member
             </a>
             <div class="mt-2 small text-muted">Tip: If you moved your member signup to <code>/member/register.php</code>, update the link above.</div>
@@ -77,7 +77,7 @@ s0.parentNode.insertBefore(s1,s0);
             <div class="role-icon" aria-hidden="true"><i class="fas fa-user-shield"></i></div>
             <h3>Admin</h3>
             <p>Register an admin account to manage content, users, and system settings in the admin panel.</p>
-            <a href="/register.php" class="btn btn-outline-brand w-100" id="goAdmin">
+            <a href="/admin/register.php" class="btn btn-outline-brand w-100" id="goAdmin">
               Continue as Admin
             </a>
           </div>
