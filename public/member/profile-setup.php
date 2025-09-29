@@ -108,7 +108,7 @@
 
     <div class="card">
       <div class="section-title">Basic Information</div>
-      <form id="profileForm" onsubmit="submitProfile(event)">
+      <form id="profileForm">
         <div class="grid">
           <div class="form-group">
             <label for="name">Full Name</label>
@@ -348,7 +348,8 @@
 
         <div class="actions">
           <button type="button" class="btn secondary" onclick="finishLater()">Finish later</button>
-          <button type="submit" class="btn" id="submitBtn">Save &amp; Continue</button>
+          <button type="button" class="btn" id="btnSaveContinue">Save &amp; Continue</button>
+          <button type="button" class="btn" id="btnSubmitAll">Submit Profile</button>
         </div>
       </form>
     </div>
@@ -428,6 +429,8 @@
     const form = document.getElementById(FORM_ID);
     const notice = document.getElementById('notice');
     const errorBox = document.getElementById('error');
+    const btnSaveContinue = document.getElementById('btnSaveContinue');
+    const btnSubmitAll = document.getElementById('btnSubmitAll');
 
     const show = (el, msg) => { el.textContent = msg; el.classList.remove('hidden'); };
     const hide = (el) => { el.classList.add('hidden'); };
@@ -529,45 +532,104 @@
       }
     });
 
-    // Submit profile - UPDATED to use auth/me endpoint
-    window.submitProfile = async function(ev){
-      ev.preventDefault();
-      const btn = document.getElementById('submitBtn');
+    // SAVE & CONTINUE FUNCTIONALITY
+    btnSaveContinue.addEventListener('click', async ()=>{
+      const btn = btnSaveContinue;
       btn.disabled = true; 
       btn.textContent = 'Saving…';
 
       hide(errorBox); 
       hide(notice);
 
-      const body = {};
-      Array.from(form.elements).forEach(el=>{
-        if (!el.name || el.type === 'file') return;
-        body[el.name] = (el.value || '').trim();
-      });
+      try{
+        const body = {};
+        Array.from(form.elements).forEach(el=>{
+          if (!el.name || el.type === 'file') return;
+          body[el.name] = (el.value || '').trim();
+        });
 
-      // Use PATCH /api/auth/me instead of /api/members/me
-      let res = await authFetch('/api/auth/me', {
-        method:'PATCH',
-        headers:{ 'Content-Type':'application/json' },
-        body: JSON.stringify(body)
-      });
+        // Save profile data
+        let res = await authFetch('/api/auth/me', {
+          method:'PATCH',
+          headers:{ 'Content-Type':'application/json' },
+          body: JSON.stringify(body)
+        });
 
-      const data = await res.json().catch(()=> ({}));
+        const data = await res.json().catch(()=> ({}));
 
-      if (!res.ok) {
-        show(errorBox, data?.message || 'Submit failed: ' + res.status);
+        if (!res.ok) {
+          throw new Error(data?.message || 'Save failed: ' + res.status);
+        }
+
+        // Success - clear draft and redirect to dashboard
+        window.clearDraft();
+        show(notice, 'Profile saved successfully!');
+        setTimeout(()=>{
+          window.location.href = '/member/dashboard.php';
+        }, 1000);
+      }catch(err){
+        show(errorBox, err.message); 
         btn.disabled = false; 
         btn.textContent = 'Save & Continue';
-        return;
       }
+    });
 
-      // Success
-      window.clearDraft();
-      show(notice, 'Profile saved successfully!');
-      setTimeout(()=>{
-        window.location.href = '/member/dashboard.php';
-      }, 1000);
-    };
+    // SUBMIT PROFILE FUNCTIONALITY
+    btnSubmitAll.addEventListener('click', async ()=>{
+      const btn = btnSubmitAll;
+      btn.disabled = true; 
+      btn.textContent = 'Submitting…';
+
+      hide(errorBox); 
+      hide(notice);
+
+      try{
+        // First save all form data
+        const body = {};
+        Array.from(form.elements).forEach(el=>{
+          if (!el.name || el.type === 'file') return;
+          body[el.name] = (el.value || '').trim();
+        });
+
+        // Save profile data
+        let res = await authFetch('/api/auth/me', {
+          method:'PATCH',
+          headers:{ 'Content-Type':'application/json' },
+          body: JSON.stringify(body)
+        });
+
+        const data = await res.json().catch(()=> ({}));
+
+        if (!res.ok) {
+          throw new Error(data?.message || 'Submit failed: ' + res.status);
+        }
+
+        // Then mark profile as completed
+        const fd = new FormData(); 
+        fd.append('profileCompleted', 'true');
+        let completeRes = await authFetch('/api/member/profile', {
+          method:'PATCH',
+          body: fd
+        });
+
+        const completeData = await completeRes.json().catch(()=> ({}));
+
+        if (!completeRes.ok) {
+          throw new Error(completeData?.message || 'Profile completion failed: ' + completeRes.status);
+        }
+
+        // Success
+        window.clearDraft();
+        show(notice, 'Profile submitted successfully! Redirecting to dashboard…');
+        setTimeout(()=>{
+          window.location.href = '/member/dashboard.php';
+        }, 1000);
+      }catch(err){
+        show(errorBox, err.message); 
+        btn.disabled = false; 
+        btn.textContent = 'Submit Profile';
+      }
+    });
   })();
   </script>
 
