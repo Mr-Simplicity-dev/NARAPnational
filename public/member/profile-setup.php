@@ -1,10 +1,6 @@
 <?php
 // profile-setup.php
 // Client-side protected profile setup page for members.
-// Assumes API endpoints:
-//   - POST /api/upload?folder=passports|signatures  (auth: Bearer JWT)
-//   - GET  /api/members/me                          (auth: Bearer JWT)
-//   - PATCH /api/members/me                         (auth: Bearer JWT)  [fallback to PATCH /api/members/:id]
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -118,7 +114,7 @@
           </div>
           <div>
             <label for="email">Email</label>
-            <input type="email" id="email" name="email" placeholder="you@example.com" required />
+            <input type="email" id="email" name="email" placeholder="you@example.com" required readonly />
           </div>
         </div>
 
@@ -185,7 +181,7 @@
   </main>
 
   <script>
-  // Simple authentication check for profile-setup.php
+  // Authentication and user data loading
   (function(){
     const statusEl = document.getElementById('authStatus');
     const token = localStorage.getItem('jwt');
@@ -198,17 +194,49 @@
       return;
     }
     
-    statusEl.textContent = 'Authenticated ✓';
+    statusEl.textContent = 'Loading your data…';
     
-    // Optional: Verify token is still valid with server
+    // Fetch user data and pre-fill the form
     fetch('/api/auth/me', {
       headers: { 'Authorization': 'Bearer ' + token }
-    }).then(res => {
+    })
+    .then(res => {
       if (!res.ok) {
-        throw new Error('Token invalid');
+        throw new Error('Failed to load user data');
       }
-    }).catch(err => {
-      statusEl.textContent = 'Session expired. Redirecting…';
+      return res.json();
+    })
+    .then(userData => {
+      statusEl.textContent = 'Authenticated ✓';
+      
+      // Pre-fill the form with user data
+      if (userData.email) {
+        document.getElementById('email').value = userData.email;
+      }
+      if (userData.name) {
+        document.getElementById('name').value = userData.name;
+      }
+      if (userData.phone) {
+        document.getElementById('phoneNumber').value = userData.phone;
+      }
+      if (userData.state) {
+        document.getElementById('state').value = userData.state;
+      }
+      if (userData.zone) {
+        document.getElementById('zone').value = userData.zone;
+      }
+      if (userData.lga) {
+        document.getElementById('lga').value = userData.lga;
+      }
+      if (userData.address) {
+        document.getElementById('address').value = userData.address;
+      }
+      
+      console.log('User data loaded:', userData);
+    })
+    .catch(err => {
+      console.error('Error loading user data:', err);
+      statusEl.textContent = 'Error loading data. Redirecting…';
       setTimeout(() => { 
         window.location.replace('/member/login.php'); 
       }, 400);
@@ -228,25 +256,30 @@
     const show = (el, msg) => { el.textContent = msg; el.classList.remove('hidden'); };
     const hide = (el) => { el.classList.add('hidden'); };
 
-    // Restore draft (if any)
+    // Restore draft (if any) - but don't override pre-filled data
     try{
       const draft = localStorage.getItem(DRAFT_KEY);
       if (draft && form) {
         const data = JSON.parse(draft);
         Object.keys(data).forEach(k => {
           const el = form.elements.namedItem(k);
-          if (el && el.type !== 'file') el.value = data[k];
+          // Only fill if the field is empty (don't override server data)
+          if (el && el.type !== 'file' && !el.value) {
+            el.value = data[k];
+          }
         });
         show(notice, 'Draft restored — you can continue where you left off.');
         setTimeout(()=> hide(notice), 2500);
       }
     }catch(e){ /* ignore */ }
 
-    // Auto-save any change
-    form?.addEventListener('input', () => {
+    // Auto-save any change (except email since it's readonly)
+    form?.addEventListener('input', (e) => {
+      if (e.target.name === 'email') return; // Don't save email changes
+      
       const payload = {};
       Array.from(form.elements).forEach(el => {
-        if (!el.name || el.type === 'file') return;
+        if (!el.name || el.type === 'file' || el.name === 'email') return;
         payload[el.name] = el.value;
       });
       try{
@@ -278,15 +311,19 @@
     function preview(input, imgSel){
       const img = document.querySelector(imgSel);
       if (!img || !input.files?.[0]) return;
-      img.src = URL.createObjectURL(input.files[0]); // requires CSP img-src to allow blob:
+      img.src = URL.createObjectURL(input.files[0]);
     }
 
     async function uploadFile(file, folder){
-      const fd = new FormData(); fd.append('file', file);
-      const res = await authFetch('/api/upload?folder='+encodeURIComponent(folder), { method:'POST', body: fd });
+      const fd = new FormData(); 
+      fd.append('file', file);
+      const res = await authFetch('/api/upload?folder='+encodeURIComponent(folder), { 
+        method:'POST', 
+        body: fd 
+      });
       const data = await res.json().catch(()=> ({}));
       if (!res.ok) throw new Error(data?.message || 'Upload failed');
-      return data.url; // { url: "https://..." }
+      return data.url;
     }
 
     // Wire file inputs
@@ -298,7 +335,8 @@
         const hidden = form.elements.namedItem('passportUrl');
         if (hidden) hidden.value = url;
       }catch(err){
-        show(errorBox, err.message); setTimeout(()=> hide(errorBox), 2600);
+        show(errorBox, err.message); 
+        setTimeout(()=> hide(errorBox), 2600);
       }
     });
 
@@ -310,17 +348,20 @@
         const hidden = form.elements.namedItem('signatureUrl');
         if (hidden) hidden.value = url;
       }catch(err){
-        show(errorBox, err.message); setTimeout(()=> hide(errorBox), 2600);
+        show(errorBox, err.message); 
+        setTimeout(()=> hide(errorBox), 2600);
       }
     });
 
-    // Submit profile
+    // Submit profile - UPDATED to use auth/me endpoint
     window.submitProfile = async function(ev){
       ev.preventDefault();
       const btn = document.getElementById('submitBtn');
-      btn.disabled = true; btn.textContent = 'Saving…';
+      btn.disabled = true; 
+      btn.textContent = 'Saving…';
 
-      hide(errorBox); hide(notice);
+      hide(errorBox); 
+      hide(notice);
 
       const body = {};
       Array.from(form.elements).forEach(el=>{
@@ -328,40 +369,28 @@
         body[el.name] = (el.value || '').trim();
       });
 
-      // PATCH /api/members/me, fallback to /api/members/:id
-      let res = await authFetch('/api/members/me', {
+      // Use PATCH /api/auth/me instead of /api/members/me
+      let res = await authFetch('/api/auth/me', {
         method:'PATCH',
         headers:{ 'Content-Type':'application/json' },
         body: JSON.stringify(body)
       });
 
-      if (res.status === 404) {
-        // fallback: find my id then PATCH /api/members/:id
-        const meRes = await authFetch('/api/members/me');
-        if (meRes.ok) {
-          const me = await meRes.json();
-          res = await authFetch('/api/members/' + (me?._id || ''), {
-            method:'PATCH',
-            headers:{ 'Content-Type':'application/json' },
-            body: JSON.stringify(body)
-          });
-        }
-      }
-
       const data = await res.json().catch(()=> ({}));
 
       if (!res.ok) {
-        show(errorBox, data?.message || 'Submit failed');
-        btn.disabled = false; btn.textContent = 'Save & Continue';
+        show(errorBox, data?.message || 'Submit failed: ' + res.status);
+        btn.disabled = false; 
+        btn.textContent = 'Save & Continue';
         return;
       }
 
       // Success
       window.clearDraft();
-      show(notice, 'Profile saved successfully.');
+      show(notice, 'Profile saved successfully!');
       setTimeout(()=>{
         window.location.href = '/member/dashboard.php';
-      }, 700);
+      }, 1000);
     };
   })();
   </script>
