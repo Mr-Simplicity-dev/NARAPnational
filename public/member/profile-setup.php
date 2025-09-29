@@ -94,6 +94,9 @@
     .hidden{display:none}
     footer{margin:24px 0; text-align:center; color:var(--muted); font-size:.9rem}
     .form-group{margin-bottom:16px}
+    .instructions{background:#f8faf9; border-left:4px solid var(--brand); padding:16px 20px; border-radius:8px; margin-bottom:24px}
+    .instructions ul{margin:8px 0; padding-left:20px}
+    .instructions li{margin-bottom:6px; font-size:0.9rem; line-height:1.5}
   </style>
 </head>
 <body>
@@ -107,6 +110,18 @@
     <div id="error" class="error hidden"></div>
 
     <div class="card">
+      <!-- Instructions Section -->
+      <div class="instructions">
+        <div class="fw-bold mb-1">Please read before filling this form</div>
+        <ul class="mb-0 ps-3 small">
+          <li>Enter your full legal name exactly as it should appear on NARAP records.</li>
+          <li>Use a valid email address and phone number; confirmations <span class="fw-bold fst-italic">may</span> be sent there.</li>
+          <li>Upload a clear, recent passport photograph (JPG/PNG).</li>
+          <li>Select your correct Date of Birth and state.</li>
+          <li>Double-check all spellings and numbers before submitting.</li>
+        </ul>
+      </div>
+
       <div class="section-title">Basic Information</div>
       <form id="profileForm">
         <div class="grid">
