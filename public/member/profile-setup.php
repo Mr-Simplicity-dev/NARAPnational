@@ -8,6 +8,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>NARAP — Profile Setup</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
     :root{
       --brand:#0a7f41;
@@ -20,6 +22,24 @@
     body{
       margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
       background:var(--bg); color:var(--ink); line-height:1.6;
+    }
+    .reg-topbar {
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      border-bottom: 1px solid #e5e7eb;
+    }
+    .reg-top-logo {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+    .reg-logo {
+      height: 40px;
+    }
+    .reg-title {
+      color: var(--brand);
+      font-weight: 700;
+      border-bottom: 2px solid var(--brand);
+      padding-bottom: 10px;
     }
     header{
       position:sticky; top:0; z-index:5;
@@ -100,277 +120,298 @@
   </style>
 </head>
 <body>
-  <header>
-    <div class="title">NARAP — Profile Setup</div>
-    <div class="status" id="authStatus">Checking authentication…</div>
-  </header>
-
-  <main>
-    <div id="notice" class="info hidden"></div>
-    <div id="error" class="error hidden"></div>
-
-    <div class="card">
-      <!-- Instructions Section -->
-      <div class="instructions">
-        <div class="fw-bold mb-1">Please read before filling this form</div>
-        <ul class="mb-0 ps-3 small">
-          <li>Enter your full legal name exactly as it should appear on NARAP records.</li>
-          <li>Use a valid email address and phone number; confirmations <span class="fw-bold fst-italic">may</span> be sent there.</li>
-          <li>Upload a clear, recent passport photograph (JPG/PNG).</li>
-          <li>Select your correct Date of Birth and state.</li>
-          <li>Double-check all spellings and numbers before submitting.</li>
-        </ul>
+  <!-- Navigation Bar -->
+  <nav class="navbar navbar-expand-lg bg-white navbar-light sticky-top p-0 shadow-sm reg-topbar">
+    <a class="navbar-brand px-4" href="/index.php">NARAP</a>
+    <button class="navbar-toggler me-4" data-bs-target="#navbarCollapse" data-bs-toggle="collapse" type="button">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+      <div class="navbar-nav ms-auto p-4 p-lg-0">
+        <a class="nav-item nav-link" href="/register.php">Back</a>
+        <a class="nav-item nav-link" href="/member/login.php">Member Login</a>
       </div>
-
-      <div class="section-title">Basic Information</div>
-      <form id="profileForm">
-        <div class="grid">
-          <div class="form-group">
-            <label for="name">Full Name</label>
-            <input type="text" id="name" name="name" placeholder="e.g., Aisha Bello" required />
-          </div>
-          <div class="form-group">
-            <label for="email">Email</label>
-            <input type="email" id="email" name="email" placeholder="you@example.com" required readonly />
-          </div>
-        </div>
-
-        <div class="grid">
-          <div class="form-group">
-            <label for="sex">Sex</label>
-            <select id="sex" name="sex" required>
-              <option disabled selected value="">Select Gender</option>
-              <option>Male</option>
-              <option>Female</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="maritalStatus">Marital Status</label>
-            <select id="maritalStatus" name="maritalStatus" required>
-              <option disabled selected value="">Select Status</option>
-              <option>Single</option>
-              <option>Married</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="grid">
-          <div class="form-group">
-            <label for="phoneNumber">Phone Number</label>
-            <input type="text" id="phoneNumber" name="phoneNumber" placeholder="+234…" required />
-          </div>
-          <div class="form-group">
-            <label for="state">State</label>
-            <select id="state" name="state" required>
-              <option disabled selected value="">Select State</option>
-              <option>Abia</option>
-              <option>Adamawa</option>
-              <option>Akwa Ibom</option>
-              <option>Anambra</option>
-              <option>Bauchi</option>
-              <option>Bayelsa</option>
-              <option>Benue</option>
-              <option>Borno</option>
-              <option>Cross River</option>
-              <option>Delta</option>
-              <option>Ebonyi</option>
-              <option>Edo</option>
-              <option>Ekiti</option>
-              <option>Enugu</option>
-              <option>Gombe</option>
-              <option>Imo</option>
-              <option>Jigawa</option>
-              <option>Kaduna</option>
-              <option>Kano</option>
-              <option>Katsina</option>
-              <option>Kebbi</option>
-              <option>Kogi</option>
-              <option>Kwara</option>
-              <option>Lagos</option>
-              <option>Nasarawa</option>
-              <option>Niger</option>
-              <option>Ogun</option>
-              <option>Ondo</option>
-              <option>Osun</option>
-              <option>Oyo</option>
-              <option>Plateau</option>
-              <option>Rivers</option>
-              <option>Sokoto</option>
-              <option>Taraba</option>
-              <option>Yobe</option>
-              <option>Zamfara</option>
-              <option>FCT (Abuja)</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="grid">
-          <div class="form-group">
-            <label for="lga">LGA</label>
-            <input type="text" id="lga" name="lga" placeholder="Local Government Area" />
-          </div>
-          <div class="form-group">
-            <label for="zone">Zone</label>
-            <input type="text" id="zone" name="zone" placeholder="e.g., North Central" />
-          </div>
-        </div>
-
-        <div class="grid">
-          <div class="form-group">
-            <label for="ward">Ward</label>
-            <input type="text" id="ward" name="ward" placeholder="Ward" />
-          </div>
-          <div class="form-group">
-            <label for="businessName">Business Registered Name</label>
-            <input type="text" id="businessName" name="businessName" placeholder="Business Registered Name" required />
-          </div>
-        </div>
-
-        <div class="grid">
-          <div class="form-group">
-            <label for="businessAddress">Business Address</label>
-            <input type="text" id="businessAddress" name="businessAddress" placeholder="Business Address" required />
-          </div>
-          <div class="form-group">
-            <label for="specialization">Area of Specialization</label>
-            <select id="specialization" name="specialization" required>
-              <option disabled selected value="">Select Area of Specialization</option>
-              <option>Air Conditioning</option>
-              <option>Refrigeration</option>
-              <option>Air Conditioning & Refrigeration</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label for="position">All Positions</label>
-          <select id="position" name="position" required>
-            <option disabled selected value="">Select Position</option>
-            <option>President</option>
-            <option>Deputy President</option>
-            <option>Vice President (North Central)</option>
-            <option>Vice President (North East)</option>
-            <option>Vice President (North West)</option>
-            <option>Vice President (South East)</option>
-            <option>Vice President (South South)</option>
-            <option>Vice President (South West)</option>
-            <option>Secretary</option>
-            <option>Assistant Secretary</option>
-            <option>Financial Secretary</option>
-            <option>Assistant Financial Secretary</option>
-            <option>Treasurer</option>
-            <option>Public Relation Officer (PRO)</option>
-            <option>Assistant Public Relation Officer (APRO)</option>
-            <option>Provost Marshal 1</option>
-            <option>Provost Marshal 2</option>
-            <option>State Welfare Coordinator</option>
-            <option>Coordinator</option>
-            <option>Assistant Coordinator</option>
-            <option>Chairman</option>
-            <option>Vice Chairman</option>
-            <option>State Secretary</option>
-            <option>State Assistant Secretary</option>
-            <option>State Financial Secretary</option>
-            <option>State Treasurer</option>
-            <option>Task Force</option>
-            <option>Old Member</option>
-            <option>New Member</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label for="address">Address</label>
-          <input type="text" id="address" name="address" placeholder="Street, city" />
-        </div>
-
-        <div class="section-title">Next of Kin & Guarantor</div>
-
-        <div class="grid">
-          <div class="form-group">
-            <label for="nextOfKin">Next of Kin</label>
-            <input type="text" id="nextOfKin" name="nextOfKin" placeholder="Next of Kin" />
-          </div>
-          <div class="form-group">
-            <label for="guarantor">Guarantor <span class="muted">(must be a practitioner)</span></label>
-            <input type="text" id="guarantor" name="guarantor" placeholder="Guarantor" required />
-          </div>
-        </div>
-
-        <div class="grid">
-          <div class="form-group">
-            <label for="guarantorAddress">Guarantor's Address</label>
-            <input type="text" id="guarantorAddress" name="guarantorAddress" placeholder="Address" required />
-          </div>
-          <div class="form-group">
-            <label for="guarantorPosition">Guarantor's Position</label>
-            <select id="guarantorPosition" name="guarantorPosition" required>
-              <option disabled selected value="">Select Position</option>
-              <option>Deputy President</option>
-              <option>Vice President (North Central)</option>
-              <option>Vice President (North East)</option>
-              <option>Vice President (North West)</option>
-              <option>Vice President (South East)</option>
-              <option>Vice President (South South)</option>
-              <option>Vice President (South West)</option>
-              <option>Secretary</option>
-              <option>Assistant Secretary</option>
-              <option>Financial Secretary</option>
-              <option>Assistant Financial Secretary</option>
-              <option>Treasurer</option>
-              <option>Public Relation Officer (PRO)</option>
-              <option>Assistant Public Relation Officer (APRO)</option>
-              <option>Provost Marshal 1</option>
-              <option>Provost Marshal 2</option>
-              <option>State Welfare Coordinator</option>
-              <option>Coordinator</option>
-              <option>Assistant Coordinator</option>
-              <option>Chairman</option>
-              <option>Vice Chairman</option>
-              <option>State Secretary</option>
-              <option>State Assistant Secretary</option>
-              <option>State Financial Secretary</option>
-              <option>State Treasurer</option>
-              <option>Task Force</option>
-              <option>Member</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="section-title">Passport &amp; Signature</div>
-        <p class="help">Upload clear images. Previews appear instantly. Files upload securely before you submit.</p>
-
-        <!-- Hidden fields populated after upload -->
-        <input type="hidden" name="passportUrl" />
-        <input type="hidden" name="signatureUrl" />
-
-        <div class="upload-wrap">
-          <div class="preview-card">
-            <div class="preview-box">
-              <img class="passport-preview" alt="Passport preview" />
-            </div>
-            <label class="file-upload-label" for="passport">Upload Passport</label>
-            <input id="passport" type="file" accept="image/*" class="hidden" />
-          </div>
-
-          <div class="preview-card">
-            <div class="preview-box">
-              <img class="signature-preview" alt="Signature preview" />
-            </div>
-            <label class="file-upload-label" for="signature">Upload Signature</label>
-            <input id="signature" type="file" accept="image/*" class="hidden" />
-          </div>
-        </div>
-
-        <div class="actions">
-          <button type="button" class="btn secondary" onclick="finishLater()">Finish later</button>
-          <button type="button" class="btn" id="btnSaveContinue">Save &amp; Continue</button>
-          <button type="button" class="btn" id="btnSubmitAll">Submit Profile</button>
-        </div>
-      </form>
     </div>
+    <div class="reg-top-logo">
+      <img alt="NARAP Logo" class="reg-logo img-fluid" src="/uploads/slider/Narap.png"/>
+    </div>
+  </nav>
 
-    <footer>Tip: If you leave, your progress is auto-saved on this device.</footer>
-  </main>
+  <div class="container py-5">
+    <div class="row justify-content-center">
+      <div class="col-lg-9">
+        <h1 class="mb-4 reg-title">Member Registration</h1>
+
+        <div id="notice" class="info hidden"></div>
+        <div id="error" class="error hidden"></div>
+
+        <div class="card">
+          <!-- Instructions Section -->
+          <div class="instructions">
+            <div class="fw-bold mb-1">Please read before filling this form</div>
+            <ul class="mb-0 ps-3 small">
+              <li>Enter your full legal name exactly as it should appear on NARAP records.</li>
+              <li>Use a valid email address and phone number; confirmations <span class="fw-bold fst-italic">may</span> be sent there.</li>
+              <li>Upload a clear, recent passport photograph (JPG/PNG).</li>
+              <li>Select your correct Date of Birth and state.</li>
+              <li>Double-check all spellings and numbers before submitting.</li>
+            </ul>
+          </div>
+
+          <div class="section-title">Basic Information</div>
+          <form id="profileForm">
+            <div class="grid">
+              <div class="form-group">
+                <label for="name">Full Name</label>
+                <input type="text" id="name" name="name" placeholder="e.g., Aisha Bello" required />
+              </div>
+              <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" placeholder="you@example.com" required readonly />
+              </div>
+            </div>
+
+            <div class="grid">
+              <div class="form-group">
+                <label for="sex">Sex</label>
+                <select id="sex" name="sex" required>
+                  <option disabled selected value="">Select Gender</option>
+                  <option>Male</option>
+                  <option>Female</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="maritalStatus">Marital Status</label>
+                <select id="maritalStatus" name="maritalStatus" required>
+                  <option disabled selected value="">Select Status</option>
+                  <option>Single</option>
+                  <option>Married</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="grid">
+              <div class="form-group">
+                <label for="phoneNumber">Phone Number</label>
+                <input type="text" id="phoneNumber" name="phoneNumber" placeholder="+234…" required />
+              </div>
+              <div class="form-group">
+                <label for="state">State</label>
+                <select id="state" name="state" required>
+                  <option disabled selected value="">Select State</option>
+                  <option>Abia</option>
+                  <option>Adamawa</option>
+                  <option>Akwa Ibom</option>
+                  <option>Anambra</option>
+                  <option>Bauchi</option>
+                  <option>Bayelsa</option>
+                  <option>Benue</option>
+                  <option>Borno</option>
+                  <option>Cross River</option>
+                  <option>Delta</option>
+                  <option>Ebonyi</option>
+                  <option>Edo</option>
+                  <option>Ekiti</option>
+                  <option>Enugu</option>
+                  <option>Gombe</option>
+                  <option>Imo</option>
+                  <option>Jigawa</option>
+                  <option>Kaduna</option>
+                  <option>Kano</option>
+                  <option>Katsina</option>
+                  <option>Kebbi</option>
+                  <option>Kogi</option>
+                  <option>Kwara</option>
+                  <option>Lagos</option>
+                  <option>Nasarawa</option>
+                  <option>Niger</option>
+                  <option>Ogun</option>
+                  <option>Ondo</option>
+                  <option>Osun</option>
+                  <option>Oyo</option>
+                  <option>Plateau</option>
+                  <option>Rivers</option>
+                  <option>Sokoto</option>
+                  <option>Taraba</option>
+                  <option>Yobe</option>
+                  <option>Zamfara</option>
+                  <option>FCT (Abuja)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="grid">
+              <div class="form-group">
+                <label for="lga">LGA</label>
+                <input type="text" id="lga" name="lga" placeholder="Local Government Area" />
+              </div>
+              <div class="form-group">
+                <label for="zone">Zone</label>
+                <input type="text" id="zone" name="zone" placeholder="e.g., North Central" />
+              </div>
+            </div>
+
+            <div class="grid">
+              <div class="form-group">
+                <label for="ward">Ward</label>
+                <input type="text" id="ward" name="ward" placeholder="Ward" />
+              </div>
+              <div class="form-group">
+                <label for="businessName">Business Registered Name</label>
+                <input type="text" id="businessName" name="businessName" placeholder="Business Registered Name" required />
+              </div>
+            </div>
+
+            <div class="grid">
+              <div class="form-group">
+                <label for="businessAddress">Business Address</label>
+                <input type="text" id="businessAddress" name="businessAddress" placeholder="Business Address" required />
+              </div>
+              <div class="form-group">
+                <label for="specialization">Area of Specialization</label>
+                <select id="specialization" name="specialization" required>
+                  <option disabled selected value="">Select Area of Specialization</option>
+                  <option>Air Conditioning</option>
+                  <option>Refrigeration</option>
+                  <option>Air Conditioning & Refrigeration</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="position">All Positions</label>
+              <select id="position" name="position" required>
+                <option disabled selected value="">Select Position</option>
+                <option>President</option>
+                <option>Deputy President</option>
+                <option>Vice President (North Central)</option>
+                <option>Vice President (North East)</option>
+                <option>Vice President (North West)</option>
+                <option>Vice President (South East)</option>
+                <option>Vice President (South South)</option>
+                <option>Vice President (South West)</option>
+                <option>Secretary</option>
+                <option>Assistant Secretary</option>
+                <option>Financial Secretary</option>
+                <option>Assistant Financial Secretary</option>
+                <option>Treasurer</option>
+                <option>Public Relation Officer (PRO)</option>
+                <option>Assistant Public Relation Officer (APRO)</option>
+                <option>Provost Marshal 1</option>
+                <option>Provost Marshal 2</option>
+                <option>State Welfare Coordinator</option>
+                <option>Coordinator</option>
+                <option>Assistant Coordinator</option>
+                <option>Chairman</option>
+                <option>Vice Chairman</option>
+                <option>State Secretary</option>
+                <option>State Assistant Secretary</option>
+                <option>State Financial Secretary</option>
+                <option>State Treasurer</option>
+                <option>Task Force</option>
+                <option>Old Member</option>
+                <option>New Member</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="address">Address</label>
+              <input type="text" id="address" name="address" placeholder="Street, city" />
+            </div>
+
+            <div class="section-title">Next of Kin & Guarantor</div>
+
+            <div class="grid">
+              <div class="form-group">
+                <label for="nextOfKin">Next of Kin</label>
+                <input type="text" id="nextOfKin" name="nextOfKin" placeholder="Next of Kin" />
+              </div>
+              <div class="form-group">
+                <label for="guarantor">Guarantor <span class="muted">(must be a practitioner)</span></label>
+                <input type="text" id="guarantor" name="guarantor" placeholder="Guarantor" required />
+              </div>
+            </div>
+
+            <div class="grid">
+              <div class="form-group">
+                <label for="guarantorAddress">Guarantor's Address</label>
+                <input type="text" id="guarantorAddress" name="guarantorAddress" placeholder="Address" required />
+              </div>
+              <div class="form-group">
+                <label for="guarantorPosition">Guarantor's Position</label>
+                <select id="guarantorPosition" name="guarantorPosition" required>
+                  <option disabled selected value="">Select Position</option>
+                  <option>Deputy President</option>
+                  <option>Vice President (North Central)</option>
+                  <option>Vice President (North East)</option>
+                  <option>Vice President (North West)</option>
+                  <option>Vice President (South East)</option>
+                  <option>Vice President (South South)</option>
+                  <option>Vice President (South West)</option>
+                  <option>Secretary</option>
+                  <option>Assistant Secretary</option>
+                  <option>Financial Secretary</option>
+                  <option>Assistant Financial Secretary</option>
+                  <option>Treasurer</option>
+                  <option>Public Relation Officer (PRO)</option>
+                  <option>Assistant Public Relation Officer (APRO)</option>
+                  <option>Provost Marshal 1</option>
+                  <option>Provost Marshal 2</option>
+                  <option>State Welfare Coordinator</option>
+                  <option>Coordinator</option>
+                  <option>Assistant Coordinator</option>
+                  <option>Chairman</option>
+                  <option>Vice Chairman</option>
+                  <option>State Secretary</option>
+                  <option>State Assistant Secretary</option>
+                  <option>State Financial Secretary</option>
+                  <option>State Treasurer</option>
+                  <option>Task Force</option>
+                  <option>Member</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="section-title">Passport &amp; Signature</div>
+            <p class="help">Upload clear images. Previews appear instantly. Files upload securely before you submit.</p>
+
+            <!-- Hidden fields populated after upload -->
+            <input type="hidden" name="passportUrl" />
+            <input type="hidden" name="signatureUrl" />
+
+            <div class="upload-wrap">
+              <div class="preview-card">
+                <div class="preview-box">
+                  <img class="passport-preview" alt="Passport preview" />
+                </div>
+                <label class="file-upload-label" for="passport">Upload Passport</label>
+                <input id="passport" type="file" accept="image/*" class="hidden" />
+              </div>
+
+              <div class="preview-card">
+                <div class="preview-box">
+                  <img class="signature-preview" alt="Signature preview" />
+                </div>
+                <label class="file-upload-label" for="signature">Upload Signature</label>
+                <input id="signature" type="file" accept="image/*" class="hidden" />
+              </div>
+            </div>
+
+            <div class="actions">
+              <button type="button" class="btn secondary" onclick="finishLater()">Finish later</button>
+              <button type="button" class="btn" id="btnSaveContinue">Save &amp; Continue</button>
+              <button type="button" class="btn" id="btnSubmitAll">Submit Profile</button>
+            </div>
+          </form>
+        </div>
+
+        <footer>Tip: If you leave, your progress is auto-saved on this device.</footer>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
   // Authentication and user data loading
