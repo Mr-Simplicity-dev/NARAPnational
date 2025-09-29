@@ -80,7 +80,14 @@
     .btn.secondary{background:#eef7f1; color:var(--brand); font-weight:700}
     .btn:active{transform:translateY(1px)}
     .btn[disabled]{opacity:.6; cursor:not-allowed}
-    .actions{display:flex; gap:14px; justify-content:flex-end; margin-top:24px}
+    .actions{display:flex; gap:14px; justify-content:space-between; margin-top:24px}
+    .actions-left{display:flex; gap:14px; justify-content:flex-start}
+    .actions-center{display:flex; gap:14px; justify-content:center}
+    .actions-right{display:flex; gap:14px; justify-content:flex-end}
+    @media (max-width: 768px){
+      .actions{flex-direction:column; align-items:stretch}
+      .actions-left, .actions-center, .actions-right{justify-content:center}
+    }
     .section-title{font-size:1.2rem; font-weight:800; margin:24px 0 18px; color:var(--brand); border-bottom:2px solid #eef7f1; padding-bottom:8px}
     .help{font-size:.9rem; color:var(--muted); margin-bottom:16px}
     .info{background:#eef7f1; color:#064e2d; padding:12px 16px; border-radius:10px; border:1px solid #d1ecda; margin-bottom:20px}
@@ -398,9 +405,15 @@
             </div>
 
             <div class="actions">
-              <button type="button" class="btn secondary" onclick="finishLater()">Finish later</button>
-              <button type="button" class="btn" id="btnSaveContinue">Save &amp; Continue</button>
-              <button type="button" class="btn" id="btnSubmitAll">Submit Profile</button>
+              <div class="actions-left">
+                <button type="button" class="btn secondary" onclick="finishLater()">Finish later</button>
+              </div>
+              <div class="actions-center">
+                <button type="button" class="btn" id="btnSaveContinue">Save &amp; Continue</button>
+              </div>
+              <div class="actions-right">
+                <button type="button" class="btn" id="btnSubmitAll">Submit Profile</button>
+              </div>
             </div>
           </form>
         </div>
@@ -416,35 +429,38 @@
   <script>
   // Authentication and user data loading
   (function(){
-    const statusEl = document.getElementById('authStatus');
     const token = localStorage.getItem('jwt');
     
     if (!token) {
-      statusEl.textContent = 'Not authenticated. Redirecting…';
+      console.log('No JWT token found, redirecting to login...');
       setTimeout(() => { 
         window.location.replace('/member/login.php'); 
       }, 400);
       return;
     }
     
-    statusEl.textContent = 'Loading your data…';
+    console.log('JWT token found, fetching user data...');
     
     // Fetch user data and pre-fill the form
     fetch('/api/auth/me', {
-      headers: { 'Authorization': 'Bearer ' + token }
+      headers: { 
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json'
+      }
     })
     .then(res => {
       if (!res.ok) {
-        throw new Error('Failed to load user data');
+        throw new Error('Failed to load user data: ' + res.status);
       }
       return res.json();
     })
     .then(userData => {
-      statusEl.textContent = 'Authenticated ✓';
+      console.log('User data loaded:', userData);
       
       // Pre-fill the form with user data
       if (userData.email) {
         document.getElementById('email').value = userData.email;
+        console.log('Email pre-filled:', userData.email);
       }
       if (userData.name) {
         document.getElementById('name').value = userData.name;
@@ -465,11 +481,9 @@
         document.getElementById('address').value = userData.address;
       }
       
-      console.log('User data loaded:', userData);
     })
     .catch(err => {
       console.error('Error loading user data:', err);
-      statusEl.textContent = 'Error loading data. Redirecting…';
       setTimeout(() => { 
         window.location.replace('/member/login.php'); 
       }, 400);
@@ -535,7 +549,7 @@
     window.authFetch = (url, opts = {}) => {
       const token = localStorage.getItem('jwt');
       const headers = Object.assign(
-        { },
+        { 'Content-Type': 'application/json' },
         token ? { 'Authorization': 'Bearer ' + token } : {},
         opts.headers || {}
       );
@@ -607,7 +621,6 @@
         // Save profile data
         let res = await authFetch('/api/auth/me', {
           method:'PATCH',
-          headers:{ 'Content-Type':'application/json' },
           body: JSON.stringify(body)
         });
 
@@ -650,7 +663,6 @@
         // Save profile data
         let res = await authFetch('/api/auth/me', {
           method:'PATCH',
-          headers:{ 'Content-Type':'application/json' },
           body: JSON.stringify(body)
         });
 
