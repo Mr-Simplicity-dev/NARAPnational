@@ -442,7 +442,7 @@
     console.log('JWT token found, fetching user data...');
     
     // Fetch user data and pre-fill the form
-    fetch('/api/auth/me', {
+    fetch('/api/member/profile', {
       headers: { 
         'Authorization': 'Bearer ' + token,
         'Content-Type': 'application/json'
@@ -549,10 +549,15 @@
     window.authFetch = (url, opts = {}) => {
       const token = localStorage.getItem('jwt');
       const headers = Object.assign(
-        { 'Content-Type': 'application/json' },
-        token ? { 'Authorization': 'Bearer ' + token } : {},
-        opts.headers || {}
+        opts.headers || {},
+        token ? { 'Authorization': 'Bearer ' + token } : {}
       );
+      
+      // Don't override Content-Type for FormData (file uploads)
+      if (!opts.body || !(opts.body instanceof FormData)) {
+        headers['Content-Type'] = 'application/json';
+      }
+      
       return fetch(url, Object.assign({}, opts, { headers, credentials: 'include' }));
     };
 
@@ -566,13 +571,13 @@
     async function uploadFile(file, folder){
       const fd = new FormData(); 
       fd.append('file', file);
-      const res = await authFetch('/api/upload?folder='+encodeURIComponent(folder), { 
+      const res = await authFetch('/api/uploads?folder='+encodeURIComponent(folder), { 
         method:'POST', 
         body: fd 
       });
       const data = await res.json().catch(()=> ({}));
       if (!res.ok) throw new Error(data?.message || 'Upload failed');
-      return data.url;
+      return data.fileUrl || data.url;
     }
 
     // Wire file inputs
@@ -583,9 +588,11 @@
         const url = await uploadFile(e.target.files[0], 'passports');
         const hidden = form.elements.namedItem('passportUrl');
         if (hidden) hidden.value = url;
+        show(notice, 'Passport uploaded successfully!');
+        setTimeout(()=> hide(notice), 2000);
       }catch(err){
-        show(errorBox, err.message); 
-        setTimeout(()=> hide(errorBox), 2600);
+        show(errorBox, 'Passport upload failed: ' + err.message); 
+        setTimeout(()=> hide(errorBox), 4000);
       }
     });
 
@@ -596,9 +603,11 @@
         const url = await uploadFile(e.target.files[0], 'signatures');
         const hidden = form.elements.namedItem('signatureUrl');
         if (hidden) hidden.value = url;
+        show(notice, 'Signature uploaded successfully!');
+        setTimeout(()=> hide(notice), 2000);
       }catch(err){
-        show(errorBox, err.message); 
-        setTimeout(()=> hide(errorBox), 2600);
+        show(errorBox, 'Signature upload failed: ' + err.message); 
+        setTimeout(()=> hide(errorBox), 4000);
       }
     });
 
@@ -618,8 +627,8 @@
           body[el.name] = (el.value || '').trim();
         });
 
-        // Save profile data
-        let res = await authFetch('/api/auth/me', {
+        // Save profile data - use the correct endpoint
+        let res = await authFetch('/api/member/profile', {
           method:'PATCH',
           body: JSON.stringify(body)
         });
@@ -660,8 +669,11 @@
           body[el.name] = (el.value || '').trim();
         });
 
-        // Save profile data
-        let res = await authFetch('/api/auth/me', {
+        // Add profile completed flag
+        body.profileCompleted = true;
+
+        // Save profile data - use the correct endpoint
+        let res = await authFetch('/api/member/profile', {
           method:'PATCH',
           body: JSON.stringify(body)
         });
@@ -670,20 +682,6 @@
 
         if (!res.ok) {
           throw new Error(data?.message || 'Submit failed: ' + res.status);
-        }
-
-        // Then mark profile as completed
-        const fd = new FormData(); 
-        fd.append('profileCompleted', 'true');
-        let completeRes = await authFetch('/api/member/profile', {
-          method:'PATCH',
-          body: fd
-        });
-
-        const completeData = await completeRes.json().catch(()=> ({}));
-
-        if (!completeRes.ok) {
-          throw new Error(completeData?.message || 'Profile completion failed: ' + completeRes.status);
         }
 
         // Success

@@ -2,6 +2,8 @@ import express from 'express';
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
+import { requireAuth } from '../middleware/auth.js'; // Add this
+import requireAdmin from '../middleware/requireAdmin.js'; // Add this
 
 const router = express.Router();
 
@@ -23,7 +25,8 @@ function folderSafe(name){ return String(name || 'file').replace(/[^a-z0-9_-]/gi
 
 const upload = multer({ storage });
 
-router.post('/', upload.single('file'), (req, res) => {
+// Add authentication for admin uploads
+router.post('/', requireAuth, requireAdmin, upload.single('file'), (req, res) => {
   const folder = (req.query.folder || 'misc').replace(/[^a-z0-9_-]/gi, '');
   const filename = req.file.filename;
   const urlPath = `/admin/uploads/${folder}/${filename}`;

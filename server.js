@@ -20,14 +20,15 @@ import offerRoutes from './src/routes/offers.js';
 import productRoutes from './src/routes/products.js';
 import featureRoutes from './src/routes/features.js';
 import settingsRoutes from './src/routes/settings.js';
-import uploadRoutes from './src/routes/upload.js';
+import uploadRoutes from './src/routes/upload.js'; // Admin uploads
+import uploadsRoutes from './src/routes/uploads.js'; // Member uploads 
 import { requireAuth } from './src/middleware/auth.js';
 import requireAdmin from './src/middleware/requireAdmin.js';
 import eventRoutes from './src/routes/events.js';
 import commentRoutes from './src/routes/comments.js';
 import paymentRoutes from './src/routes/payments.js';
-import memberRoutes from './src/routes/member.js';
-import registrationsRoutes from './src/routes/members.js';
+import memberRoutes from './src/routes/member.js'; // singular
+import registrationsRoutes from './src/routes/members.js'; // plural
 import paidRoutes from './src/routes/paid.js';
 import unpaidRoutes from './src/routes/unpaid.js';
 
@@ -86,17 +87,17 @@ app.use(helmet({
         
       ],
       "img-src": [
-  "'self'",
-  "data:",
-  "blob:",              // ← add this for file previews
-  "https://static.whatsapp.net",
-  "https://www.facebook.com",
-  "https://*.fbcdn.net",
-  "https://cdn.tawk.to",
-  "https://tawk.to",
-  "https://*.tawk.to",
-  "https://pagead2.googlesyndication.com"
-],
+        "'self'",
+        "data:",
+        "blob:",
+        "https://static.whatsapp.net",
+        "https://www.facebook.com",
+        "https://*.fbcdn.net",
+        "https://cdn.tawk.to",
+        "https://tawk.to",
+        "https://*.tawk.to",
+        "https://pagead2.googlesyndication.com"
+      ],
       "font-src": [
         "'self'",
         "data:",
@@ -117,17 +118,17 @@ app.use(helmet({
         "https://googleads.g.doubleclick.net",
         "https://js.paystack.co"],
       "connect-src": [
-  "'self'",
-  "https://tawk.to",
-  "https://embed.tawk.to",
-  "https://cdn.tawk.to",
-  "https://va.tawk.to",
-  "https://*.tawk.to",
-  "wss://*.tawk.to",
-  "https://ep1.adtrafficquality.google",
-  "https://api.paystack.co",
-  "https://cdn.jsdelivr.net" // ← optional (removes .map console noise)
-]
+        "'self'",
+        "https://tawk.to",
+        "https://embed.tawk.to",
+        "https://cdn.tawk.to",
+        "https://va.tawk.to",
+        "https://*.tawk.to",
+        "wss://*.tawk.to",
+        "https://ep1.adtrafficquality.google",
+        "https://api.paystack.co",
+        "https://cdn.jsdelivr.net"
+      ]
     }
   }
 }));
@@ -141,7 +142,7 @@ app.get(/\.php$/, (req, res, next) => {
   const filePath = path.join(__dirname, 'public', req.path);
   fs.access(filePath, fs.constants.F_OK, (err) => {
     if (err) return next();
-    res.type('html'); // Content-Type: text/html
+    res.type('html');
     res.sendFile(filePath, (e) => (e ? next(e) : null));
   });
 });
@@ -161,7 +162,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
 // Map legacy PHP links to single-page anchors
 app.get('/about.php', (req, res) => res.redirect('/#about'));
 
-// APIs
+// APIs - FIXED ROUTES
 app.use('/api/auth', authRoutes);
 app.use('/api/blogs', blogRoutes);
 app.use('/api/services', serviceRoutes);
@@ -173,18 +174,33 @@ app.use('/api/offers', offerRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/features', featureRoutes);
 app.use('/api/settings', settingsRoutes);
-app.use('/api/upload', requireAuth, uploadRoutes);
+app.use('/api/upload', uploadRoutes); // Admin uploads (dashboard)
+app.use('/api/uploads', uploadsRoutes); // Member uploads
 app.use('/api/events', eventRoutes);
 app.use('/api/comments', commentRoutes);
 app.use('/api/payments', paymentRoutes);
-app.use('/api/members', requireAuth, memberRoutes);
-app.use('/api/registrations', requireAuth, requireAdmin, registrationsRoutes);
+
+// Member routes - ONLY ONCE
+app.use('/api/member', memberRoutes); // This handles /api/member/profile
+
+// Admin routes
+app.use('/api/members', requireAuth, requireAdmin, registrationsRoutes);
 app.use('/api/members/paid', requireAuth, requireAdmin, paidRoutes);
 app.use('/api/members/unpaid', requireAuth, requireAdmin, unpaidRoutes);
 
-
 // Health
 app.get('/healthz', (_req,res)=>res.json({ ok:true }));
+
+// Global error handler
+app.use((err, req, res, next) => {
+  console.error('Error:', err);
+  res.status(500).json({ error: 'Internal server error' });
+});
+
+// 404 handler
+app.use((req, res) => {
+  res.status(404).json({ error: 'Route not found' });
+});
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`🚀 Server running on http://localhost:${PORT}`));
