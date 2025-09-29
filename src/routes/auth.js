@@ -145,8 +145,8 @@ router.post('/register-member', uploadMember.single('passport'), async (req, res
       declare_agree: declare
     });
 
-    return res.status(201).json({
-      id: user._id,
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET || 'secret', { expiresIn: '7d' });
+    return res.status(201).json({ token, user: { id: user._id,
       email: user.email,
       role: user.role,
       name: user.name,
@@ -158,9 +158,8 @@ router.post('/register-member', uploadMember.single('passport'), async (req, res
       guarantor: user.guarantor || null,
       dob: user.dob || null,
       declare_agree: !!user.declare_agree,
-      passportUrl: user.passportUrl || null
-    });
-  } catch (e) {
+      passportUrl: user.passportUrl || null } });
+} catch (e) {
     // Duplicate email friendly message
     if (e && e.code === 11000) {
       return res.status(400).json({ message: 'Email already exists' });

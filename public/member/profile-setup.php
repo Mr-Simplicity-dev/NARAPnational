@@ -1,349 +1,370 @@
-<?php /* profile-setup.php — Guided multi-step profile completion
-  - GET /api/member/profile   → prefill
-  - PATCH /api/member/profile → autosave per section
-  - Final submit can also PATCH with { profileCompleted: true }
-  - Requires Bootstrap 5 (already in project). Uses jQuery if present; otherwise plain JS.
-*/ ?>
-<!doctype html>
+<?php
+// profile-setup.php
+// Client-side protected profile setup page for members.
+// Assumes API endpoints:
+//   - POST /api/upload?folder=passports|signatures  (auth: Bearer JWT)
+//   - GET  /api/members/me                          (auth: Bearer JWT)
+//   - PATCH /api/members/me                         (auth: Bearer JWT)  [fallback to PATCH /api/members/:id]
+?>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>NARAP — Complete Your Profile</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+  <title>NARAP — Profile Setup</title>
   <style>
-    :root{ --brand:#0a7f41; --muted:#6b7280; }
-    body{ background:#f6f8fa; font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, 'Helvetica Neue', Arial }
-    .container-narrow{ max-width:980px }
-    .card-setup{ background:#fff; border-radius:18px; box-shadow:0 10px 30px rgba(16,24,40,.08); padding:24px }
-    .stepper{ display:flex; gap:12px; flex-wrap:wrap; margin-bottom:20px }
-    .step{ display:flex; align-items:center; gap:8px; padding:8px 12px; border-radius:12px; background:#eef2f4; color:#111827; font-weight:600; cursor:pointer; user-select:none }
-    .step.active{ background:#e6f6ee; color:#065f38; outline:2px solid rgba(10,127,65,.25) }
-    .progress{ height:8px; border-radius:999px }
-    .form-control, .form-select{ border-radius:12px; padding:.7rem .9rem }
-    .actions{ display:flex; gap:12px; justify-content:flex-end }
-    .btn-brand{ background:var(--brand); border-color:var(--brand); color:#fff; font-weight:600; padding:.7rem 1rem; border-radius:12px }
-    .btn-outline-brand{ border-color:var(--brand); color:var(--brand); font-weight:600; border-radius:12px }
-    .section{ display:none }
-    .section.active{ display:block }
-    .hint{ color:var(--muted); font-size:.95rem }
-    .upload-preview{ display:flex; align-items:center; justify-content:center; border:1px dashed #cfd8dc; border-radius:12px; background:#fafafa; width:100%; height:180px; overflow:hidden }
-    .upload-preview img{ max-width:100%; max-height:100%; object-fit:contain }
-    @media (max-width: 576px){ .upload-preview{ height:140px } }
+    :root{
+      --brand:#0a7f41;
+      --ink:#0b1220; --muted:#6b7280; --surface:#ffffff; --bg:#f7faf9;
+      --ok:#16a34a; --warn:#f59e0b; --err:#ef4444;
+      --ring: 0 0 0 3px rgba(10,127,65,.18);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      background:var(--bg); color:var(--ink); line-height:1.6;
+    }
+    header{
+      position:sticky; top:0; z-index:5;
+      background:var(--brand); color:#fff; padding:14px 18px;
+      display:flex; align-items:center; justify-content:space-between;
+      box-shadow:0 2px 8px rgba(0,0,0,.1);
+    }
+    header .title{font-weight:800; letter-spacing:.2px}
+    header .status{font-size:.9rem; opacity:.9}
+    main{max-width:980px; margin:28px auto; padding:0 16px}
+    .card{
+      background:var(--surface); border-radius:16px; padding:20px;
+      box-shadow:0 8px 24px rgba(2,6,23,.06);
+      border:1px solid #e5efe9;
+    }
+    .grid{display:grid; grid-template-columns:1fr 1fr; gap:16px}
+    .grid-3{display:grid; grid-template-columns:repeat(3,1fr); gap:16px}
+    @media (max-width: 860px){
+      .grid,.grid-3{grid-template-columns:1fr}
+    }
+    label{display:block; font-weight:600; margin:10px 0 6px}
+    input[type="text"], input[type="email"], textarea, select{
+      width:100%; padding:12px 12px; border:1px solid #dbe7e0; border-radius:12px;
+      background:#fff; color:var(--ink); outline:none;
+      transition:border-color .15s ease, box-shadow .15s ease;
+    }
+    input[type="text"]:focus, input[type="email"]:focus, textarea:focus, select:focus{
+      border-color:var(--brand); box-shadow:var(--ring);
+    }
+    textarea{min-height:90px; resize:vertical}
+    .muted{color:var(--muted); font-size:.92rem}
+    .row{display:flex; gap:12px; align-items:center; flex-wrap:wrap}
+    .btn{
+      appearance:none; border:0; border-radius:12px; padding:12px 16px; font-weight:700;
+      cursor:pointer; background:var(--brand); color:#fff; box-shadow:0 6px 16px rgba(10,127,65,.2);
+      transition: transform .06s ease, box-shadow .15s ease, opacity .2s;
+    }
+    .btn.secondary{background:#eef7f1; color:var(--brand); font-weight:700}
+    .btn:active{transform:translateY(1px)}
+    .btn[disabled]{opacity:.6; cursor:not-allowed}
+    .actions{display:flex; gap:12px; justify-content:flex-end; margin-top:12px}
+    .section-title{font-size:1.1rem; font-weight:800; margin:6px 0 14px}
+    .help{font-size:.9rem; color:var(--muted)}
+    .info{background:#eef7f1; color:#064e2d; padding:8px 12px; border-radius:10px; border:1px solid #d1ecda}
+    .error{background:#fef2f2; color:#991b1b; padding:8px 12px; border-radius:10px; border:1px solid #ffe1e1}
+    /* Upload + preview */
+    .upload-wrap{display:grid; grid-template-columns:1fr 1fr; gap:16px}
+    @media (max-width: 680px){
+      .upload-wrap{grid-template-columns:1fr}
+    }
+    .preview-card{
+      border:1px dashed #cfe3d7; border-radius:14px; padding:14px;
+      display:flex; flex-direction:column; gap:10px; align-items:center; justify-content:center;
+      min-height:230px; background:#fff;
+    }
+    .preview-box{display:flex; align-items:center; justify-content:center; width:100%}
+    .passport-preview,.signature-preview{
+      display:block; max-width:160px; max-height:160px; object-fit:cover; margin:auto; border-radius:10px;
+      box-shadow:0 8px 18px rgba(2,6,23,.06);
+    }
+    .signature-preview{max-height:80px}
+    @media (max-width:768px){
+      .passport-preview,.signature-preview{max-width:120px; max-height:120px}
+      .signature-preview{max-height:60px}
+    }
+    .file-upload-label{
+      background:#eef7f1; color:var(--brand); padding:10px 14px; border-radius:10px; font-weight:700;
+      border:1px solid #cfe3d7; cursor:pointer;
+    }
+    .file-upload-label:hover{filter:brightness(.98)}
+    .hidden{display:none}
+    footer{margin:24px 0; text-align:center; color:var(--muted); font-size:.9rem}
   </style>
 </head>
 <body>
-  <div class="py-4">
-    <div class="container container-narrow">
-      <div class="mb-3">
-        <h2 class="fw-bold mb-1">Complete your profile</h2>
-        <div class="hint">Provide your personal, contact and professional information. You can save progress and finish later.</div>
-      </div>
+  <header>
+    <div class="title">NARAP — Profile Setup</div>
+    <div class="status" id="authStatus">Checking authentication…</div>
+  </header>
 
-      <div class="card-setup mb-3">
-        <!-- Stepper -->
-        <div class="stepper" id="stepper">
-          <div class="step active" data-step="personal">1. Personal</div>
-          <div class="step" data-step="contact">2. Contact</div>
-          <div class="step" data-step="professional">3. Professional</div>
-          <div class="step" data-step="documents">4. Documents</div>
-        </div>
-        <div class="progress mb-3">
-          <div class="progress-bar" id="progressBar" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
-        </div>
+  <main>
+    <div id="notice" class="info hidden"></div>
+    <div id="error" class="error hidden"></div>
 
-        <!-- Sections -->
-        <form id="profileForm">
-          <!-- PERSONAL -->
-          <section class="section active" id="section-personal">
-            <div class="row g-3">
-              <div class="col-md-6">
-                <label class="form-label">First Name</label>
-                <input type="text" class="form-control" name="firstName" required />
-              </div>
-              <div class="col-md-6">
-                <label class="form-label">Last Name</label>
-                <input type="text" class="form-control" name="lastName" required />
-              </div>
-              <div class="col-md-6">
-                <label class="form-label">Date of Birth</label>
-                <input type="date" class="form-control" name="dob" />
-              </div>
-              <div class="col-md-6">
-                <label class="form-label">Gender</label>
-                <select class="form-select" name="gender">
-                  <option value="" selected disabled>Select</option>
-                  <option>Male</option><option>Female</option>
-                </select>
-              </div>
-              <div class="col-md-6">
-                <label class="form-label">Marital Status</label>
-                <select class="form-select" name="maritalStatus">
-                  <option value="" selected disabled>Select</option>
-                  <option>Single</option><option>Married</option>
-                </select>
-              </div>
-            </div>
-          </section>
-
-          <!-- CONTACT -->
-          <section class="section" id="section-contact">
-            <div class="row g-3">
-              <div class="col-md-6">
-                <label class="form-label">Mobile Number</label>
-                <input type="tel" class="form-control" name="phone" placeholder="e.g., 0803 000 0000" />
-              </div>
-              <div class="col-md-6">
-                <label class="form-label">Email</label>
-                <input type="email" class="form-control" name="email" placeholder="you@example.com" />
-              </div>
-              <div class="col-12">
-                <label class="form-label">Residential Address</label>
-                <input type="text" class="form-control" name="address" />
-              </div>
-              <div class="col-md-6">
-                <label class="form-label">State</label>
-                <select class="form-select" name="state">
-                  <option value="" disabled selected>Select State</option>
-                  <option>Abia</option><option>Adamawa</option><option>Akwa Ibom</option><option>Anambra</option>
-                  <option>Bauchi</option><option>Bayelsa</option><option>Benue</option><option>Borno</option>
-                  <option>Cross River</option><option>Delta</option><option>Ebonyi</option><option>Edo</option>
-                  <option>Ekiti</option><option>Enugu</option><option>FCT</option><option>Gombe</option>
-                  <option>Imo</option><option>Jigawa</option><option>Kaduna</option><option>Kano</option>
-                  <option>Katsina</option><option>Kebbi</option><option>Kogi</option><option>Kwara</option>
-                  <option>Lagos</option><option>Nasarawa</option><option>Niger</option><option>Ogun</option>
-                  <option>Ondo</option><option>Osun</option><option>Oyo</option><option>Plateau</option>
-                  <option>Rivers</option><option>Sokoto</option><option>Taraba</option><option>Yobe</option>
-                  <option>Zamfara</option>
-                </select>
-              </div>
-            </div>
-          </section>
-
-          <!-- PROFESSIONAL -->
-          <section class="section" id="section-professional">
-            <div class="row g-3">
-              <div class="col-md-6">
-                <label class="form-label">Occupation</label>
-                <input type="text" class="form-control" name="occupation" />
-              </div>
-              <div class="col-md-6">
-                <label class="form-label">Next of Kin</label>
-                <input type="text" class="form-control" name="nok" />
-              </div>
-              <div class="col-md-6">
-                <label class="form-label">Guarantor (must be a practitioner)</label>
-                <input type="text" class="form-control" name="guarantor" />
-              </div>
-              <div class="col-md-6">
-                <label class="form-label">Guarantor's Address</label>
-                <input type="text" class="form-control" name="guarantorAddress" />
-              </div>
-              <div class="col-md-6">
-                <label class="form-label">Guarantor's Position</label>
-                <select class="form-select" name="guarantorPosition">
-                  <option value="" selected disabled>Select Position</option>
-                  <option>Deputy President</option>
-                  <option>Vice President (North Central)</option>
-                  <option>Vice President (North East)</option>
-                  <option>Vice President (North West)</option>
-                  <option>Vice President (South East)</option>
-                  <option>Vice President (South South)</option>
-                  <option>Vice President (South West)</option>
-                  <option>Secretary</option>
-                  <option>Assistant Secretary</option>
-                  <option>Financial Secretary</option>
-                  <option>Assistant Financial Secretary</option>
-                  <option>Public Relation Officer</option>
-                  <option>Assistant PRO (APRO)</option>
-                  <option>Welfare</option>
-                  <option>State Welfare Coordinator</option>
-                  <option>Member</option>
-                  <option>Task Force</option>
-                  <option>Provost Marshal 1</option>
-                  <option>Provost Marshal 2</option>
-                  <option>State Secretary</option>
-                  <option>State Assistant Secretary</option>
-                  <option>State Financial Secretary</option>
-                  <option>State Treasurer</option>
-                  <option>Chairman</option>
-                  <option>Coordinator</option>
-                  <option>Assistant Coordinator</option>
-                </select>
-              </div>
-            </div>
-          </section>
-
-          <!-- DOCUMENTS -->
-          <section class="section" id="section-documents">
-            <div class="row g-3">
-              <div class="col-md-6">
-                <label class="form-label">Passport Photograph (JPG/PNG)</label>
-                <div class="upload-preview" id="passportPreview"><span class="hint">No file chosen</span></div>
-                <input class="form-control mt-2" type="file" name="passport" id="passport" accept="image/*" />
-              </div>
-              <div class="col-md-6">
-                <label class="form-label">Signature (JPG/PNG)</label>
-                <div class="upload-preview" id="signaturePreview"><span class="hint">No file chosen</span></div>
-                <input class="form-control mt-2" type="file" name="signature" id="signature" accept="image/*" />
-              </div>
-            </div>
-            <div class="hint mt-2">Images are centered and scaled to fit. You can replace them anytime before submitting.</div>
-          </section>
-
-          <div class="mt-4 actions">
-            <button type="button" class="btn btn-outline-brand" id="btnFinishLater">Finish Later</button>
-            <button type="button" class="btn btn-brand" id="btnNext">Save &amp; Continue</button>
-            <button type="button" class="btn btn-brand d-none" id="btnSubmitAll">Submit Profile</button>
+    <div class="card">
+      <div class="section-title">Basic Information</div>
+      <form id="profileForm" onsubmit="submitProfile(event)">
+        <div class="grid">
+          <div>
+            <label for="name">Full Name</label>
+            <input type="text" id="name" name="name" placeholder="e.g., Aisha Bello" required />
           </div>
-        </form>
+          <div>
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" placeholder="you@example.com" required />
+          </div>
+        </div>
 
-        <div id="saveMsg" class="mt-3"></div>
-      </div>
+        <div class="grid">
+          <div>
+            <label for="phoneNumber">Phone Number</label>
+            <input type="text" id="phoneNumber" name="phoneNumber" placeholder="+234…" required />
+          </div>
+          <div>
+            <label for="state">State</label>
+            <input type="text" id="state" name="state" placeholder="State of residence" required />
+          </div>
+        </div>
+
+        <div class="grid">
+          <div>
+            <label for="lga">LGA</label>
+            <input type="text" id="lga" name="lga" placeholder="Local Government Area" />
+          </div>
+          <div>
+            <label for="zone">Zone</label>
+            <input type="text" id="zone" name="zone" placeholder="e.g., North Central" />
+          </div>
+        </div>
+
+        <div>
+          <label for="address">Address</label>
+          <input type="text" id="address" name="address" placeholder="Street, city" />
+        </div>
+
+        <div class="section-title" style="margin-top:18px">Passport &amp; Signature</div>
+        <p class="help">Upload clear images. Previews appear instantly. Files upload securely before you submit.</p>
+
+        <!-- Hidden fields populated after upload -->
+        <input type="hidden" name="passportUrl" />
+        <input type="hidden" name="signatureUrl" />
+
+        <div class="upload-wrap">
+          <div class="preview-card">
+            <div class="preview-box">
+              <img class="passport-preview" alt="Passport preview" />
+            </div>
+            <label class="file-upload-label" for="passport">Upload Passport</label>
+            <input id="passport" type="file" accept="image/*" class="hidden" />
+          </div>
+
+          <div class="preview-card">
+            <div class="preview-box">
+              <img class="signature-preview" alt="Signature preview" />
+            </div>
+            <label class="file-upload-label" for="signature">Upload Signature</label>
+            <input id="signature" type="file" accept="image/*" class="hidden" />
+          </div>
+        </div>
+
+        <div class="actions">
+          <button type="button" class="btn secondary" onclick="finishLater()">Finish later</button>
+          <button type="submit" class="btn" id="submitBtn">Save &amp; Continue</button>
+        </div>
+      </form>
     </div>
-  </div>
+
+    <footer>Tip: If you leave, your progress is auto-saved on this device.</footer>
+  </main>
 
   <script>
-    (function(){
-      function getAuthHeaders(){
-        const token = localStorage.getItem('jwt') || localStorage.getItem('token') || sessionStorage.getItem('jwt') || sessionStorage.getItem('token');
-        const headers = {};
-        if (token) headers['Authorization'] = 'Bearer ' + token;
-        return headers;
+  // Simple authentication check for profile-setup.php
+  (function(){
+    const statusEl = document.getElementById('authStatus');
+    const token = localStorage.getItem('jwt');
+    
+    if (!token) {
+      statusEl.textContent = 'Not authenticated. Redirecting…';
+      setTimeout(() => { 
+        window.location.replace('/member/login.php'); 
+      }, 400);
+      return;
+    }
+    
+    statusEl.textContent = 'Authenticated ✓';
+    
+    // Optional: Verify token is still valid with server
+    fetch('/api/auth/me', {
+      headers: { 'Authorization': 'Bearer ' + token }
+    }).then(res => {
+      if (!res.ok) {
+        throw new Error('Token invalid');
       }
-
-      const steps = ['personal','contact','professional','documents'];
-      let current = 0;
-      const form = document.getElementById('profileForm');
-      const progressBar = document.getElementById('progressBar');
-      const stepper = document.getElementById('stepper');
-      const saveMsg = document.getElementById('saveMsg');
-      const btnNext = document.getElementById('btnNext');
-      const btnSubmitAll = document.getElementById('btnSubmitAll');
-      const btnFinishLater = document.getElementById('btnFinishLater');
-
-      function showStep(i){
-        current = Math.max(0, Math.min(i, steps.length-1));
-        steps.forEach((key, idx)=>{
-          document.getElementById('section-'+key).classList.toggle('active', idx===current);
-          const node = stepper.querySelector('[data-step="'+key+'"]');
-          node.classList.toggle('active', idx===current);
-        });
-        const pct = Math.round(((current) / (steps.length-1)) * 100);
-        progressBar.style.width = pct+'%'; progressBar.setAttribute('aria-valuenow', pct);
-        btnNext.classList.toggle('d-none', current === steps.length-1);
-        btnSubmitAll.classList.toggle('d-none', current !== steps.length-1);
-      }
-
-      stepper.querySelectorAll('.step').forEach(el=>{
-        el.addEventListener('click', ()=>{ showStep(steps.indexOf(el.dataset.step)); });
-      });
-
-      function serializeSection(key){
-        const sec = document.getElementById('section-'+key);
-        const fd = new FormData();
-        // collect only inputs inside this section
-        sec.querySelectorAll('input, select, textarea').forEach(el=>{
-          if (el.type === 'file') return; // handled separately
-          if (el.name) fd.append(el.name, el.value);
-        });
-        fd.append('section', key);
-        return fd;
-      }
-
-      async function patch(url, body){
-        const res = await fetch(url, { method:'PATCH', body, headers: getAuthHeaders(), credentials:'include' });
-        const data = await res.json().catch(()=>({}));
-        if (!res.ok) throw new Error(data.message||'Save failed');
-        return data;
-      }
-
-      let saveTimer=null;
-      function autosave(key){
-        clearTimeout(saveTimer);
-        saveTimer=setTimeout(async()=>{
-          try{
-            const fd = serializeSection(key);
-            await patch('/api/member/profile', fd);
-            saveMsg.innerHTML = '<div class="alert alert-success py-2 mb-0">Saved.</div>';
-            setTimeout(()=> saveMsg.innerHTML='', 1200);
-          }catch(err){ saveMsg.innerHTML = '<div class="alert alert-danger py-2">'+(err.message||'Save failed')+'</div>'; }
-        }, 500);
-      }
-
-      // Hook change/blur on inputs for autosave
-      steps.forEach(key=>{
-        const sec = document.getElementById('section-'+key);
-        sec.addEventListener('input', ()=> autosave(key));
-        sec.addEventListener('change', ()=> autosave(key));
-      });
-
-      // Uploads with preview
-      function bindUpload(inputId, previewId, field){
-        const input = document.getElementById(inputId);
-        const preview = document.getElementById(previewId);
-        input.addEventListener('change', async ()=>{
-          const file = input.files && input.files[0];
-          if (!file) return;
-          // preview
-          const url = URL.createObjectURL(file);
-          preview.innerHTML = '<img alt="preview" />';
-          preview.querySelector('img').src = url;
-          // upload
-          try{
-            const fd = new FormData();
-            fd.append('section','documents');
-            fd.append(field, file);
-            await patch('/api/member/profile', fd);
-            saveMsg.innerHTML = '<div class="alert alert-success py-2 mb-0">'+ field.charAt(0).toUpperCase()+field.slice(1)+' uploaded.</div>';
-            setTimeout(()=> saveMsg.innerHTML='', 1200);
-          }catch(err){ saveMsg.innerHTML = '<div class="alert alert-danger py-2">'+(err.message||'Upload failed')+'</div>'; }
-        });
-      }
-      bindUpload('passport','passportPreview','passport');
-      bindUpload('signature','signaturePreview','signature');
-
-      // Navigation buttons
-      btnNext.addEventListener('click', async ()=>{
-        const key = steps[current];
-        try{ await patch('/api/member/profile', serializeSection(key)); showStep(current+1); }
-        catch(err){ saveMsg.innerHTML = '<div class="alert alert-danger">'+(err.message||'Save failed')+'</div>'; }
-      });
-      btnSubmitAll.addEventListener('click', async ()=>{
-        try{
-          const fd = new FormData(); fd.append('profileCompleted', 'true');
-          await patch('/api/member/profile', fd);
-          saveMsg.innerHTML = '<div class="alert alert-success">Profile submitted. Redirecting to your dashboard…</div>';
-          setTimeout(()=>{ window.location.href = '/member/dashboard.php'; }, 800);
-        }catch(err){ saveMsg.innerHTML = '<div class="alert alert-danger">'+(err.message||'Submit failed')+'</div>'; }
-      });
-      btnFinishLater.addEventListener('click', ()=>{ window.location.href = '/member/dashboard.php'; });
-
-      // Prefill
-      async function prefill(){
-        try{
-          const res = await fetch('/api/member/profile', { headers: getAuthHeaders(), credentials:'include' });
-          const data = await res.json();
-          if (data && typeof data === 'object'){
-            Object.entries(data).forEach(([k,v])=>{
-              const el = form.querySelector('[name="'+k+'"]');
-              if (el) el.value = v == null ? '' : v;
-              if (k==='passportUrl' && v){
-                const prev=document.getElementById('passportPreview'); prev.innerHTML='<img alt="passport" src="'+v+'" />';
-              }
-              if (k==='signatureUrl' && v){
-                const prev=document.getElementById('signaturePreview'); prev.innerHTML='<img alt="signature" src="'+v+'" />';
-              }
-            });
-          }
-        }catch(_){}
-      }
-      prefill();
-
-      showStep(0);
-    })();
+    }).catch(err => {
+      statusEl.textContent = 'Session expired. Redirecting…';
+      setTimeout(() => { 
+        window.location.replace('/member/login.php'); 
+      }, 400);
+    });
+  })();
   </script>
+
+  <script>
+  // ===== Utilities & Draft Autosave =====
+  (function(){
+    const FORM_ID = 'profileForm';
+    const DRAFT_KEY = 'profileDraft.v1';
+    const form = document.getElementById(FORM_ID);
+    const notice = document.getElementById('notice');
+    const errorBox = document.getElementById('error');
+
+    const show = (el, msg) => { el.textContent = msg; el.classList.remove('hidden'); };
+    const hide = (el) => { el.classList.add('hidden'); };
+
+    // Restore draft (if any)
+    try{
+      const draft = localStorage.getItem(DRAFT_KEY);
+      if (draft && form) {
+        const data = JSON.parse(draft);
+        Object.keys(data).forEach(k => {
+          const el = form.elements.namedItem(k);
+          if (el && el.type !== 'file') el.value = data[k];
+        });
+        show(notice, 'Draft restored — you can continue where you left off.');
+        setTimeout(()=> hide(notice), 2500);
+      }
+    }catch(e){ /* ignore */ }
+
+    // Auto-save any change
+    form?.addEventListener('input', () => {
+      const payload = {};
+      Array.from(form.elements).forEach(el => {
+        if (!el.name || el.type === 'file') return;
+        payload[el.name] = el.value;
+      });
+      try{
+        localStorage.setItem(DRAFT_KEY, JSON.stringify(payload));
+      }catch(e){ /* ignore quota */ }
+    });
+
+    // Expose finishLater()
+    window.finishLater = () => {
+      show(notice, 'Saved. You can return to complete your profile later.');
+      setTimeout(()=> hide(notice), 2400);
+    };
+
+    // Expose clearDraft()
+    window.clearDraft = () => localStorage.removeItem(DRAFT_KEY);
+
+    // Small helper to attach Authorization header every time
+    window.authFetch = (url, opts = {}) => {
+      const token = localStorage.getItem('jwt');
+      const headers = Object.assign(
+        { },
+        token ? { 'Authorization': 'Bearer ' + token } : {},
+        opts.headers || {}
+      );
+      return fetch(url, Object.assign({}, opts, { headers, credentials: 'include' }));
+    };
+
+    // Upload + preview helpers
+    function preview(input, imgSel){
+      const img = document.querySelector(imgSel);
+      if (!img || !input.files?.[0]) return;
+      img.src = URL.createObjectURL(input.files[0]); // requires CSP img-src to allow blob:
+    }
+
+    async function uploadFile(file, folder){
+      const fd = new FormData(); fd.append('file', file);
+      const res = await authFetch('/api/upload?folder='+encodeURIComponent(folder), { method:'POST', body: fd });
+      const data = await res.json().catch(()=> ({}));
+      if (!res.ok) throw new Error(data?.message || 'Upload failed');
+      return data.url; // { url: "https://..." }
+    }
+
+    // Wire file inputs
+    const passportInput = document.getElementById('passport');
+    passportInput?.addEventListener('change', async (e)=>{
+      preview(e.target, '.passport-preview');
+      try{
+        const url = await uploadFile(e.target.files[0], 'passports');
+        const hidden = form.elements.namedItem('passportUrl');
+        if (hidden) hidden.value = url;
+      }catch(err){
+        show(errorBox, err.message); setTimeout(()=> hide(errorBox), 2600);
+      }
+    });
+
+    const signatureInput = document.getElementById('signature');
+    signatureInput?.addEventListener('change', async (e)=>{
+      preview(e.target, '.signature-preview');
+      try{
+        const url = await uploadFile(e.target.files[0], 'signatures');
+        const hidden = form.elements.namedItem('signatureUrl');
+        if (hidden) hidden.value = url;
+      }catch(err){
+        show(errorBox, err.message); setTimeout(()=> hide(errorBox), 2600);
+      }
+    });
+
+    // Submit profile
+    window.submitProfile = async function(ev){
+      ev.preventDefault();
+      const btn = document.getElementById('submitBtn');
+      btn.disabled = true; btn.textContent = 'Saving…';
+
+      hide(errorBox); hide(notice);
+
+      const body = {};
+      Array.from(form.elements).forEach(el=>{
+        if (!el.name || el.type === 'file') return;
+        body[el.name] = (el.value || '').trim();
+      });
+
+      // PATCH /api/members/me, fallback to /api/members/:id
+      let res = await authFetch('/api/members/me', {
+        method:'PATCH',
+        headers:{ 'Content-Type':'application/json' },
+        body: JSON.stringify(body)
+      });
+
+      if (res.status === 404) {
+        // fallback: find my id then PATCH /api/members/:id
+        const meRes = await authFetch('/api/members/me');
+        if (meRes.ok) {
+          const me = await meRes.json();
+          res = await authFetch('/api/members/' + (me?._id || ''), {
+            method:'PATCH',
+            headers:{ 'Content-Type':'application/json' },
+            body: JSON.stringify(body)
+          });
+        }
+      }
+
+      const data = await res.json().catch(()=> ({}));
+
+      if (!res.ok) {
+        show(errorBox, data?.message || 'Submit failed');
+        btn.disabled = false; btn.textContent = 'Save & Continue';
+        return;
+      }
+
+      // Success
+      window.clearDraft();
+      show(notice, 'Profile saved successfully.');
+      setTimeout(()=>{
+        window.location.href = '/member/dashboard.php';
+      }, 700);
+    };
+  })();
+  </script>
+
 </body>
 </html>

@@ -56,6 +56,75 @@ document.getElementById('loginForm').addEventListener('submit', async (e)=>{
     document.getElementById('msg').textContent = err.message || 'Error logging in';
   }
 });
+
+
+// Logs in a member, checks profile completeness, and routes accordingly
+
+(async function(){
+  const form = document.querySelector('#loginForm') || document.querySelector('form[data-form="login"]');
+  if(!form) return;
+
+  const status = document.getElementById('loginStatus');
+
+  function setStatus(msg, ok=false){
+    if(!status) return;
+    status.textContent = msg || '';
+    status.style.color = ok ? 'green' : 'crimson';
+  }
+
+  async function handleLogin(ev){
+    ev.preventDefault();
+    setStatus('Signing in…');
+
+    const identifier = form.querySelector('[name="identifier"]')?.value?.trim() ||
+                       form.querySelector('[name="email"]')?.value?.trim();
+    const password   = form.querySelector('[name="password"]')?.value || '';
+
+    if(!identifier || !password){
+      setStatus('Enter your email/identifier and password.');
+      return;
+    }
+
+    try{
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ identifier, password }),
+        credentials: 'include'
+      });
+      const data = await res.json().catch(()=> ({}));
+
+      if(!res.ok){
+        setStatus(data?.message || 'Login failed');
+        return;
+      }
+
+      const token = data.token || data.jwt;
+      if(token) localStorage.setItem('jwt', token);
+
+      // Check profile completeness
+      const meRes = await fetch('/api/members/me', {
+        headers: token ? { Authorization: 'Bearer ' + token } : {},
+        credentials: 'include'
+      });
+      const me = meRes.ok ? await meRes.json() : null;
+
+      const isComplete =
+        !!me?.state &&
+        !!(me?.phoneNumber || me?.phone) &&
+        !!me?.passportUrl &&
+        !!me?.signatureUrl;
+
+      setStatus('Success. Redirecting…', true);
+      window.location.href = isComplete ? '/member/dashboard.php' : '/profile-setup.php';
+    }catch(err){
+      setStatus(err.message || 'Network error');
+    }
+  }
+
+  form.addEventListener('submit', handleLogin);
+})();
+
 </script>
 </body>
 </html>

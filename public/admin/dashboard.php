@@ -456,10 +456,12 @@ const PAGE_SIZE = window.PAGE_SIZE || 20;
 let allPage = 1, paidPage = 1, unpaidPage = 1;
 
 // Small helper to wrap JSON requests (keeps any auth headers your authFetch adds)
+
 const json = (opts = {}) => ({
   ...opts,
   headers: { 'Content-Type': 'application/json', ...(opts.headers || {}) }
 });
+
 
 // Defensive selector
 const $ = (sel) => document.querySelector(sel);

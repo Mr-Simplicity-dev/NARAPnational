@@ -123,7 +123,7 @@
   // Map dashboard resource names to API endpoints
   function resolveApi(resource) {
     switch (resource) {
-      case 'registrations': return '/api/members';       // full members list
+      case 'registrations': return '/api/registrations';      // full members list
       case 'paid':          return '/api/members/paid';  // paid subset
       case 'unpaid':        return '/api/members/unpaid';// unpaid subset
       default:              return '/api/' + resource;

@@ -27,7 +27,10 @@ import eventRoutes from './src/routes/events.js';
 import commentRoutes from './src/routes/comments.js';
 import paymentRoutes from './src/routes/payments.js';
 import memberRoutes from './src/routes/member.js';
-import registrationsRoutes from './src/routes/registrations.js';
+import registrationsRoutes from './src/routes/members.js';
+import paidRoutes from './src/routes/paid.js';
+import unpaidRoutes from './src/routes/unpaid.js';
+
 
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
@@ -83,16 +86,17 @@ app.use(helmet({
         
       ],
       "img-src": [
-        "'self'",
-        "data:",
-        "https://static.whatsapp.net",
-        "https://www.facebook.com",
-        "https://*.fbcdn.net",
-        "https://cdn.tawk.to",
-        "https://tawk.to",
-        "https://*.tawk.to",
-        "https://pagead2.googlesyndication.com"
-      ],
+  "'self'",
+  "data:",
+  "blob:",              // ← add this for file previews
+  "https://static.whatsapp.net",
+  "https://www.facebook.com",
+  "https://*.fbcdn.net",
+  "https://cdn.tawk.to",
+  "https://tawk.to",
+  "https://*.tawk.to",
+  "https://pagead2.googlesyndication.com"
+],
       "font-src": [
         "'self'",
         "data:",
@@ -113,15 +117,17 @@ app.use(helmet({
         "https://googleads.g.doubleclick.net",
         "https://js.paystack.co"],
       "connect-src": [
-        "'self'",
-        "https://tawk.to",
-        "https://embed.tawk.to",
-        "https://cdn.tawk.to",
-        "https://va.tawk.to",
-        "https://*.tawk.to",
-        "wss://*.tawk.to",
-        "https://ep1.adtrafficquality.google",
-        "https://api.paystack.co"]
+  "'self'",
+  "https://tawk.to",
+  "https://embed.tawk.to",
+  "https://cdn.tawk.to",
+  "https://va.tawk.to",
+  "https://*.tawk.to",
+  "wss://*.tawk.to",
+  "https://ep1.adtrafficquality.google",
+  "https://api.paystack.co",
+  "https://cdn.jsdelivr.net" // ← optional (removes .map console noise)
+]
     }
   }
 }));
@@ -171,8 +177,11 @@ app.use('/api/upload', requireAuth, uploadRoutes);
 app.use('/api/events', eventRoutes);
 app.use('/api/comments', commentRoutes);
 app.use('/api/payments', paymentRoutes);
-app.use('/api/member', requireAuth, memberRoutes);
-app.use('/api/members', requireAuth, requireAdmin, registrationsRoutes);
+app.use('/api/members', requireAuth, memberRoutes);
+app.use('/api/registrations', requireAuth, requireAdmin, registrationsRoutes);
+app.use('/api/members/paid', requireAuth, requireAdmin, paidRoutes);
+app.use('/api/members/unpaid', requireAuth, requireAdmin, unpaidRoutes);
+
 
 // Health
 app.get('/healthz', (_req,res)=>res.json({ ok:true }));

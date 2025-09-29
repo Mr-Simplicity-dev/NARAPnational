@@ -7,7 +7,6 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
-  <!-- If you already include Bootstrap CSS globally, you may remove this next line -->
   <link href="/css/bootstrap.min.css" rel="stylesheet" />
   <style>
     :root{ --brand:#0a7f41; --brand-600:#0a7f41; --brand-700:#086d37; --brand-50:#eaf7f0; --ink:#0b1220; --muted:#6b7280; --surface:#fff }
@@ -65,7 +64,7 @@
     <main class="right-pane">
       <div class="card-auth">
         <h2>Create your account</h2>
-        <div class="subtitle">Use a valid email you can access. You’ll complete your full profile next.</div>
+        <div class="subtitle">Use a valid email you can access. You'll complete your full profile next.</div>
 
         <div class="alert alert-guidelines" role="alert">
           <div class="fw-bold mb-1">Before you start</div>
@@ -122,75 +121,151 @@
     </main>
   </div>
 
-  <!-- If you already include these globally, you can remove them here -->
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
 
   <script>
-    (function(){
-      const form = document.getElementById('signupForm');
-      const email = document.getElementById('email');
-      const pass = document.getElementById('password');
-      const confirm = document.getElementById('confirm');
-      const agree = document.getElementById('agree');
-      const submitBtn = document.getElementById('submitBtn');
-      const msg = document.getElementById('signupMsg');
-      const pwHint = document.getElementById('pwHint');
-      const nameField = document.getElementById('name');
+(function(){
+  const form = document.getElementById('signupForm');
+  const email = document.getElementById('email');
+  const pass = document.getElementById('password');
+  const confirm = document.getElementById('confirm');
+  const agree = document.getElementById('agree');
+  const submitBtn = document.getElementById('submitBtn');
+  const msg = document.getElementById('signupMsg');
+  const pwHint = document.getElementById('pwHint');
+  const nameField = document.getElementById('name');
 
-      function passwordsMatch(){ return pass.value && confirm.value && pass.value === confirm.value; }
-      function sync(){
-        const ok = form.checkValidity() && agree.checked && passwordsMatch();
-        submitBtn.disabled = !ok;
-        if (confirm.value.length>0){
-          if (passwordsMatch()) { confirm.classList.remove('is-invalid'); confirm.setCustomValidity(''); }
-          else { confirm.classList.add('is-invalid'); confirm.setCustomValidity('Passwords do not match'); }
-        } else { confirm.classList.remove('is-invalid'); confirm.setCustomValidity(''); }
-        pwHint.textContent = pass.value.length < 8 ? 'Use at least 8 characters.' : 'Looks good. Keep your password safe.';
+  function passwordsMatch(){ 
+    return pass.value && confirm.value && pass.value === confirm.value; 
+  }
+  
+  function sync(){
+    const ok = form.checkValidity() && agree.checked && passwordsMatch();
+    submitBtn.disabled = !ok;
+    
+    if (confirm.value.length > 0){
+      if (passwordsMatch()) { 
+        confirm.classList.remove('is-invalid'); 
+        confirm.setCustomValidity(''); 
+      } else { 
+        confirm.classList.add('is-invalid'); 
+        confirm.setCustomValidity('Passwords do not match'); 
       }
-      ['input','change','blur','keyup'].forEach(ev=>{ [email,pass,confirm,agree].forEach(el=> el && el.addEventListener(ev, sync)); });
-      sync();
+    } else { 
+      confirm.classList.remove('is-invalid'); 
+      confirm.setCustomValidity(''); 
+    }
+    
+    pwHint.textContent = pass.value.length < 8 ? 
+      'Use at least 8 characters.' : 
+      'Looks good. Keep your password safe.';
+  }
 
-      document.getElementById('togglePassword').addEventListener('click', function(){
-        pass.type = pass.type === 'password' ? 'text' : 'password';
-        this.textContent = pass.type === 'password' ? 'Show' : 'Hide';
-        this.setAttribute('aria-label', this.textContent + ' password');
+  // Initialize validation
+  ['input','change','blur','keyup'].forEach(ev => { 
+    [email,pass,confirm,agree].forEach(el => el && el.addEventListener(ev, sync)); 
+  });
+  sync();
+
+  // Password toggle functionality
+  document.getElementById('togglePassword').addEventListener('click', function(){
+    const currentType = pass.getAttribute('type');
+    if (currentType === 'password') {
+      pass.setAttribute('type', 'text');
+      this.textContent = 'Hide';
+      this.setAttribute('aria-label', 'Hide password');
+    } else {
+      pass.setAttribute('type', 'password');
+      this.textContent = 'Show';
+      this.setAttribute('aria-label', 'Show password');
+    }
+  });
+  
+  document.getElementById('toggleConfirm').addEventListener('click', function(){
+    const currentType = confirm.getAttribute('type');
+    if (currentType === 'password') {
+      confirm.setAttribute('type', 'text');
+      this.textContent = 'Hide';
+      this.setAttribute('aria-label', 'Hide password');
+    } else {
+      confirm.setAttribute('type', 'password');
+      this.textContent = 'Show';
+      this.setAttribute('aria-label', 'Show password');
+    }
+  });
+
+  // Form submission
+  form.addEventListener('submit', async function(e){
+    e.preventDefault();
+    if (!form.checkValidity()) { 
+      form.classList.add('was-validated');
+      return; 
+    }
+
+    // Auto-generate a simple name from email local-part
+    const emailValue = email.value.trim();
+    const nameFromEmail = emailValue.split('@')[0] || 'Member';
+    nameField.value = nameFromEmail;
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Creating Account...';
+    msg.innerHTML = '';
+    
+    try{
+      const fd = new FormData();
+      fd.append('name', nameFromEmail);
+      fd.append('email', emailValue);
+      fd.append('password', pass.value);
+      fd.append('confirm_password', confirm.value);
+
+      console.log('Sending registration request...');
+      
+      const res = await fetch('/api/auth/register-member', { 
+        method: 'POST', 
+        body: fd 
       });
-      document.getElementById('toggleConfirm').addEventListener('click', function(){
-        confirm.type = confirm.type === 'password' ? 'text' : 'password';
-        this.textContent = confirm.type === 'password' ? 'Show' : 'Hide';
-        this.setAttribute('aria-label', this.textContent + ' password');
-      });
+      
+      const data = await res.json().catch(() => ({}));
+      
+      console.log('Response status:', res.status);
+      console.log('Response data:', data);
+      
+      if (!res.ok) {
+        throw new Error(data.message || `Registration failed (${res.status})`);
+      }
 
-      form.addEventListener('submit', async function(e){
-        e.preventDefault();
-        if (!form.checkValidity()) { form.reportValidity(); return; }
+      // CRITICAL: Save the JWT token to localStorage
+      if (data.token) {
+        localStorage.setItem('jwt', data.token);
+        console.log('Token saved to localStorage:', data.token.substring(0, 20) + '...');
+      } else {
+        console.warn('No token received in response');
+      }
 
-        // Auto-generate a simple name from email local-part to satisfy backend
-        const emailValue = email.value.trim();
-        const nameFromEmail = emailValue.split('@')[0] || 'Member';
-        nameField.value = nameFromEmail;
+      msg.innerHTML = '<div class="alert alert-success">Account created successfully! Redirecting to profile setup...</div>';
+      console.log('Redirecting to profile setup...');
+      
+      setTimeout(() => { 
+        window.location.href = '/member/profile-setup.php'; 
+      }, 1500);
+      
+    } catch(err) {
+      console.error('Registration error:', err);
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Create Account';
+      msg.innerHTML = '<div class="alert alert-danger">' + (err.message || 'Something went wrong. Please try again.') + '</div>';
+    }
+  });
 
-        submitBtn.disabled = true;
-        msg.innerHTML = '';
-        try{
-          const fd = new FormData();
-          fd.append('name', nameFromEmail);
-          fd.append('email', emailValue);
-          fd.append('password', pass.value);
-
-          const res = await fetch('/api/auth/register-member', { method:'POST', body: fd });
-          const data = await res.json().catch(()=>({}));
-          if (!res.ok) throw new Error(data.message || 'Registration failed');
-
-          msg.innerHTML = '<div class="alert alert-success">Account created. Redirecting to profile setup…</div>';
-          setTimeout(()=>{ window.location.href = '/member/profile-setup.php'; }, 800);
-        } catch(err){
-          submitBtn.disabled = false;
-          msg.innerHTML = '<div class="alert alert-danger">'+(err.message||'Something went wrong.')+'</div>';
-        }
-      });
-    })();
-  </script>
+  // Add Bootstrap validation styling
+  form.addEventListener('input', function() {
+    if (this.classList.contains('was-validated')) {
+      this.classList.remove('was-validated');
+    }
+  });
+})();
+</script>
+    
 </body>
 </html>
