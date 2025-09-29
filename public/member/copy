@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<link href="/uploads/slider/Narap.png" rel="icon" type="image/png"/>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Register — Member</title>
+<link href="/uploads/slider/Narap.png" rel="icon" type="image/png"/>
+<link href="/css/bootstrap.min.css" rel="stylesheet"/>
+<link href="/css/style.css" rel="stylesheet"/>
+<style>.form-hint{font-size:.9rem;color:#6b7280}</style>
+<style>
+    :root{
+      --brand:#0a7f41;
+      --ink:#0b1220; --muted:#6b7280; --surface:#ffffff; --bg:#f7faf9;
+      --ok:#16a34a; --warn:#f59e0b; --err:#ef4444;
+      --ring: 0 0 0 3px rgba(10,127,65,.18);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      background:var(--bg); color:var(--ink); line-height:1.6;
+    }
+    header{
+      position:sticky; top:0; z-index:5;
+      background:var(--brand); color:#fff; padding:14px 18px;
+      display:flex; align-items:center; justify-content:space-between;
+      box-shadow:0 2px 8px rgba(0,0,0,.1);
+    }
+    header .title{font-weight:800; letter-spacing:.2px}
+    header .status{font-size:.9rem; opacity:.9}
+    main{max-width:980px; margin:28px auto; padding:0 16px}
+    .card{
+      background:var(--surface); border-radius:16px; padding:20px;
+      box-shadow:0 8px 24px rgba(2,6,23,.06);
+      border:1px solid #e5efe9;
+    }
+    .grid{display:grid; grid-template-columns:1fr 1fr; gap:16px}
+    .grid-3{display:grid; grid-template-columns:repeat(3,1fr); gap:16px}
+    @media (max-width: 860px){
+      .grid,.grid-3{grid-template-columns:1fr}
+    }
+    label{display:block; font-weight:600; margin:10px 0 6px}
+    input[type="text"], input[type="email"], textarea, select{
+      width:100%; padding:12px 12px; border:1px solid #dbe7e0; border-radius:12px;
+      background:#fff; color:var(--ink); outline:none;
+      transition:border-color .15s ease, box-shadow .15s ease;
+    }
+    input[type="text"]:focus, input[type="email"]:focus, textarea:focus, select:focus{
+      border-color:var(--brand); box-shadow:var(--ring);
+    }
+    textarea{min-height:90px; resize:vertical}
+    .muted{color:var(--muted); font-size:.92rem}
+    .row{display:flex; gap:12px; align-items:center; flex-wrap:wrap}
+    .btn{
+      appearance:none; border:0; border-radius:12px; padding:12px 16px; font-weight:700;
+      cursor:pointer; background:var(--brand); color:#fff; box-shadow:0 6px 16px rgba(10,127,65,.2);
+      transition: transform .06s ease, box-shadow .15s ease, opacity .2s;
+    }
+    .btn.secondary{background:#eef7f1; color:var(--brand); font-weight:700}
+    .btn:active{transform:translateY(1px)}
+    .btn[disabled]{opacity:.6; cursor:not-allowed}
+    .actions{display:flex; gap:12px; justify-content:flex-end; margin-top:12px}
+    .section-title{font-size:1.1rem; font-weight:800; margin:6px 0 14px}
+    .help{font-size:.9rem; color:var(--muted)}
+    .info{background:#eef7f1; color:#064e2d; padding:8px 12px; border-radius:10px; border:1px solid #d1ecda}
+    .error{background:#fef2f2; color:#991b1b; padding:8px 12px; border-radius:10px; border:1px solid #ffe1e1}
+    /* Upload + preview */
+    .upload-wrap{display:grid; grid-template-columns:1fr 1fr; gap:16px}
+    @media (max-width: 680px){
+      .upload-wrap{grid-template-columns:1fr}
+    }
+    .preview-card{
+      border:1px dashed #cfe3d7; border-radius:14px; padding:14px;
+      display:flex; flex-direction:column; gap:10px; align-items:center; justify-content:center;
+      min-height:230px; background:#fff;
+    }
+    .preview-box{display:flex; align-items:center; justify-content:center; width:100%}
+    .passport-preview,.signature-preview{
+      display:block; max-width:160px; max-height:160px; object-fit:cover; margin:auto; border-radius:10px;
+      box-shadow:0 8px 18px rgba(2,6,23,.06);
+    }
+    .signature-preview{max-height:80px}
+    @media (max-width:768px){
+      .passport-preview,.signature-preview{max-width:120px; max-height:120px}
+      .signature-preview{max-height:60px}
+    }
+    .file-upload-label{
+      background:#eef7f1; color:var(--brand); padding:10px 14px; border-radius:10px; font-weight:700;
+      border:1px solid #cfe3d7; cursor:pointer;
+    }
+    .file-upload-label:hover{filter:brightness(.98)}
+    .hidden{display:none}
+    footer{margin:24px 0; text-align:center; color:var(--muted); font-size:.9rem}
+  </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg bg-white navbar-light sticky-top p-0 shadow-sm reg-topbar">
+<a class="navbar-brand px-4" href="/index.php">NARAP</a>
+<button class="navbar-toggler me-4" data-bs-target="#navbarCollapse" data-bs-toggle="collapse" type="button">
+<span class="navbar-toggler-icon"></span>
+</button>
+<div class="collapse navbar-collapse" id="navbarCollapse">
+<div class="navbar-nav ms-auto p-4 p-lg-0">
+<a class="nav-item nav-link" href="/register.php">Back</a>
+<a class="nav-item nav-link" href="/member/login.php">Member Login</a>
+</div>
+</div>
+<div class="reg-top-logo"><img alt="NARAP Logo" class="reg-logo img-fluid" src="/uploads/slider/Narap.png"/></div></nav>
+<div class="container py-5">
+<div class="row justify-content-center">
+<div class="col-lg-9">
+<h1 class="mb-4 reg-title">Member Registration</h1>
+<form class="row g-3" enctype="multipart/form-data" id="memberForm">
+<div class="col-12">
+<div class="alert alert-warning mb-3" role="alert">
+<div class="fw-bold mb-1">Please read before filling this form</div>
+<ul class="mb-0 ps-3 small">
+<li>Enter your full legal name exactly as it should appear on NARAP records.</li>
+<li>Use a valid email address and phone number; confirmations <span class="fw-bold fst-italic">may</span> be sent there.</li>
+<li>Upload a clear, recent passport photograph (JPG/PNG).</li>
+<li>Select your correct Date of Birth and state.</li>
+<li>Double-check all spellings and numbers before submitting.</li>
+</ul>
+</div>
+</div>
+<div class="col-md-6">
+<label class="form-label">First Name:</label>
+<input class="form-control" name="firstName" placeholder="Your name" required=""/>
+</div>
+<div class="col-md-6">
+<label class="form-label">Last Name:</label>
+<input class="form-control" name="lastName" placeholder="Surname" required=""/>
+</div>
+<div class="col-md-6">
+<label class="form-label">Sex:</label>
+<select class="form-control" name="sex" required="">
+<option disabled="" selected="" value="">Gender</option>
+<option>Male</option>
+<option>Female</option>
+</select>
+</div>
+<div class="col-md-6">
+<label class="form-label">Marital Status:</label>
+<select class="form-control" name="maritalStatus" required="">
+<option disabled="" selected="" value="">Select Status</option>
+<option>Single</option>
+<option>Married</option>
+</select>
+</div>
+<div class="col-md-6">
+<label class="form-label">Mobile Number:</label>
+<input class="form-control" name="phone" placeholder="Phone Number" required="" type="tel"/>
+</div>
+<div class="col-md-6">
+<label class="form-label">Email:</label>
+<input class="form-control" name="email" placeholder="@gmail.com" required="" type="email"/>
+</div>
+<div class="col-md-6">
+<label class="form-label">Residential Address:</label>
+<input class="form-control" name="address" placeholder="Residential Address" required=""/>
+</div>
+<div class="col-md-6">
+<label class="form-label">State:</label>
+<select class="form-control" name="state" required="">
+<option disabled="" selected="" value="">Select State</option>
+<option>Abia</option>
+<option>Adamawa</option>
+<option>Akwa Ibom</option>
+<option>Anambra</option>
+<option>Bauchi</option>
+<option>Bayelsa</option>
+<option>Benue</option>
+<option>Borno</option>
+<option>Cross River</option>
+<option>Delta</option>
+<option>Ebonyi</option>
+<option>Edo</option>
+<option>Ekiti</option>
+<option>Enugu</option>
+<option>Gombe</option>
+<option>Imo</option>
+<option>Jigawa</option>
+<option>Kaduna</option>
+<option>Kano</option>
+<option>Katsina</option>
+<option>Kebbi</option>
+<option>Kogi</option>
+<option>Kwara</option>
+<option>Lagos</option>
+<option>Nasarawa</option>
+<option>Niger</option>
+<option>Ogun</option>
+<option>Ondo</option>
+<option>Osun</option>
+<option>Oyo</option>
+<option>Plateau</option>
+<option>Rivers</option>
+<option>Sokoto</option>
+<option>Taraba</option>
+<option>Yobe</option>
+<option>Zamfara</option>
+<option>FCT (Abuja)</option>
+</select>
+</div>
+<div class="col-md-6">
+<label class="form-label">Zone:</label>
+<input class="form-control" name="zone" placeholder="Zone"/>
+</div>
+<div class="col-md-6">
+<label class="form-label">Ward:</label>
+<input class="form-control" name="ward" placeholder="Ward"/>
+</div>
+<div class="col-md-6">
+<label class="form-label">Business Registered Name:</label>
+<input class="form-control" name="businessName" placeholder="Business Registered Name" required=""/>
+</div>
+<div class="col-md-6">
+<label class="form-label">Business Address:</label>
+<input class="form-control" name="businessAddress" placeholder="Business Address" required=""/>
+</div>
+<div class="col-md-6">
+<label class="form-label">Area of Specialization</label>
+<select class="form-control" name="specialization" required="">
+<option disabled="" selected="" value="">Select Area of Specialization</option>
+<option>Air Conditioning</option>
+<option>Refrigeration</option>
+<option>Air Conditioning &amp; Refrigeration</option>
+</select>
+</div>
+<div class="col-md-6">
+<label class="form-label">All Positions:</label>
+<select class="form-control" name="position" required="">
+<option disabled="" selected="" value="">Select Position</option>
+<option>President</option>
+<option>Deputy President</option>
+<option>Vice President (North Central)</option>
+<option>Vice President (North East)</option>
+<option>Vice President (North West)</option>
+<option>Vice President (South East)</option>
+<option>Vice President (South South)</option>
+<option>Vice President (South West)</option>
+<option>Secretary</option>
+<option>Assistant Secretary</option>
+<option>Financial Secretary</option>
+<option>Assistant Financial Secretary</option>
+<option>Treasurer</option>
+<option>Public Relation Officer (PRO)</option>
+<option>Assistant Public Relation Officer (APRO)</option>
+<option>Provost Marshal 1</option>
+<option>Provost Marshal 2</option>
+<option>State Welfare Coordinator</option>
+<option>Coordinator</option>
+<option>Assistant Coordinator</option>
+<option>Chairman</option>
+<option>Vice Chairman</option>
+<option>State Secretary </option>
+<option>State Assistant Secretary</option>
+<option>State Financial Secretary</option>
+<option>State Treasurer</option>
+<option>Task Force</option>
+<option>Old Member</option>
+<option>New Member</option>
+</select>
+</div>
+<div class="col-md-6">
+<label class="form-label">Password:</label>
+<div class="input-group mb-2"><input class="form-control" id="password" minlength="6" name="password" placeholder="*******" required="" type="password"/><button aria-label="Show password" class="btn btn-outline-secondary toggle-password" data-target="#password" title="Show password" type="button"><svg aria-hidden="true" class="icon-eye" height="16" viewbox="0 0 16 16" width="16" xmlns="http://www.w3.org/2000/svg">
+<path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8z"></path>
+<path d="M8 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"></path>
+</svg><svg aria-hidden="true" class="icon-eye-slash" height="16" hidden="" viewbox="0 0 16 16" width="16" xmlns="http://www.w3.org/2000/svg">
+<path d="M13.359 11.238C11.93 12.5 10.1 13.5 8 13.5 3 13.5 0 8 0 8a17.6 17.6 0 0 1 3.11-3.66l-.97-.97a.75.75 0 1 1 1.06-1.06l12 12a.75.75 0 1 1-1.06 1.06l-0.78-0.78z"></path>
+<path d="M5.354 6.207A3 3 0 0 0 8 11a2.99 2.99 0 0 0 2.793-1.646l-5.44-5.44zM8 2.5C13 2.5 16 8 16 8c-.365.67-.81 1.32-1.32 1.93l-1.07-1.07C14.41 8.28 14.76 7.66 15 7.25 15 7.25 12 2.5 8 2.5 6.67 2.5 5.53 2.9 4.58 3.44l1.08 1.08C6.35 4.2 7.15 4 8 4z"></path>
+</svg><span class="visually-hidden">Show</span></button></div>
+</div>
+<div class="col-md-6">
+<label class="form-label">Confirm Password:</label>
+<div class="input-group mb-2"><input class="form-control" id="confirmPassword" minlength="6" name="confirm_password" placeholder="*******" required="" type="password"/><button aria-label="Show password" class="btn btn-outline-secondary toggle-password" data-target="#confirmPassword" title="Show password" type="button"><svg aria-hidden="true" class="icon-eye" height="16" viewbox="0 0 16 16" width="16" xmlns="http://www.w3.org/2000/svg">
+<path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8z"></path>
+<path d="M8 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"></path>
+</svg><svg aria-hidden="true" class="icon-eye-slash" height="16" hidden="" viewbox="0 0 16 16" width="16" xmlns="http://www.w3.org/2000/svg">
+<path d="M13.359 11.238C11.93 12.5 10.1 13.5 8 13.5 3 13.5 0 8 0 8a17.6 17.6 0 0 1 3.11-3.66l-.97-.97a.75.75 0 1 1 1.06-1.06l12 12a.75.75 0 1 1-1.06 1.06l-0.78-0.78z"></path>
+<path d="M5.354 6.207A3 3 0 0 0 8 11a2.99 2.99 0 0 0 2.793-1.646l-5.44-5.44zM8 2.5C13 2.5 16 8 16 8c-.365.67-.81 1.32-1.32 1.93l-1.07-1.07C14.41 8.28 14.76 7.66 15 7.25 15 7.25 12 2.5 8 2.5 6.67 2.5 5.53 2.9 4.58 3.44l1.08 1.08C6.35 4.2 7.15 4 8 4z"></path>
+</svg><span class="visually-hidden">Show</span></button></div>
+<div class="invalid-feedback">Passwords do not match.</div></div>
+<div class="col-md-6">
+<label class="form-label">Next of Kin:</label>
+<input class="form-control" name="nextOfKin" placeholder="Next of Kin"/>
+</div>
+<div class="col-md-6">
+<label class="form-label">Guarantor (<em>must be a practitioner</em>):</label>
+<input class="form-control" name="guarantor" placeholder="Guarantor" required=""/>
+</div>
+<div class="col-md-6">
+<label class="form-label">Guarantor's Address:</label>
+<input class="form-control" name="guarantorAddress" placeholder="Address" required=""/>
+</div>
+<div class="col-md-6">
+<label class="form-label">Guarantor's Position:</label>
+<select class="form-control" name="guarantorPosition" required="">
+<option disabled="" selected="" value="">Select Position</option>
+<option>Deputy President</option>
+<option>Vice President (North Central)</option>
+<option>Vice President (North East)</option>
+<option>Vice President (North West)</option>
+<option>Vice President (South East)</option>
+<option>Vice President (South South)</option>
+<option>Vice President (South West)</option>
+<option>Secretary</option>
+<option>Assistant Secretary</option>
+<option>Financial Secretary</option>
+<option>Assistant Financial Secretary</option>
+<option>Treasurer</option>
+<option>Public Relation Officer (PRO)</option>
+<option>Assistant Public Relation Officer (APRO)</option>
+<option>Provost Marshal 1</option>
+<option>Provost Marshal 2</option>
+<option>State Welfare Coordinator</option>
+<option>Coordinator</option>
+<option>Assistant Coordinator</option>
+<option>Chairman</option>
+<option>Vice Chairman</option>
+<option>State Secretary </option>
+<option>State Assistant Secretary</option>
+<option>State Financial Secretary</option>
+<option>State Treasurer</option>
+<option>Task Force</option>
+<option>Member</option>
+</select>
+</div>
+<div class="col-md-6">
+<label class="form-label">Passport Photo:</label>
+<input accept="image/*" class="form-control" name="passport" required="" type="file"/>
+<div class="form-hint fst-italic">Upload a clear face photo (JPG/PNG).</div>
+</div>
+<div class="col-md-6">
+<label class="form-label">Signature:</label>
+<input accept="image/*" class="form-control" name="signature" required="" type="file"/>
+<div class="form-hint fst-italic">Upload a Signature.</div>
+</div>
+<div class="col-12">
+<label class="form-label fw-bold">Declaration:</label>
+<div class="mb-3"><div class="form-check"><input class="form-check-input" id="declareAgree" name="declare_agree" required="" type="checkbox"/><label class="form-check-label" for="declareAgree">I agree to become a member of the Nigerian Association of Refrigeration &amp; Air Conditioning Practitioners (NARAP) and confirm that all information supplied in this form is correct. I understand that any false information will lead to dismembership from the Association.</label></div></div><button aria-disabled="true" class="btn btn-success disabled" disabled="disabled" type="submit">Create Member Account</button>
+</div>
+</form>
+<div class="mt-3" id="memberMsg"></div>
+</div>
+</div>
+</div>
+<script>
+function setMsg(el, text, ok=false) {
+  el.innerHTML = '<div class="alert '+(ok?'alert-success':'alert-danger')+'">'+text+'</div>';
+  el.scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+
+document.getElementById('memberForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const msg = document.getElementById('memberMsg');
+  const submitBtn = e.target.querySelector('button[type="submit"]');
+  
+  // Disable button and show loading
+  submitBtn.disabled = true;
+  submitBtn.innerHTML = 'Creating Account...';
+  msg.innerHTML = '';
+  
+  try {
+    const fd = new FormData(e.target);
+    
+    // Add additional fields that need special handling
+    const firstName = e.target.querySelector('[name="firstName"]').value;
+    const lastName = e.target.querySelector('[name="lastName"]').value;
+    fd.append('name', `${firstName} ${lastName}`);
+    fd.append('surname', lastName);
+    fd.append('otherNames', firstName);
+
+    console.log('Sending registration request...');
+    
+    const res = await fetch('/api/auth/register-member', {
+      method: 'POST',
+      body: fd
+    });
+    
+    const data = await res.json().catch(() => ({}));
+    
+    console.log('Response status:', res.status);
+    console.log('Response data:', data);
+    
+    if (!res.ok) {
+      throw new Error(data.message || `Registration failed (${res.status})`);
+    }
+
+    // CRITICAL: Save the JWT token to localStorage
+    if (data.token) {
+      localStorage.setItem('jwt', data.token);
+      console.log('Token saved to localStorage');
+    }
+
+    setMsg(msg, 'Member account created successfully! Redirecting to profile setup...', true);
+    setTimeout(() => { 
+      window.location.href = '/member/profile-setup.php'; 
+    }, 1500);
+    
+  } catch (err) {
+    console.error('Registration error:', err);
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = 'Create Member Account';
+    setMsg(msg, err.message || 'Something went wrong. Please try again.');
+  }
+});
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  var form = document.getElementById('memberForm') || document.querySelector('form');
+  var checkbox = form ? form.querySelector('#declareAgree, [name="declare_agree"]') : null;
+  var submits = form ? Array.from(form.querySelectorAll('button[type="submit"], input[type="submit"]')) : [];
+  var submitBtn = submits.find(function(el){
+    var t = (el.innerText || el.value || '').toLowerCase();
+    return t.includes('create member');
+  }) || submits[0];
+
+  function sync() {
+    if (!checkbox || !submitBtn) return;
+    submitBtn.disabled = !checkbox.checked;
+    if (submitBtn.tagName === 'BUTTON') {
+      submitBtn.setAttribute('aria-disabled', submitBtn.disabled ? 'true' : 'false');
+    }
+  }
+
+  if (checkbox && submitBtn) {
+    sync();
+    checkbox.addEventListener('change', sync);
+    form.addEventListener('submit', function(e){
+      if (!checkbox.checked) {
+        e.preventDefault();
+        checkbox.focus();
+      }
+    });
+  }
+});
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  var form = document.getElementById('memberForm') || document.querySelector('form');
+  if (!form) return;
+  var checkbox = form.querySelector('#declareAgree, [name="declare_agree"]');
+  var submits = Array.from(form.querySelectorAll('button[type="submit"], input[type="submit"]'));
+  var submitBtn = submits.find(function(el){
+    var t = (el.innerText || el.value || '').toLowerCase();
+    return t.includes('create member');
+  }) || submits[0];
+  if (!checkbox || !submitBtn) return;
+
+  function syncDisabled(){
+    var enabled = !!checkbox.checked;
+    submitBtn.disabled = !enabled;
+    if (submitBtn.tagName === 'BUTTON') {
+      submitBtn.setAttribute('aria-disabled', (!enabled).toString());
+    }
+    if (enabled) {
+      submitBtn.classList.remove('disabled');
+    } else {
+      if (!submitBtn.classList.contains('disabled')) submitBtn.classList.add('disabled');
+    }
+  }
+
+  syncDisabled();
+  checkbox.addEventListener('change', syncDisabled);
+});
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var form = document.getElementById('memberForm') || document.querySelector('form');
+  if (!form) return;
+
+  var checkbox = form.querySelector('#declareAgree, [name="declare_agree"]');
+  var pass = form.querySelector('#password, [name="password"]');
+  var confirm = form.querySelector('#confirmPassword, [name="confirm_password"]');
+  var btns = Array.from(form.querySelectorAll('button[type="submit"], input[type="submit"]'));
+  var submitBtn = btns.find(function(el){
+    var t = (el.innerText || el.value || '').toLowerCase();
+    return t.includes('create member');
+  }) || btns[0];
+
+  // Icon-based toggle (inline SVG)
+  form.querySelectorAll('.toggle-password').forEach(function(btn){
+    var targetSel = btn.getAttribute('data-target');
+    var target = targetSel ? form.querySelector(targetSel) : null;
+    var eye = btn.querySelector('.icon-eye');
+    var eyeSlash = btn.querySelector('.icon-eye-slash');
+    var sr = btn.querySelector('.visually-hidden');
+    function render(){
+      var isPwd = target && target.type === 'password';
+      if (eye && eyeSlash){
+        eye.hidden = !isPwd;
+        eyeSlash.hidden = isPwd;
+      }
+      if (sr){ sr.textContent = isPwd ? 'Show' : 'Hide'; }
+      btn.setAttribute('aria-label', isPwd ? 'Show password' : 'Hide password');
+      btn.setAttribute('title', isPwd ? 'Show password' : 'Hide password');
+    }
+    render();
+    btn.addEventListener('click', function(){
+      if (!target) return;
+      target.type = (target.type === 'password') ? 'text' : 'password';
+      render();
+    });
+  });
+  
+  // Validation for password match
+  function passwordsMatch(){
+    if (!pass || !confirm) return true;
+    if (!confirm.value || !pass.value) return false;
+    return pass.value === confirm.value;
+  }
+
+  function updateValidationUI(){
+    if (!pass || !confirm) return;
+    if (confirm.value.length === 0) {
+      confirm.classList.remove('is-invalid');
+      confirm.setCustomValidity('');
+      return;
+    }
+    if (passwordsMatch()){
+      confirm.classList.remove('is-invalid');
+      confirm.setCustomValidity('');
+    } else {
+      confirm.classList.add('is-invalid');
+      confirm.setCustomValidity('Passwords do not match');
+    }
+  }
+
+  function syncDisabled(){
+    if (!submitBtn) return;
+    var declOK = checkbox ? checkbox.checked : true;
+    var pwdOK = passwordsMatch();
+    var enabled = declOK && pwdOK;
+    submitBtn.disabled = !enabled;
+    if (submitBtn.tagName === 'BUTTON') {
+      submitBtn.setAttribute('aria-disabled', (!enabled).toString());
+    }
+    if (enabled) {
+      submitBtn.classList.remove('disabled');
+    } else {
+      if (!submitBtn.classList.contains('disabled')) submitBtn.classList.add('disabled');
+    }
+  }
+
+  ['input','change','blur','keyup'].forEach(function(ev){
+    if (pass) pass.addEventListener(ev, function(){ updateValidationUI(); syncDisabled(); });
+    if (confirm) confirm.addEventListener(ev, function(){ updateValidationUI(); syncDisabled(); });
+  });
+  if (checkbox) checkbox.addEventListener('change', syncDisabled);
+
+  updateValidationUI();
+  syncDisabled();
+});
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var selects = Array.from(document.querySelectorAll('select.form-select'));
+  function syncPlaceholder(sel){
+    try {
+      var isPlaceholder = !sel.value || (sel.selectedOptions && sel.selectedOptions[0] && sel.selectedOptions[0].disabled);
+      sel.classList.toggle('select-placeholder', !!isPlaceholder);
+    } catch(_) {}
+  }
+  selects.forEach(function(sel){
+    syncPlaceholder(sel);
+    sel.addEventListener('change', function(){ syncPlaceholder(sel); });
+  });
+});
+</script></body>
+</html>
