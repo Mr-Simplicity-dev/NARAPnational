@@ -433,6 +433,22 @@ if (!token) {
   window.location.replace('/admin/login.php');
 }
 
+// ADD THIS LINE - define your API base URL
+const API_BASE = 'http://localhost:5000/api'; // or whatever your API base path is
+
+
+// Add this after API_BASE definition
+async function authFetch(url, options = {}) {
+  const token = localStorage.getItem('jwt');
+  return fetch(url, {
+    ...options,
+    headers: {
+      ...options.headers,
+      'Authorization': `Bearer ${token}`
+    }
+  });
+}
+
 // Simple logout function
 document.getElementById('logoutBtn')?.addEventListener('click', function() {
   localStorage.removeItem('jwt');
@@ -1040,6 +1056,8 @@ document.getElementById('tab-members-unpaid')?.addEventListener('shown.bs.tab', 
 // ===== initial loads =====
 loadHomeSettings();
 ['sliders', 'services', 'projects', 'features', 'offers', 'blogs', 'faqs', 'team', 'members-all', 'members-paid', 'members-unpaid'].forEach(loadList);
+
+
 
 </script>
 
