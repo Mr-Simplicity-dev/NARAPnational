@@ -425,7 +425,6 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-
 <script>
 // Basic authentication check
 const token = localStorage.getItem('jwt');
@@ -433,9 +432,8 @@ if (!token) {
   window.location.replace('/admin/login.php');
 }
 
-// ADD THIS LINE - define your API base URL
-const API_BASE = '/api'; // or whatever your API base path is
-
+// Define your API base URL
+const API_BASE = '/api';
 
 // Add this after API_BASE definition
 async function authFetch(url, options = {}) {
@@ -455,14 +453,11 @@ document.getElementById('logoutBtn')?.addEventListener('click', function() {
   localStorage.removeItem('token');
   window.location.replace('/index.php');
 });
-</script>
-
-<script>
-
 
 // ===== SAFE HELPERS =====
 const PAGE_SIZE = window.PAGE_SIZE || 20;
 let allPage = 1, paidPage = 1, unpaidPage = 1;
+let currentAllData = [], currentPaidData = [], currentUnpaidData = [];
 
 // Helper for JSON requests
 const json = (opts = {}) => ({
@@ -472,6 +467,352 @@ const json = (opts = {}) => ({
 
 // Defensive selector
 const $ = (sel) => document.querySelector(sel);
+
+// ===== LOADING INDICATORS =====
+function showLoading(selector) {
+  const element = $(selector);
+  if (element) {
+    element.innerHTML = '<tr><td colspan="10" class="text-center py-4"><div class="spinner-border spinner-border-sm text-brand" role="status"></div> Loading...</td></tr>';
+  }
+}
+
+function showButtonLoading(button, text = 'Loading...') {
+  if (!button) return;
+  button.disabled = true;
+  const originalHTML = button.innerHTML;
+  button.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> ${text}`;
+  button.setAttribute('data-original-html', originalHTML);
+}
+
+function hideButtonLoading(button) {
+  if (!button) return;
+  button.disabled = false;
+  const originalHTML = button.getAttribute('data-original-html');
+  if (originalHTML) {
+    button.innerHTML = originalHTML;
+  }
+}
+
+// ===== CSV EXPORT FUNCTIONALITY =====
+function convertToCSV(data, type) {
+  if (!data.length) return '';
+  
+  const headers = [];
+  const rows = [];
+  
+  switch(type) {
+    case 'all':
+      headers.push(['Name', 'Email', 'Member ID', 'State', 'LGA', 'Phone', 'Registration Date']);
+      data.forEach(item => {
+        const date = item?.createdAt ? new Date(item.createdAt).toLocaleDateString() : '';
+        rows.push([
+          `"${item?.name || ''}"`,
+          `"${item?.email || ''}"`,
+          `"${item?.memberId || item?.memberCode || ''}"`,
+          `"${item?.state || ''}"`,
+          `"${item?.lga || ''}"`,
+          `"${item?.phone || ''}"`,
+          `"${date}"`
+        ]);
+      });
+      break;
+      
+    case 'paid':
+      headers.push(['Name', 'Email', 'Member ID', 'State', 'Paid Fees', 'Membership Paid', 'Certificate Paid', 'ID Card Paid']);
+      data.forEach(item => {
+        const flags = summarizePaidFlags(item);
+        const paidList = [flags.membership ? 'Membership' : '', flags.certificate ? 'Certificate' : '', flags.idcard ? 'ID Card' : '']
+          .filter(Boolean).join('; ');
+        rows.push([
+          `"${item?.name || ''}"`,
+          `"${item?.email || ''}"`,
+          `"${item?.memberId || item?.memberCode || ''}"`,
+          `"${item?.state || ''}"`,
+          `"${paidList}"`,
+          `"${flags.membership ? 'Yes' : 'No'}"`,
+          `"${flags.certificate ? 'Yes' : 'No'}"`,
+          `"${flags.idcard ? 'Yes' : 'No'}"`
+        ]);
+      });
+      break;
+      
+    case 'unpaid':
+      headers.push(['Name', 'Email', 'Member ID', 'State', 'Unpaid Fees', 'Membership Due', 'Certificate Due', 'ID Card Due']);
+      data.forEach(item => {
+        const missing = unpaidListFromFlags(summarizePaidFlags(item));
+        const flags = summarizePaidFlags(item);
+        rows.push([
+          `"${item?.name || ''}"`,
+          `"${item?.email || ''}"`,
+          `"${item?.memberId || item?.memberCode || ''}"`,
+          `"${item?.state || ''}"`,
+          `"${missing}"`,
+          `"${flags.membership ? 'Paid' : 'Due'}"`,
+          `"${flags.certificate ? 'Paid' : 'Due'}"`,
+          `"${flags.idcard ? 'Paid' : 'Due'}"`
+        ]);
+      });
+      break;
+  }
+  
+  return [...headers, ...rows].map(row => row.join(',')).join('\n');
+}
+
+function downloadCSV(csv, filename) {
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
+  const url = URL.createObjectURL(blob);
+  link.setAttribute('href', url);
+  link.setAttribute('download', filename);
+  link.style.visibility = 'hidden';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
+// ===== SEARCH AND FILTER FUNCTIONALITY =====
+function filterMembers(data, searchTerm, type = 'all') {
+  if (!searchTerm) return data;
+  
+  const term = searchTerm.toLowerCase();
+  return data.filter(item => {
+    const name = (item?.name || '').toLowerCase();
+    const email = (item?.email || '').toLowerCase();
+    const memberId = (item?.memberId || item?.memberCode || '').toLowerCase();
+    const state = (item?.state || '').toLowerCase();
+    const lga = (item?.lga || '').toLowerCase();
+    
+    return name.includes(term) || 
+           email.includes(term) || 
+           memberId.includes(term) || 
+           state.includes(term) ||
+           lga.includes(term);
+  });
+}
+
+function filterPaidMembers(data, requireAll) {
+  const membershipChecked = $('#paidFeeMembership')?.checked ?? true;
+  const certificateChecked = $('#paidFeeCertificate')?.checked ?? true;
+  const idcardChecked = $('#paidFeeIdcard')?.checked ?? true;
+  
+  return data.filter(item => {
+    const flags = summarizePaidFlags(item);
+    const conditions = [];
+    
+    if (membershipChecked) conditions.push(flags.membership);
+    if (certificateChecked) conditions.push(flags.certificate);
+    if (idcardChecked) conditions.push(flags.idcard);
+    
+    if (requireAll) {
+      return conditions.every(condition => condition);
+    } else {
+      return conditions.some(condition => condition);
+    }
+  });
+}
+
+// ===== UPDATED MEMBERS LOADING WITH ALL FEATURES =====
+async function loadMembersSimple(type) {
+  try {
+    let endpoint = '';
+    switch(type) {
+      case 'all': endpoint = `${API_BASE}/members`; break;
+      case 'paid': endpoint = `${API_BASE}/members/paid`; break;
+      case 'unpaid': endpoint = `${API_BASE}/members/unpaid`; break;
+    }
+
+    console.log(`Loading ${type} members from:`, endpoint);
+    
+    // Show loading indicator
+    showLoading(`#list-members-${type}`);
+    
+    const res = await authFetch(endpoint);
+    
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    
+    const items = await res.json();
+    console.log(`Loaded ${items?.length || 0} ${type} members:`, items);
+    
+    // Store the data for filtering/export
+    switch(type) {
+      case 'all': currentAllData = items || []; break;
+      case 'paid': currentPaidData = items || []; break;
+      case 'unpaid': currentUnpaidData = items || []; break;
+    }
+    
+    // Apply filters and render
+    renderFilteredMembers(type);
+    
+  } catch (err) {
+    console.error(`loadMembersSimple(${type}) error:`, err);
+    const tbody = document.getElementById(`list-members-${type}`);
+    if (tbody) {
+      tbody.innerHTML = '<tr><td colspan="6" class="text-center text-danger py-4">Failed to load members</td></tr>';
+    }
+  }
+}
+
+function renderFilteredMembers(type) {
+  let data = [];
+  let searchTerm = '';
+  let filteredData = [];
+  
+  switch(type) {
+    case 'all':
+      data = currentAllData;
+      searchTerm = $('#allSearch')?.value || '';
+      filteredData = filterMembers(data, searchTerm, 'all');
+      break;
+      
+    case 'paid':
+      data = currentPaidData;
+      searchTerm = $('#paidSearch')?.value || '';
+      const requireAll = $('#paidLogicAll')?.checked || false;
+      let paidFiltered = filterMembers(data, searchTerm, 'paid');
+      paidFiltered = filterPaidMembers(paidFiltered, requireAll);
+      filteredData = paidFiltered;
+      break;
+      
+    case 'unpaid':
+      data = currentUnpaidData;
+      searchTerm = $('#unpaidSearch')?.value || '';
+      filteredData = filterMembers(data, searchTerm, 'unpaid');
+      break;
+  }
+  
+  const tbody = document.getElementById(`list-members-${type}`);
+  const countEl = document.getElementById(`${type}Count`);
+  
+  if (!tbody) return;
+
+  // Clear existing content
+  tbody.innerHTML = '';
+
+  if (!filteredData.length) {
+    tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-4">No members found</td></tr>';
+    if (countEl) countEl.textContent = '0 results';
+    return;
+  }
+
+  // Render rows
+  filteredData.forEach((item, i) => {
+    const row = document.createElement('tr');
+    
+    if (type === 'all') {
+      const created = item?.createdAt ? new Date(item.createdAt).toLocaleDateString() : '';
+      row.innerHTML = `
+        <td>${i + 1}</td>
+        <td>${item?.name || ''}</td>
+        <td>${item?.email || ''}</td>
+        <td>${item?.memberId || item?.memberCode || ''}</td>
+        <td>${item?.state || item?.lga || ''}</td>
+        <td>${created}</td>
+      `;
+    } 
+    else if (type === 'paid') {
+      const flags = summarizePaidFlags(item);
+      const paidList = [flags.membership ? 'Membership' : '', flags.certificate ? 'Certificate' : '', flags.idcard ? 'ID Card' : '']
+        .filter(Boolean).join(' / ');
+      row.innerHTML = `
+        <td>${i + 1}</td>
+        <td>${item?.name || ''}</td>
+        <td>${item?.email || ''}</td>
+        <td>${item?.memberId || item?.memberCode || ''}</td>
+        <td>${item?.state || item?.lga || ''}</td>
+        <td>${paidList || '-'}</td>
+      `;
+    }
+    else if (type === 'unpaid') {
+      const missing = unpaidListFromFlags(summarizePaidFlags(item));
+      row.innerHTML = `
+        <td>${i + 1}</td>
+        <td>${item?.name || ''}</td>
+        <td>${item?.email || ''}</td>
+        <td>${item?.memberId || item?.memberCode || ''}</td>
+        <td>${item?.state || item?.lga || ''}</td>
+        <td>${missing || 'All paid'}</td>
+      `;
+    }
+    
+    tbody.appendChild(row);
+  });
+
+  if (countEl) countEl.textContent = `${filteredData.length} result(s)`;
+}
+
+// ===== EXPORT HANDLERS =====
+async function handleExport(type) {
+  try {
+    const button = $(`#btnExport${type.charAt(0).toUpperCase() + type.slice(1)}`);
+    showButtonLoading(button, 'Exporting...');
+    
+    // Get current filtered data for export
+    let dataToExport = [];
+    switch(type) {
+      case 'all': dataToExport = filterMembers(currentAllData, $('#allSearch')?.value || '', 'all'); break;
+      case 'paid': 
+        let paidData = filterMembers(currentPaidData, $('#paidSearch')?.value || '', 'paid');
+        const requireAll = $('#paidLogicAll')?.checked || false;
+        dataToExport = filterPaidMembers(paidData, requireAll);
+        break;
+      case 'unpaid': dataToExport = filterMembers(currentUnpaidData, $('#unpaidSearch')?.value || '', 'unpaid'); break;
+    }
+    
+    const csv = convertToCSV(dataToExport, type);
+    const filename = `${type}-members-${new Date().toISOString().split('T')[0]}.csv`;
+    
+    downloadCSV(csv, filename);
+    
+    setTimeout(() => hideButtonLoading(button), 1000);
+    
+  } catch (err) {
+    console.error(`Export ${type} error:`, err);
+    const button = $(`#btnExport${type.charAt(0).toUpperCase() + type.slice(1)}`);
+    hideButtonLoading(button);
+    alert('Export failed. Please try again.');
+  }
+}
+
+// ===== EVENT LISTENERS FOR NEW FEATURES =====
+document.addEventListener('DOMContentLoaded', function() {
+  // Search functionality
+  $('#allSearch')?.addEventListener('input', () => renderFilteredMembers('all'));
+  $('#paidSearch')?.addEventListener('input', () => renderFilteredMembers('paid'));
+  $('#unpaidSearch')?.addEventListener('input', () => renderFilteredMembers('unpaid'));
+  
+  // Paid member filter options
+  $('#paidFeeMembership')?.addEventListener('change', () => renderFilteredMembers('paid'));
+  $('#paidFeeCertificate')?.addEventListener('change', () => renderFilteredMembers('paid'));
+  $('#paidFeeIdcard')?.addEventListener('change', () => renderFilteredMembers('paid'));
+  $('#paidLogicAll')?.addEventListener('change', () => renderFilteredMembers('paid'));
+  
+  // Export functionality
+  $('#btnExportAll')?.addEventListener('click', () => handleExport('all'));
+  $('#btnExportPaid')?.addEventListener('click', () => handleExport('paid'));
+  $('#btnExportUnpaid')?.addEventListener('click', () => handleExport('unpaid'));
+  
+  // Reload buttons with loading states
+  $('#btnReloadAll')?.addEventListener('click', async () => {
+    showButtonLoading($('#btnReloadAll'), 'Reloading...');
+    await loadMembersSimple('all');
+    hideButtonLoading($('#btnReloadAll'));
+  });
+  
+  $('#btnReloadPaid')?.addEventListener('click', async () => {
+    showButtonLoading($('#btnReloadPaid'), 'Reloading...');
+    await loadMembersSimple('paid');
+    hideButtonLoading($('#btnReloadPaid'));
+  });
+  
+  $('#btnReloadUnpaid')?.addEventListener('click', async () => {
+    showButtonLoading($('#btnReloadUnpaid'), 'Reloading...');
+    await loadMembersSimple('unpaid');
+    hideButtonLoading($('#btnReloadUnpaid'));
+  });
+});
+
+// ===== KEEP ALL YOUR EXISTING CODE BELOW =====
+// (All the home settings, generic CRUD, helper functions, etc.)
 
 // ===== HOME SETTINGS =====
 async function loadHomeSettings() {
@@ -658,62 +999,6 @@ const resources = {
     renderRow: (item, i) => `<tr><td>${i + 1}</td><td>${item.image ? '<img class="img-thumb" src="' + item.image + '">' : ''}</td><td>${item.name || ''}</td><td>${item.role || ''}</td>
     <td class="text-end"><button class="btn btn-sm btn-outline-primary" data-edit="team" data-id="${item._id}">Edit</button>
     <button class="btn btn-sm btn-outline-danger" data-del="team" data-id="${item._id}">Delete</button></td></tr>`
-  },
-  'members-all': {
-    endpoint: '/members',
-    listEl: '#list-members-all',
-    form: null,
-    status: null,
-    toPayload: () => ({}),
-    renderRow: (item, i) => {
-      const created = item?.createdAt ? new Date(item.createdAt).toLocaleDateString() : '';
-      return `<tr>
-      <td>${i + 1}</td>
-      <td>${item?.name || ''}</td>
-      <td>${item?.email || ''}</td>
-      <td>${item?.memberId || item?.memberCode || ''}</td>
-      <td>${item?.state || item?.lga || ''}</td>
-      <td>${created}</td>
-    </tr>`;
-    }
-  },
-  'members-paid': {
-    endpoint: '/members/paid',
-    listEl: '#list-members-paid',
-    form: null,
-    status: null,
-    toPayload: () => ({}),
-    renderRow: (item, i) => {
-      const f = summarizePaidFlags(item);
-      const paidList = [f.membership ? 'Membership' : '', f.certificate ? 'Certificate' : '', f.idcard ? 'ID Card' : '']
-        .filter(Boolean).join(' / ');
-      return `<tr>
-      <td>${i + 1}</td>
-      <td>${item?.name || ''}</td>
-      <td>${item?.email || ''}</td>
-      <td>${item?.memberId || item?.memberCode || ''}</td>
-      <td>${item?.state || item?.lga || ''}</td>
-      <td>${paidList || '-'}</td>
-    </tr>`;
-    }
-  },
-  'members-unpaid': {
-    endpoint: '/members/unpaid',
-    listEl: '#list-members-unpaid',
-    form: null,
-    status: null,
-    toPayload: () => ({}),
-    renderRow: (item, i) => {
-      const missing = unpaidListFromFlags(summarizePaidFlags(item));
-      return `<tr>
-      <td>${i + 1}</td>
-      <td>${item?.name || ''}</td>
-      <td>${item?.email || ''}</td>
-      <td>${item?.memberId || item?.memberCode || ''}</td>
-      <td>${item?.state || item?.lga || ''}</td>
-      <td>${missing || 'All paid'}</td>
-    </tr>`;
-    }
   }
 };
 
@@ -836,109 +1121,7 @@ document.querySelectorAll('[data-reset]')?.forEach(btn => {
   btn.addEventListener('click', () => resetForm(btn.getAttribute('data-reset')));
 });
 
-
-// ===== SIMPLIFIED MEMBERS LOADING =====
-async function loadMembersSimple(type) {
-  try {
-    let endpoint = '';
-    switch(type) {
-      case 'all': endpoint = '/api/members'; break;
-      case 'paid': endpoint = '/api/members/paid'; break;
-      case 'unpaid': endpoint = '/api/members/unpaid'; break;
-    }
-
-    const res = await fetch(endpoint, {
-      headers: {
-        'Authorization': 'Bearer ' + (localStorage.getItem('jwt') || ''),
-        'Content-Type': 'application/json'
-      }
-    });
-
-    if (!res.ok) throw new Error('Failed to load');
-    
-    const items = await res.json();
-    const tbody = document.getElementById(`list-members-${type}`);
-    const countEl = document.getElementById(`${type}Count`);
-    
-    if (!tbody) return;
-
-    // Clear existing content
-    tbody.innerHTML = '';
-
-    if (!items.length) {
-      tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-4">No members found</td></tr>';
-      if (countEl) countEl.textContent = '0 results';
-      return;
-    }
-
-    // Render rows
-    items.forEach((item, i) => {
-      const row = document.createElement('tr');
-      
-      if (type === 'all') {
-        const created = item?.createdAt ? new Date(item.createdAt).toLocaleDateString() : '';
-        row.innerHTML = `
-          <td>${i + 1}</td>
-          <td>${item?.name || ''}</td>
-          <td>${item?.email || ''}</td>
-          <td>${item?.memberId || item?.memberCode || ''}</td>
-          <td>${item?.state || item?.lga || ''}</td>
-          <td>${created}</td>
-        `;
-      } 
-      else if (type === 'paid') {
-        const flags = summarizePaidFlags(item);
-        const paidList = [flags.membership ? 'Membership' : '', flags.certificate ? 'Certificate' : '', flags.idcard ? 'ID Card' : '']
-          .filter(Boolean).join(' / ');
-        row.innerHTML = `
-          <td>${i + 1}</td>
-          <td>${item?.name || ''}</td>
-          <td>${item?.email || ''}</td>
-          <td>${item?.memberId || item?.memberCode || ''}</td>
-          <td>${item?.state || item?.lga || ''}</td>
-          <td>${paidList || '-'}</td>
-        `;
-      }
-      else if (type === 'unpaid') {
-        const missing = unpaidListFromFlags(summarizePaidFlags(item));
-        row.innerHTML = `
-          <td>${i + 1}</td>
-          <td>${item?.name || ''}</td>
-          <td>${item?.email || ''}</td>
-          <td>${item?.memberId || item?.memberCode || ''}</td>
-          <td>${item?.state || item?.lga || ''}</td>
-          <td>${missing || 'All paid'}</td>
-        `;
-      }
-      
-      tbody.appendChild(row);
-    });
-
-    if (countEl) countEl.textContent = `${items.length} result(s)`;
-
-  } catch (err) {
-    console.error(`loadMembersSimple(${type}) error:`, err);
-    const tbody = document.getElementById(`list-members-${type}`);
-    if (tbody) {
-      tbody.innerHTML = '<tr><td colspan="6" class="text-center text-danger py-4">Failed to load members</td></tr>';
-    }
-  }
-}
-
-// Replace the complex member loading functions with simple ones
-async function loadAllMembers() {
-  await loadMembersSimple('all');
-}
-
-async function loadPaidMembers() {
-  await loadMembersSimple('paid');
-}
-
-async function loadUnpaidMembers() {
-  await loadMembersSimple('unpaid');
-}
-
-// Keep your existing helper functions
+// Helper functions
 function summarizePaidFlags(m) {
   const paid = { membership: false, certificate: false, idcard: false };
   if (Array.isArray(m?.payments)) {
@@ -963,102 +1146,22 @@ function unpaidListFromFlags(flags) {
   return missing.join(', ');
 }
 
-// Update event listeners to use the new simple functions
-$('#btnReloadAll')?.addEventListener('click', loadAllMembers);
-$('#btnReloadPaid')?.addEventListener('click', loadPaidMembers);
-$('#btnReloadUnpaid')?.addEventListener('click', loadUnpaidMembers);
-
-// Remove the old complex search and pagination code for now
-$('#allSearch')?.addEventListener('input', () => loadAllMembers());
-$('#paidSearch')?.addEventListener('input', () => loadPaidMembers());
-$('#unpaidSearch')?.addEventListener('input', () => loadUnpaidMembers());
-
 // Load members when tabs are shown
 document.getElementById('tab-members-all')?.addEventListener('shown.bs.tab', loadAllMembers);
 document.getElementById('tab-members-paid')?.addEventListener('shown.bs.tab', loadPaidMembers);
 document.getElementById('tab-members-unpaid')?.addEventListener('shown.bs.tab', loadUnpaidMembers);
 
-// Paid
-async function loadPaidMembers() {
-  const fees = [];
-  $('#paidFeeMembership')?.checked && fees.push('membership');
-  $('#paidFeeCertificate')?.checked && fees.push('certificate');
-  $('#paidFeeIdcard')?.checked && fees.push('idcard');
-  const logic = $('#paidLogicAll')?.checked ? 'all' : 'any';
-  const search = ($('#paidSearch')?.value || '').trim();
-
-  const { items = [], total = 0 } = await fetchMembers('paid', { logic, fees, search, page: paidPage });
-  const tbody = $('#list-members-paid');
-  if (tbody) {
-    tbody.innerHTML = items.map((m, i) => {
-      const f = summarizePaidFlags(m);
-      const paidList = [f.membership ? 'Membership' : '', f.certificate ? 'Certificate' : '', f.idcard ? 'ID Card' : '']
-        .filter(Boolean).join(' / ');
-      return `<tr>
-        <td>${(paidPage - 1) * PAGE_SIZE + i + 1}</td>
-        <td>${m?.name || ''}</td>
-        <td>${m?.email || ''}</td>
-        <td>${m?.memberId || m?.memberCode || ''}</td>
-        <td>${m?.state || m?.lga || ''}</td>
-        <td>${paidList || '-'}</td>
-      </tr>`;
-    }).join('');
-  }
-  $('#paidCount') && ($('#paidCount').textContent = `${total} result(s)`);
-}
-
-// Unpaid
-async function loadUnpaidMembers() {
-  const search = ($('#unpaidSearch')?.value || '').trim();
-  const { items = [], total = 0 } = await fetchMembers('unpaid', { search, page: unpaidPage });
-  const tbody = $('#list-members-unpaid');
-  if (tbody) {
-    tbody.innerHTML = items.map((m, i) => {
-      const missing = unpaidListFromFlags(summarizePaidFlags(m));
-      return `<tr>
-        <td>${(unpaidPage - 1) * PAGE_SIZE + i + 1}</td>
-        <td>${m?.name || ''}</td>
-        <td>${m?.email || ''}</td>
-        <td>${m?.memberId || m?.memberCode || ''}</td>
-        <td>${m?.state || m?.lga || ''}</td>
-        <td>${missing || 'All paid'}</td>
-      </tr>`;
-    }).join('');
-  }
-  $('#unpaidCount') && ($('#unpaidCount').textContent = `${total} result(s)`);
-}
-
-// Events
-$('#btnReloadAll')?.addEventListener('click', () => { allPage = 1; loadAllMembers(); });
-$('#btnReloadPaid')?.addEventListener('click', () => { paidPage = 1; loadPaidMembers(); });
-$('#btnReloadUnpaid')?.addEventListener('click', () => { unpaidPage = 1; loadUnpaidMembers(); });
-
-$('#allSearch')?.addEventListener('input', () => { allPage = 1; loadAllMembers(); });
-$('#paidSearch')?.addEventListener('input', () => { paidPage = 1; loadPaidMembers(); });
-$('#unpaidSearch')?.addEventListener('input', () => { unpaidPage = 1; loadUnpaidMembers(); });
-
-$('#allPrev')?.addEventListener('click', () => { if (allPage > 1) { allPage--; loadAllMembers(); } });
-$('#allNext')?.addEventListener('click', () => { allPage++; loadAllMembers(); });
-$('#paidPrev')?.addEventListener('click', () => { if (paidPage > 1) { paidPage--; loadPaidMembers(); } });
-$('#paidNext')?.addEventListener('click', () => { paidPage++; loadPaidMembers(); });
-$('#unpaidPrev')?.addEventListener('click', () => { if (unpaidPage > 1) { unpaidPage--; loadUnpaidMembers(); } });
-$('#unpaidNext')?.addEventListener('click', () => { unpaidPage++; loadUnpaidMembers(); });
-
-['paidFeeMembership', 'paidFeeCertificate', 'paidFeeIdcard', 'paidLogicAll'].forEach(id => {
-  document.getElementById(id)?.addEventListener('change', () => { paidPage = 1; loadPaidMembers(); });
-});
-
-// If you're using Bootstrap tabs, these fire when shown
-document.getElementById('tab-members-all')?.addEventListener('shown.bs.tab', loadAllMembers);
-document.getElementById('tab-members-paid')?.addEventListener('shown.bs.tab', loadPaidMembers);
-document.getElementById('tab-members-unpaid')?.addEventListener('shown.bs.tab', loadUnpaidMembers);
+// Remove the complex pagination buttons
+$('#allPrev')?.style.display = 'none';
+$('#allNext')?.style.display = 'none';
+$('#paidPrev')?.style.display = 'none';
+$('#paidNext')?.style.display = 'none';
+$('#unpaidPrev')?.style.display = 'none';
+$('#unpaidNext')?.style.display = 'none';
 
 // ===== initial loads =====
 loadHomeSettings();
-['sliders', 'services', 'projects', 'features', 'offers', 'blogs', 'faqs', 'team', 'members-all', 'members-paid', 'members-unpaid'].forEach(loadList);
-
-
-
+['sliders', 'services', 'projects', 'features', 'offers', 'blogs', 'faqs', 'team'].forEach(loadList);
 </script>
 
 </body>
