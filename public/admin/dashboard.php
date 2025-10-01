@@ -425,6 +425,9 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
 <script>
 
 // Basic authentication check
@@ -1183,49 +1186,39 @@ document.body.addEventListener('click', async (e) => {
   }
 });
 
-$('#resetSliderForm')?.addEventListener('click', () => resetForm('#form-slider'));
+// ===== INITIAL LOADS =====
+loadHomeSettings();
+Object.keys(resources).forEach(loadList);
+loadMembersSimple('all');
+loadMembersSimple('paid');
+loadMembersSimple('unpaid');
 
-// Helper functions
-function summarizePaidFlags(m) {
-  const paid = { membership: false, certificate: false, idcard: false };
-  if (Array.isArray(m?.payments)) {
-    for (const p of m.payments) {
-      const type = (p?.type || '').toLowerCase();
-      if (['membership', 'certificate', 'idcard'].includes(type) && (p?.status === 'success' || p?.status === 'paid')) {
-        paid[type] = true;
-      }
-    }
+// ===== HELPER FUNCTIONS =====
+function summarizePaidFlags(item) {
+  const flags = {
+    membership: item?.membershipPaid || false,
+    certificate: item?.certificatePaid || false,
+    idcard: item?.idCardPaid || false
+  };
+  
+  // Check for alternative field names
+  if (typeof item?.paidFlags === 'object') {
+    flags.membership = flags.membership || item.paidFlags.membership || false;
+    flags.certificate = flags.certificate || item.paidFlags.certificate || false;
+    flags.idcard = flags.idcard || item.paidFlags.idcard || false;
   }
-  if (m?.hasPaidMembership) paid.membership = true;
-  if (m?.hasPaidCertificate) paid.certificate = true;
-  if (m?.hasPaidIdCard || m?.hasPaidIdcard) paid.idcard = true;
-  return paid;
+  
+  return flags;
 }
 
 function unpaidListFromFlags(flags) {
-  const missing = [];
-  if (!flags.membership) missing.push('Membership');
-  if (!flags.certificate) missing.push('Certificate');
-  if (!flags.idcard) missing.push('ID Card');
-  return missing.join(', ');
+  const unpaid = [];
+  if (!flags.membership) unpaid.push('Membership');
+  if (!flags.certificate) unpaid.push('Certificate');
+  if (!flags.idcard) unpaid.push('ID Card');
+  return unpaid.length ? unpaid.join(', ') : 'All paid';
 }
 
-// Load members when tabs are shown
-document.getElementById('tab-members-all')?.addEventListener('shown.bs.tab', loadAllMembers);
-document.getElementById('tab-members-paid')?.addEventListener('shown.bs.tab', loadPaidMembers);
-document.getElementById('tab-members-unpaid')?.addEventListener('shown.bs.tab', loadUnpaidMembers);
-
-// Remove the complex pagination buttons
-$('#allPrev')?.style.display = 'none';
-$('#allNext')?.style.display = 'none';
-$('#paidPrev')?.style.display = 'none';
-$('#paidNext')?.style.display = 'none';
-$('#unpaidPrev')?.style.display = 'none';
-$('#unpaidNext')?.style.display = 'none';
-
-// ===== initial loads =====
-loadHomeSettings();
-['sliders', 'services', 'projects', 'features', 'offers', 'blogs', 'faqs', 'team'].forEach(loadList);
 </script>
 
 </body>
