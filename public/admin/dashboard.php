@@ -426,6 +426,7 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
+
 // Basic authentication check
 const token = localStorage.getItem('jwt');
 if (!token) {
@@ -773,7 +774,71 @@ async function handleExport(type) {
   }
 }
 
-// ===== EVENT LISTENERS FOR NEW FEATURES =====
+// ===== MISSING FUNCTIONALITY IMPLEMENTATION =====
+
+// 1. Form reset buttons for all forms
+function setupFormResetButtons() {
+  document.querySelectorAll('[data-reset]').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const formSelector = this.getAttribute('data-reset');
+      resetForm(formSelector);
+      
+      // Show feedback
+      const form = document.querySelector(formSelector);
+      const statusElement = form?.querySelector('.text-muted');
+      if (statusElement) {
+        statusElement.textContent = 'Form reset.';
+        setTimeout(() => statusElement.textContent = '', 2000);
+      }
+    });
+  });
+}
+
+// 2. Auto-slug generation for blogs
+function setupAutoSlugGeneration() {
+  const titleField = document.querySelector('#form-blog [name="title"]');
+  const slugField = document.querySelector('#form-blog [name="slug"]');
+  
+  if (titleField && slugField) {
+    titleField.addEventListener('blur', function() {
+      // Only auto-generate if slug is empty and title has value
+      if (!slugField.value && titleField.value) {
+        const slug = titleField.value
+          .toLowerCase()
+          .replace(/[^a-z0-9 -]/g, '') // Remove invalid chars
+          .replace(/\s+/g, '-')        // Replace spaces with -
+          .replace(/-+/g, '-')         // Replace multiple - with single -
+          .trim();
+        slugField.value = slug;
+        
+        // Show feedback
+        const statusElement = document.querySelector('#blogStatus');
+        if (statusElement) {
+          statusElement.textContent = 'Slug auto-generated.';
+          setTimeout(() => statusElement.textContent = '', 2000);
+        }
+      }
+    });
+  }
+}
+
+// 3. Enhanced form submission feedback
+function enhanceFormSubmissions() {
+  // Add loading states to all form submit buttons
+  document.querySelectorAll('form').forEach(form => {
+    form.addEventListener('submit', function(e) {
+      const submitBtn = this.querySelector('button[type="submit"]');
+      if (submitBtn) {
+        showButtonLoading(submitBtn, 'Saving...');
+        
+        // Re-enable button after 5 seconds (safety net)
+        setTimeout(() => hideButtonLoading(submitBtn), 5000);
+      }
+    });
+  });
+}
+
+// ===== EVENT LISTENERS FOR ALL FEATURES =====
 document.addEventListener('DOMContentLoaded', function() {
   // Search functionality
   $('#allSearch')?.addEventListener('input', () => renderFilteredMembers('all'));
@@ -809,10 +874,12 @@ document.addEventListener('DOMContentLoaded', function() {
     await loadMembersSimple('unpaid');
     hideButtonLoading($('#btnReloadUnpaid'));
   });
+  
+  // Setup missing functionality
+  setupFormResetButtons();
+  setupAutoSlugGeneration();
+  enhanceFormSubmissions();
 });
-
-// ===== KEEP ALL YOUR EXISTING CODE BELOW =====
-// (All the home settings, generic CRUD, helper functions, etc.)
 
 // ===== HOME SETTINGS =====
 async function loadHomeSettings() {
@@ -1117,9 +1184,6 @@ document.body.addEventListener('click', async (e) => {
 });
 
 $('#resetSliderForm')?.addEventListener('click', () => resetForm('#form-slider'));
-document.querySelectorAll('[data-reset]')?.forEach(btn => {
-  btn.addEventListener('click', () => resetForm(btn.getAttribute('data-reset')));
-});
 
 // Helper functions
 function summarizePaidFlags(m) {
