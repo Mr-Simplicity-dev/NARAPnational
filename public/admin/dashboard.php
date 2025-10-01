@@ -354,7 +354,7 @@
             <input id="paidSearch" class="form-control" placeholder="Search…">
           </div>
           <div class="col-md-5">
-            <label class="form-label">Count as “Paid” if…</label>
+            <label class="form-label">Count as "Paid" if…</label>
             <div class="d-flex gap-3 flex-wrap">
               <div class="form-check"><input class="form-check-input" type="checkbox" id="paidFeeMembership" checked><label class="form-check-label" for="paidFeeMembership">Membership fee</label></div>
               <div class="form-check"><input class="form-check-input" type="checkbox" id="paidFeeCertificate" checked><label class="form-check-label" for="paidFeeCertificate">Certificate</label></div>
@@ -424,60 +424,34 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<!-- Add this line to include admin.js -->
 <script src="/admin/admin.js"></script>
-
 <script>
-// ===== BASE AUTH & HELPERS =====
-const API_BASE = '/api';
 
-// --- Auth gate ---
-const token0 = localStorage.getItem('jwt');
-if (!token0) {
-  window.location.replace('./login.php');
-}
 
-// Auth fetch that reads the latest token each call
-const authFetch = (url, opts = {}) => {
-  const jwt = localStorage.getItem('jwt');
-  const headers = Object.assign(
-    { 'Content-Type': 'application/json' },
-    jwt ? { 'Authorization': 'Bearer ' + jwt } : {},
-    opts.headers || {}
-  );
-  return fetch(url, Object.assign({}, opts, { headers, credentials: 'include' }));
-};
-
-// Auth fetch helper (reads latest token each time)
-// ===== HOME SETTINGS =====
 // ===== SAFE HELPERS =====
 const PAGE_SIZE = window.PAGE_SIZE || 20;
 let allPage = 1, paidPage = 1, unpaidPage = 1;
 
-// Small helper to wrap JSON requests (keeps any auth headers your authFetch adds)
-
+// Helper for JSON requests
 const json = (opts = {}) => ({
   ...opts,
   headers: { 'Content-Type': 'application/json', ...(opts.headers || {}) }
 });
 
-
 // Defensive selector
 const $ = (sel) => document.querySelector(sel);
 
 // ===== HOME SETTINGS =====
-async function loadHomeSettings(){
-  try{
+async function loadHomeSettings() {
+  try {
     const res = await authFetch(`${API_BASE}/settings/home`);
-    if(!res?.ok) return;
+    if (!res?.ok) return;
 
     const data = await res.json();
 
     const set = (name, val) => {
       const el = document.querySelector(`[name="${name}"]`);
       if (!el) return;
-      // coerce numbers to string for inputs
       el.value = (val ?? '') + '';
     };
 
@@ -491,68 +465,68 @@ async function loadHomeSettings(){
     set('about.image', data?.about?.image);
 
     const pairs = [
-      ['services','title'],['services','subtitle'],
-      ['projects','title'],['projects','subtitle'],
-      ['features','title'],['features','headline'],
-      ['offer','title'],
-      ['blog','title'],['blog','showCount'],
-      ['faqs','title'],['faqs','image'],
-      ['team','title']
+      ['services', 'title'], ['services', 'subtitle'],
+      ['projects', 'title'], ['projects', 'subtitle'],
+      ['features', 'title'], ['features', 'headline'],
+      ['offer', 'title'],
+      ['blog', 'title'], ['blog', 'showCount'],
+      ['faqs', 'title'], ['faqs', 'image'],
+      ['team', 'title']
     ];
 
-    pairs.forEach(([k1,k2])=>{
+    pairs.forEach(([k1, k2]) => {
       const el = document.querySelector(`[name="${k1}.${k2}"]`);
-      if(!el) return;
+      if (!el) return;
       const v = data?.[k1]?.[k2];
       el.value = (v ?? '') + '';
     });
-  }catch(e){
+  } catch (e) {
     console.error('loadHomeSettings error:', e);
   }
 }
 
-$('#form-home-about')?.addEventListener('submit', async (e)=>{
+$('#form-home-about')?.addEventListener('submit', async (e) => {
   e.preventDefault();
-  try{
+  try {
     const fd = new FormData(e.target);
     const payload = {
-      about:{
-        title:    fd.get('about.title')    || '',
+      about: {
+        title: fd.get('about.title') || '',
         headline: fd.get('about.headline') || '',
         paragraphs: (fd.get('about.paragraphs') || '')
           .replace(/\r\n/g, '\n')
           .split('\n')
-          .map(s=>s.trim())
+          .map(s => s.trim())
           .filter(Boolean),
-        image:    fd.get('about.image')    || ''
+        image: fd.get('about.image') || ''
       }
     };
-    const res = await authFetch(`${API_BASE}/settings/home`, json({ method:'PUT', body: JSON.stringify(payload) }));
+    const res = await authFetch(`${API_BASE}/settings/home`, json({ method: 'PUT', body: JSON.stringify(payload) }));
     $('#aboutStatus') && ($('#aboutStatus').textContent = res.ok ? 'Saved.' : 'Failed.');
-    if(res.ok) loadHomeSettings();
-  }catch(err){
+    if (res.ok) loadHomeSettings();
+  } catch (err) {
     console.error('About save error:', err);
     $('#aboutStatus') && ($('#aboutStatus').textContent = 'Failed.');
   }
 });
 
-$('#form-home-sections')?.addEventListener('submit', async (e)=>{
+$('#form-home-sections')?.addEventListener('submit', async (e) => {
   e.preventDefault();
-  try{
+  try {
     const fd = new FormData(e.target);
     const payload = {
-      services:{ title:fd.get('services.title')||'', subtitle:fd.get('services.subtitle')||'' },
-      projects:{ title:fd.get('projects.title')||'', subtitle:fd.get('projects.subtitle')||'' },
-      features:{ title:fd.get('features.title')||'', headline:fd.get('features.headline')||'' },
-      offer:{ title:fd.get('offer.title')||'' },
-      blog:{ title:fd.get('blog.title')||'', showCount:Number(fd.get('blog.showCount')||3) || 3 },
-      faqs:{ title:fd.get('faqs.title')||'', image:fd.get('faqs.image')||'' },
-      team:{ title:fd.get('team.title')||'' }
+      services: { title: fd.get('services.title') || '', subtitle: fd.get('services.subtitle') || '' },
+      projects: { title: fd.get('projects.title') || '', subtitle: fd.get('projects.subtitle') || '' },
+      features: { title: fd.get('features.title') || '', headline: fd.get('features.headline') || '' },
+      offer: { title: fd.get('offer.title') || '' },
+      blog: { title: fd.get('blog.title') || '', showCount: Number(fd.get('blog.showCount') || 3) || 3 },
+      faqs: { title: fd.get('faqs.title') || '', image: fd.get('faqs.image') || '' },
+      team: { title: fd.get('team.title') || '' }
     };
-    const res = await authFetch(`${API_BASE}/settings/home`, json({ method:'PUT', body: JSON.stringify(payload) }));
+    const res = await authFetch(`${API_BASE}/settings/home`, json({ method: 'PUT', body: JSON.stringify(payload) }));
     $('#sectionsStatus') && ($('#sectionsStatus').textContent = res.ok ? 'Saved.' : 'Failed.');
-    if(res.ok) loadHomeSettings();
-  }catch(err){
+    if (res.ok) loadHomeSettings();
+  } catch (err) {
     console.error('Sections save error:', err);
     $('#sectionsStatus') && ($('#sectionsStatus').textContent = 'Failed.');
   }
@@ -560,43 +534,42 @@ $('#form-home-sections')?.addEventListener('submit', async (e)=>{
 
 // ===== GENERIC CRUD (content sections) =====
 const resources = {
-  sliders:{ endpoint:'/sliders', listEl:'#list-sliders', form:'#form-slider', status:'#sliderStatus',
-    toPayload:(fd)=>{
-      const kicker   = fd.get('kicker')||'';
-      const headline = fd.get('headline')||'';
-      const text     = fd.get('text')||'';
-      const c1Label  = fd.get('cta1.label')||'';
-      const c1Href   = fd.get('cta1.href')||'';
-      const c2Label  = fd.get('cta2.label')||'';
-      const c2Href   = fd.get('cta2.href')||'';
-      const image    = fd.get('image')||'';
-      const order    = Number(fd.get('order')||0) || 0;
-      // keep both legacy and new fields to match API variants
+  sliders: {
+    endpoint: '/sliders', listEl: '#list-sliders', form: '#form-slider', status: '#sliderStatus',
+    toPayload: (fd) => {
+      const kicker = fd.get('kicker') || '';
+      const headline = fd.get('headline') || '';
+      const text = fd.get('text') || '';
+      const c1Label = fd.get('cta1.label') || '';
+      const c1Href = fd.get('cta1.href') || '';
+      const c2Label = fd.get('cta2.label') || '';
+      const c2Href = fd.get('cta2.href') || '';
+      const image = fd.get('image') || '';
+      const order = Number(fd.get('order') || 0) || 0;
       return {
         kicker, headline, text,
-        cta1: c1Label || c1Href ? { label:c1Label, href:c1Href } : undefined,
-        cta2: c2Label || c2Href ? { label:c2Label, href:c2Href } : undefined,
+        cta1: c1Label || c1Href ? { label: c1Label, href: c1Href } : undefined,
+        cta2: c2Label || c2Href ? { label: c2Label, href: c2Href } : undefined,
         image,
         order,
-        // legacy names
-        smallTitle:kicker, bigTitle:headline, paragraph:text,
-        primaryBtnText:c1Label, primaryBtnLink:c1Href, secondaryBtnText:c2Label, secondaryBtnLink:c2Href,
-        imageUrl:image
+        smallTitle: kicker, bigTitle: headline, paragraph: text,
+        primaryBtnText: c1Label, primaryBtnLink: c1Href, secondaryBtnText: c2Label, secondaryBtnLink: c2Href,
+        imageUrl: image
       };
     },
-    renderRow:(item,i)=>{
-      const img   = item.image || item.imageUrl || '';
-      const kick  = item.kicker || item.smallTitle || '';
-      const head  = item.headline || item.bigTitle || '';
-      const c1    = (item.cta1 && item.cta1.label) || item.primaryBtnText || '';
-      const c2    = (item.cta2 && item.cta2.label) || item.secondaryBtnText || '';
-      const ord   = (item.order ?? '') + '';
+    renderRow: (item, i) => {
+      const img = item.image || item.imageUrl || '';
+      const kick = item.kicker || item.smallTitle || '';
+      const head = item.headline || item.bigTitle || '';
+      const c1 = (item.cta1 && item.cta1.label) || item.primaryBtnText || '';
+      const c2 = (item.cta2 && item.cta2.label) || item.secondaryBtnText || '';
+      const ord = (item.order ?? '') + '';
       return `<tr>
-        <td>${i+1}</td>
-        <td>${img?`<img class="img-thumb" src="${img}">`:''}</td>
+        <td>${i + 1}</td>
+        <td>${img ? `<img class="img-thumb" src="${img}">` : ''}</td>
         <td>${kick}</td>
         <td>${head}</td>
-        <td>${[c1,c2].filter(Boolean).join(' / ')}</td>
+        <td>${[c1, c2].filter(Boolean).join(' / ')}</td>
         <td>${ord}</td>
         <td class="text-end">
           <button class="btn btn-sm btn-outline-primary" data-edit="sliders" data-id="${item._id}">Edit</button>
@@ -605,116 +578,176 @@ const resources = {
       </tr>`;
     }
   },
-  services:{ endpoint:'/services', listEl:'#list-services', form:'#form-service', status:'#serviceStatus',
-    toPayload:(fd)=>({ title:fd.get('title')||'', description:fd.get('description')||'', image:fd.get('image')||'', link:fd.get('link')||'' }),
-    renderRow:(item,i)=>`<tr><td>${i+1}</td><td>${item.image?'<img class="img-thumb" src="'+item.image+'">':''}</td><td>${item.title||''}</td><td>${item.description||''}</td><td>${item.link||''}</td>
+  services: {
+    endpoint: '/services', listEl: '#list-services', form: '#form-service', status: '#serviceStatus',
+    toPayload: (fd) => ({ title: fd.get('title') || '', description: fd.get('description') || '', image: fd.get('image') || '', link: fd.get('link') || '' }),
+    renderRow: (item, i) => `<tr><td>${i + 1}</td><td>${item.image ? '<img class="img-thumb" src="' + item.image + '">' : ''}</td><td>${item.title || ''}</td><td>${item.description || ''}</td><td>${item.link || ''}</td>
     <td class="text-end"><button class="btn btn-sm btn-outline-primary" data-edit="services" data-id="${item._id}">Edit</button>
     <button class="btn btn-sm btn-outline-danger" data-del="services" data-id="${item._id}">Delete</button></td></tr>`
   },
-  projects:{ endpoint:'/projects', listEl:'#list-projects', form:'#form-project', status:'#projectStatus',
-    toPayload:(fd)=>({ title:fd.get('title')||'', category:fd.get('category')||'', description:fd.get('description')||'', image:fd.get('image')||'', link:fd.get('link')||'' }),
-    renderRow:(item,i)=>`<tr><td>${i+1}</td><td>${item.image?'<img class="img-thumb" src="'+item.image+'">':''}</td><td>${item.title||''}</td><td>${item.category||''}</td><td>${item.link||''}</td>
+  projects: {
+    endpoint: '/projects', listEl: '#list-projects', form: '#form-project', status: '#projectStatus',
+    toPayload: (fd) => ({ title: fd.get('title') || '', category: fd.get('category') || '', description: fd.get('description') || '', image: fd.get('image') || '', link: fd.get('link') || '' }),
+    renderRow: (item, i) => `<tr><td>${i + 1}</td><td>${item.image ? '<img class="img-thumb" src="' + item.image + '">' : ''}</td><td>${item.title || ''}</td><td>${item.category || ''}</td><td>${item.link || ''}</td>
     <td class="text-end"><button class="btn btn-sm btn-outline-primary" data-edit="projects" data-id="${item._id}">Edit</button>
     <button class="btn btn-sm btn-outline-danger" data-del="projects" data-id="${item._id}">Delete</button></td></tr>`
   },
-  features:{ endpoint:'/features', listEl:'#list-features', form:'#form-feature', status:'#featureStatus',
-    toPayload:(fd)=>({ title:fd.get('title')||'', subtitle:fd.get('subtitle')||'', description:fd.get('description')||'', icon:fd.get('icon')||'' }),
-    renderRow:(item,i)=>`<tr><td>${i+1}</td><td>${item.icon||''}</td><td>${item.title||''}</td><td>${item.subtitle||''}</td>
+  features: {
+    endpoint: '/features', listEl: '#list-features', form: '#form-feature', status: '#featureStatus',
+    toPayload: (fd) => ({ title: fd.get('title') || '', subtitle: fd.get('subtitle') || '', description: fd.get('description') || '', icon: fd.get('icon') || '' }),
+    renderRow: (item, i) => `<tr><td>${i + 1}</td><td>${item.icon || ''}</td><td>${item.title || ''}</td><td>${item.subtitle || ''}</td>
     <td class="text-end"><button class="btn btn-sm btn-outline-primary" data-edit="features" data-id="${item._id}">Edit</button>
     <button class="btn btn-sm btn-outline-danger" data-del="features" data-id="${item._id}">Delete</button></td></tr>`
   },
-  offers:{ endpoint:'/offers', listEl:'#list-offers', form:'#form-offer', status:'#offerStatus',
-    toPayload:(fd)=>({ title:fd.get('title')||'', description:fd.get('description')||'', image:fd.get('image')||'' }),
-    renderRow:(item,i)=>`<tr><td>${i+1}</td><td>${item.image?'<img class="img-thumb" src="'+item.image+'">':''}</td><td>${item.title||''}</td>
+  offers: {
+    endpoint: '/offers', listEl: '#list-offers', form: '#form-offer', status: '#offerStatus',
+    toPayload: (fd) => ({ title: fd.get('title') || '', description: fd.get('description') || '', image: fd.get('image') || '' }),
+    renderRow: (item, i) => `<tr><td>${i + 1}</td><td>${item.image ? '<img class="img-thumb" src="' + item.image + '">' : ''}</td><td>${item.title || ''}</td>
     <td class="text-end"><button class="btn btn-sm btn-outline-primary" data-edit="offers" data-id="${item._id}">Edit</button>
     <button class="btn btn-sm btn-outline-danger" data-del="offers" data-id="${item._id}">Delete</button></td></tr>`
   },
-  blogs:{ endpoint:'/blogs', listEl:'#list-blogs', form:'#form-blog', status:'#blogStatus',
-    toPayload:(fd)=>({ title:fd.get('title')||'', slug:fd.get('slug')||'', excerpt:fd.get('excerpt')||'', content:fd.get('content')||'', image:fd.get('image')||'' }),
-    renderRow:(item,i)=>`<tr><td>${i+1}</td><td>${item.image?'<img class="img-thumb" src="'+item.image+'">':''}</td><td>${item.title||''}</td><td>${item.slug||''}</td>
+  blogs: {
+    endpoint: '/blogs', listEl: '#list-blogs', form: '#form-blog', status: '#blogStatus',
+    toPayload: (fd) => ({ title: fd.get('title') || '', slug: fd.get('slug') || '', excerpt: fd.get('excerpt') || '', content: fd.get('content') || '', image: fd.get('image') || '' }),
+    renderRow: (item, i) => `<tr><td>${i + 1}</td><td>${item.image ? '<img class="img-thumb" src="' + item.image + '">' : ''}</td><td>${item.title || ''}</td><td>${item.slug || ''}</td>
     <td class="text-end"><button class="btn btn-sm btn-outline-primary" data-edit="blogs" data-id="${item._id}">Edit</button>
     <button class="btn btn-sm btn-outline-danger" data-del="blogs" data-id="${item._id}">Delete</button></td></tr>`
   },
-  faqs:{ endpoint:'/faqs', listEl:'#list-faqs', form:'#form-faq', status:'#faqStatus',
-    toPayload:(fd)=>({ question:fd.get('question')||'', answer:fd.get('answer')||'' }),
-    renderRow:(item,i)=>`<tr><td>${i+1}</td><td>${item.question||''}</td><td>${item.answer||''}</td>
+  faqs: {
+    endpoint: '/faqs', listEl: '#list-faqs', form: '#form-faq', status: '#faqStatus',
+    toPayload: (fd) => ({ question: fd.get('question') || '', answer: fd.get('answer') || '' }),
+    renderRow: (item, i) => `<tr><td>${i + 1}</td><td>${item.question || ''}</td><td>${item.answer || ''}</td>
     <td class="text-end"><button class="btn btn-sm btn-outline-primary" data-edit="faqs" data-id="${item._id}">Edit</button>
     <button class="btn btn-sm btn-outline-danger" data-del="faqs" data-id="${item._id}">Delete</button></td></tr>`
   },
-  team:{ endpoint:'/team', listEl:'#list-team', form:'#form-team', status:'#teamStatus',
-    toPayload:(fd)=>({ name:fd.get('name')||'', role:fd.get('role')||'', image:fd.get('image')||'', facebook:fd.get('facebook')||'', twitter:fd.get('twitter')||'', linkedin:fd.get('linkedin')||'' }),
-    renderRow:(item,i)=>`<tr><td>${i+1}</td><td>${item.image?'<img class="img-thumb" src="'+item.image+'">':''}</td><td>${item.name||''}</td><td>${item.role||''}</td>
+  team: {
+    endpoint: '/team', listEl: '#list-team', form: '#form-team', status: '#teamStatus',
+    toPayload: (fd) => ({ name: fd.get('name') || '', role: fd.get('role') || '', image: fd.get('image') || '', facebook: fd.get('facebook') || '', twitter: fd.get('twitter') || '', linkedin: fd.get('linkedin') || '' }),
+    renderRow: (item, i) => `<tr><td>${i + 1}</td><td>${item.image ? '<img class="img-thumb" src="' + item.image + '">' : ''}</td><td>${item.name || ''}</td><td>${item.role || ''}</td>
     <td class="text-end"><button class="btn btn-sm btn-outline-primary" data-edit="team" data-id="${item._id}">Edit</button>
     <button class="btn btn-sm btn-outline-danger" data-del="team" data-id="${item._id}">Delete</button></td></tr>`
+  },
+  'members-all': {
+    endpoint: '/members',
+    listEl: '#list-members-all',
+    form: null,
+    status: null,
+    toPayload: () => ({}),
+    renderRow: (item, i) => {
+      const created = item?.createdAt ? new Date(item.createdAt).toLocaleDateString() : '';
+      return `<tr>
+      <td>${i + 1}</td>
+      <td>${item?.name || ''}</td>
+      <td>${item?.email || ''}</td>
+      <td>${item?.memberId || item?.memberCode || ''}</td>
+      <td>${item?.state || item?.lga || ''}</td>
+      <td>${created}</td>
+    </tr>`;
+    }
+  },
+  'members-paid': {
+    endpoint: '/members/paid',
+    listEl: '#list-members-paid',
+    form: null,
+    status: null,
+    toPayload: () => ({}),
+    renderRow: (item, i) => {
+      const f = summarizePaidFlags(item);
+      const paidList = [f.membership ? 'Membership' : '', f.certificate ? 'Certificate' : '', f.idcard ? 'ID Card' : '']
+        .filter(Boolean).join(' / ');
+      return `<tr>
+      <td>${i + 1}</td>
+      <td>${item?.name || ''}</td>
+      <td>${item?.email || ''}</td>
+      <td>${item?.memberId || item?.memberCode || ''}</td>
+      <td>${item?.state || item?.lga || ''}</td>
+      <td>${paidList || '-'}</td>
+    </tr>`;
+    }
+  },
+  'members-unpaid': {
+    endpoint: '/members/unpaid',
+    listEl: '#list-members-unpaid',
+    form: null,
+    status: null,
+    toPayload: () => ({}),
+    renderRow: (item, i) => {
+      const missing = unpaidListFromFlags(summarizePaidFlags(item));
+      return `<tr>
+      <td>${i + 1}</td>
+      <td>${item?.name || ''}</td>
+      <td>${item?.email || ''}</td>
+      <td>${item?.memberId || item?.memberCode || ''}</td>
+      <td>${item?.state || item?.lga || ''}</td>
+      <td>${missing || 'All paid'}</td>
+    </tr>`;
+    }
   }
 };
 
-async function loadList(key){
-  try{
+async function loadList(key) {
+  try {
     const cfg = resources[key];
-    if(!cfg) return;
+    if (!cfg) return;
     const res = await authFetch(`${API_BASE}${cfg.endpoint}`);
-    if(!res?.ok) return;
+    if (!res?.ok) return;
     const items = await res.json();
     const html = (items || [])
-      .slice() // avoid mutating original
-      .sort((a,b)=> (Number(a?.order ?? 0)) - (Number(b?.order ?? 0)))
+      .slice()
+      .sort((a, b) => (Number(a?.order ?? 0)) - (Number(b?.order ?? 0)))
       .map(cfg.renderRow)
       .join('');
     const container = document.querySelector(cfg.listEl);
     if (container) container.innerHTML = html;
-  }catch(e){
+  } catch (e) {
     console.error(`loadList(${key}) error:`, e);
   }
 }
 
-function resetForm(sel){
+function resetForm(sel) {
   const f = document.querySelector(sel);
-  if(!f) return;
+  if (!f) return;
   f.reset();
   const id = f.querySelector('[name="_id"]');
-  if(id) id.value = '';
+  if (id) id.value = '';
 }
 
-function fillFormFromItem(formSel, item){
+function fillFormFromItem(formSel, item) {
   const form = document.querySelector(formSel);
-  if(!form || !item) return;
+  if (!form || !item) return;
 
-  // Basic 1:1 fills
-  Object.keys(item).forEach(k=>{
+  Object.keys(item).forEach(k => {
     const el = form.querySelector(`[name="${k}"]`);
-    if(el) el.value = (item[k] ?? '') + '';
+    if (el) el.value = (item[k] ?? '') + '';
   });
 
-  // Ensure hidden _id is applied for updates
   const idEl = form.querySelector('[name="_id"]');
-  if(idEl) idEl.value = item._id || '';
+  if (idEl) idEl.value = item._id || '';
 
-  // Slider special mapping
-  if(formSel === '#form-slider'){
+  if (formSel === '#form-slider') {
     const map = {
       'kicker': item.kicker ?? item.smallTitle ?? '',
       'headline': item.headline ?? item.bigTitle ?? '',
       'text': item.text ?? item.paragraph ?? '',
       'cta1.label': item.cta1?.label ?? item.primaryBtnText ?? '',
-      'cta1.href':  item.cta1?.href  ?? item.primaryBtnLink ?? '',
+      'cta1.href': item.cta1?.href ?? item.primaryBtnLink ?? '',
       'cta2.label': item.cta2?.label ?? item.secondaryBtnText ?? '',
-      'cta2.href':  item.cta2?.href  ?? item.secondaryBtnLink ?? '',
+      'cta2.href': item.cta2?.href ?? item.secondaryBtnLink ?? '',
       'image': item.image ?? item.imageUrl ?? '',
       'order': item.order ?? 0
     };
-    Object.entries(map).forEach(([name,val])=>{
+    Object.entries(map).forEach(([name, val]) => {
       const el = form.querySelector(`[name="${name}"]`);
-      if(el) el.value = (val ?? '') + '';
+      if (el) el.value = (val ?? '') + '';
     });
   }
 }
 
-async function createOrUpdate(e, key){
+async function createOrUpdate(e, key) {
   e.preventDefault();
-  try{
+  try {
     const cfg = resources[key];
-    if(!cfg) return;
+    if (!cfg) return;
     const fd = new FormData(e.target);
     const id = fd.get('_id');
     const method = id ? 'PUT' : 'POST';
@@ -722,69 +755,69 @@ async function createOrUpdate(e, key){
     const payload = cfg.toPayload(fd);
     const res = await authFetch(url, json({ method, body: JSON.stringify(payload) }));
     document.querySelector(cfg.status) && (document.querySelector(cfg.status).textContent = res.ok ? 'Saved.' : 'Failed.');
-    if(res.ok){ resetForm(cfg.form); loadList(key); }
-  }catch(err){
+    if (res.ok) { resetForm(cfg.form); loadList(key); }
+  } catch (err) {
     console.error(`createOrUpdate ${key} error:`, err);
     document.querySelector(resources[key]?.status)?.textContent = 'Failed.';
   }
 }
 
-async function deleteItem(key, id){
-  try{
-    if(!confirm('Delete this item?')) return;
+async function deleteItem(key, id) {
+  try {
+    if (!confirm('Delete this item?')) return;
     const cfg = resources[key];
-    if(!cfg) return;
-    const res = await authFetch(`${API_BASE}${cfg.endpoint}/${id}`, { method:'DELETE' });
-    if(res?.ok) loadList(key);
-  }catch(err){
+    if (!cfg) return;
+    const res = await authFetch(`${API_BASE}${cfg.endpoint}/${id}`, { method: 'DELETE' });
+    if (res?.ok) loadList(key);
+  } catch (err) {
     console.error(`deleteItem ${key} error:`, err);
   }
 }
 
-Object.keys(resources).forEach(key=>{
+Object.keys(resources).forEach(key => {
   const formSel = resources[key].form;
-  document.querySelector(formSel)?.addEventListener('submit', (e)=>createOrUpdate(e,key));
+  document.querySelector(formSel)?.addEventListener('submit', (e) => createOrUpdate(e, key));
 });
 
-document.body.addEventListener('click', async (e)=>{
+document.body.addEventListener('click', async (e) => {
   const editBtn = e.target.closest?.('[data-edit]');
-  const delBtn  = e.target.closest?.('[data-del]');
-  if(editBtn){
+  const delBtn = e.target.closest?.('[data-del]');
+  if (editBtn) {
     const key = editBtn.getAttribute('data-edit');
-    const id  = editBtn.getAttribute('data-id');
+    const id = editBtn.getAttribute('data-id');
     const cfg = resources[key];
-    if(!cfg) return;
+    if (!cfg) return;
     const res = await authFetch(`${API_BASE}${cfg.endpoint}/${id}`);
-    if(!res?.ok) return;
+    if (!res?.ok) return;
     const item = await res.json();
     fillFormFromItem(cfg.form, item);
   }
-  if(delBtn){
+  if (delBtn) {
     const key = delBtn.getAttribute('data-del');
-    const id  = delBtn.getAttribute('data-id');
+    const id = delBtn.getAttribute('data-id');
     deleteItem(key, id);
   }
 });
 
-$('#resetSliderForm')?.addEventListener('click', ()=>resetForm('#form-slider'));
-document.querySelectorAll('[data-reset]')?.forEach(btn=>{
-  btn.addEventListener('click', ()=> resetForm(btn.getAttribute('data-reset')));
+$('#resetSliderForm')?.addEventListener('click', () => resetForm('#form-slider'));
+document.querySelectorAll('[data-reset]')?.forEach(btn => {
+  btn.addEventListener('click', () => resetForm(btn.getAttribute('data-reset')));
 });
 
 // ===== MEMBERS (All / Paid / Unpaid) =====
-function toCSV(rows){
-  if(!rows?.length) return '';
+function toCSV(rows) {
+  if (!rows?.length) return '';
   const headers = Object.keys(rows[0]);
-  const esc = v => '"' + String(v ?? '').replace(/"/g,'""') + '"';
+  const esc = v => '"' + String(v ?? '').replace(/"/g, '""') + '"';
   return [headers.join(','), ...rows.map(r => headers.map(h => esc(r[h])).join(','))].join('\n');
 }
 
-function summarizePaidFlags(m){
-  const paid = { membership:false, certificate:false, idcard:false };
+function summarizePaidFlags(m) {
+  const paid = { membership: false, certificate: false, idcard: false };
   if (Array.isArray(m?.payments)) {
     for (const p of m.payments) {
       const type = (p?.type || '').toLowerCase();
-      if (['membership','certificate','idcard'].includes(type) && (p?.status === 'success' || p?.status === 'paid')) {
+      if (['membership', 'certificate', 'idcard'].includes(type) && (p?.status === 'success' || p?.status === 'paid')) {
         paid[type] = true;
       }
     }
@@ -795,20 +828,19 @@ function summarizePaidFlags(m){
   return paid;
 }
 
-function unpaidListFromFlags(flags){
+function unpaidListFromFlags(flags) {
   const missing = [];
-  if(!flags.membership)  missing.push('Membership');
-  if(!flags.certificate) missing.push('Certificate');
-  if(!flags.idcard)      missing.push('ID Card');
+  if (!flags.membership) missing.push('Membership');
+  if (!flags.certificate) missing.push('Certificate');
+  if (!flags.idcard) missing.push('ID Card');
   return missing.join(', ');
 }
 
-
 async function fetchMembers(
   kind,
-  { logic = 'any', fees = ['membership','certificate','idcard'], search = '', page = 1, limit = PAGE_SIZE }
-){
-  try{
+  { logic = 'any', fees = ['membership', 'certificate', 'idcard'], search = '', page = 1, limit = PAGE_SIZE }
+) {
+  try {
     const params = new URLSearchParams({
       filter: kind,
       logic,
@@ -827,20 +859,20 @@ async function fetchMembers(
       return data;
     }
 
-    const s = (search||'').trim().toLowerCase();
+    const s = (search || '').trim().toLowerCase();
     const applyFilters = (list) => {
       const filtered = (list || []).filter(m => {
         const flags = summarizePaidFlags(m);
         const count = fees.filter(f => flags[f]).length;
-        const isPaid = (logic==='all') ? (count===fees.length) : (count>=1);
-        const hay = [m?.name, m?.email, m?.memberId||m?.memberCode||'', m?.state||m?.lga||''].join(' ').toLowerCase();
+        const isPaid = (logic === 'all') ? (count === fees.length) : (count >= 1);
+        const hay = [m?.name, m?.email, m?.memberId || m?.memberCode || '', m?.state || m?.lga || ''].join(' ').toLowerCase();
         const match = !s || hay.includes(s);
-        if (kind === 'paid')   return isPaid && match;
+        if (kind === 'paid') return isPaid && match;
         if (kind === 'unpaid') return (!flags.membership && !flags.certificate && !flags.idcard) && match;
         return match && (m?.isRegistered !== false);
       });
-      const start=(page-1)*limit, end=start+limit;
-      return { items: filtered.slice(start,end), total: filtered.length, page, limit };
+      const start = (page - 1) * limit, end = start + limit;
+      return { items: filtered.slice(start, end), total: filtered.length, page, limit };
     };
 
     if (kind === 'all') {
@@ -857,7 +889,7 @@ async function fetchMembers(
     if (!res?.ok) return { items: [], total: 0, page, limit };
     const list = await res.json();
     return applyFilters(list);
-  }catch(err){
+  } catch (err) {
     console.error('fetchMembers error:', err);
     return { items: [], total: 0, page, limit };
   }
@@ -865,19 +897,19 @@ async function fetchMembers(
 
 // All
 const allSearchInput = $('#allSearch');
-async function loadAllMembers(){
+async function loadAllMembers() {
   const search = allSearchInput?.value?.trim() || '';
   const { items = [], total = 0 } = await fetchMembers('all', { search, page: allPage });
   const tbody = $('#list-members-all');
   if (tbody) {
-    tbody.innerHTML = items.map((m,i)=>{
+    tbody.innerHTML = items.map((m, i) => {
       const created = m?.createdAt ? new Date(m.createdAt).toLocaleDateString() : '';
       return `<tr>
-        <td>${(allPage-1)*PAGE_SIZE + i + 1}</td>
-        <td>${m?.name||''}</td>
-        <td>${m?.email||''}</td>
-        <td>${m?.memberId||m?.memberCode||''}</td>
-        <td>${m?.state||m?.lga||''}</td>
+        <td>${(allPage - 1) * PAGE_SIZE + i + 1}</td>
+        <td>${m?.name || ''}</td>
+        <td>${m?.email || ''}</td>
+        <td>${m?.memberId || m?.memberCode || ''}</td>
+        <td>${m?.state || m?.lga || ''}</td>
         <td>${created}</td>
       </tr>`;
     }).join('');
@@ -886,28 +918,28 @@ async function loadAllMembers(){
 }
 
 // Paid
-async function loadPaidMembers(){
+async function loadPaidMembers() {
   const fees = [];
   $('#paidFeeMembership')?.checked && fees.push('membership');
   $('#paidFeeCertificate')?.checked && fees.push('certificate');
   $('#paidFeeIdcard')?.checked && fees.push('idcard');
-  const logic  = $('#paidLogicAll')?.checked ? 'all' : 'any';
+  const logic = $('#paidLogicAll')?.checked ? 'all' : 'any';
   const search = ($('#paidSearch')?.value || '').trim();
 
   const { items = [], total = 0 } = await fetchMembers('paid', { logic, fees, search, page: paidPage });
   const tbody = $('#list-members-paid');
   if (tbody) {
-    tbody.innerHTML = items.map((m,i)=>{
+    tbody.innerHTML = items.map((m, i) => {
       const f = summarizePaidFlags(m);
-      const paidList = [f.membership?'Membership':'', f.certificate?'Certificate':'', f.idcard?'ID Card':'']
+      const paidList = [f.membership ? 'Membership' : '', f.certificate ? 'Certificate' : '', f.idcard ? 'ID Card' : '']
         .filter(Boolean).join(' / ');
       return `<tr>
-        <td>${(paidPage-1)*PAGE_SIZE + i + 1}</td>
-        <td>${m?.name||''}</td>
-        <td>${m?.email||''}</td>
-        <td>${m?.memberId||m?.memberCode||''}</td>
-        <td>${m?.state||m?.lga||''}</td>
-        <td>${paidList||'-'}</td>
+        <td>${(paidPage - 1) * PAGE_SIZE + i + 1}</td>
+        <td>${m?.name || ''}</td>
+        <td>${m?.email || ''}</td>
+        <td>${m?.memberId || m?.memberCode || ''}</td>
+        <td>${m?.state || m?.lga || ''}</td>
+        <td>${paidList || '-'}</td>
       </tr>`;
     }).join('');
   }
@@ -915,20 +947,20 @@ async function loadPaidMembers(){
 }
 
 // Unpaid
-async function loadUnpaidMembers(){
+async function loadUnpaidMembers() {
   const search = ($('#unpaidSearch')?.value || '').trim();
   const { items = [], total = 0 } = await fetchMembers('unpaid', { search, page: unpaidPage });
   const tbody = $('#list-members-unpaid');
   if (tbody) {
-    tbody.innerHTML = items.map((m,i)=>{
+    tbody.innerHTML = items.map((m, i) => {
       const missing = unpaidListFromFlags(summarizePaidFlags(m));
       return `<tr>
-        <td>${(unpaidPage-1)*PAGE_SIZE + i + 1}</td>
-        <td>${m?.name||''}</td>
-        <td>${m?.email||''}</td>
-        <td>${m?.memberId||m?.memberCode||''}</td>
-        <td>${m?.state||m?.lga||''}</td>
-        <td>${missing||'All paid'}</td>
+        <td>${(unpaidPage - 1) * PAGE_SIZE + i + 1}</td>
+        <td>${m?.name || ''}</td>
+        <td>${m?.email || ''}</td>
+        <td>${m?.memberId || m?.memberCode || ''}</td>
+        <td>${m?.state || m?.lga || ''}</td>
+        <td>${missing || 'All paid'}</td>
       </tr>`;
     }).join('');
   }
@@ -936,23 +968,23 @@ async function loadUnpaidMembers(){
 }
 
 // Events
-$('#btnReloadAll')?.addEventListener('click', ()=>{ allPage=1; loadAllMembers(); });
-$('#btnReloadPaid')?.addEventListener('click', ()=>{ paidPage=1; loadPaidMembers(); });
-$('#btnReloadUnpaid')?.addEventListener('click', ()=>{ unpaidPage=1; loadUnpaidMembers(); });
+$('#btnReloadAll')?.addEventListener('click', () => { allPage = 1; loadAllMembers(); });
+$('#btnReloadPaid')?.addEventListener('click', () => { paidPage = 1; loadPaidMembers(); });
+$('#btnReloadUnpaid')?.addEventListener('click', () => { unpaidPage = 1; loadUnpaidMembers(); });
 
-$('#allSearch')?.addEventListener('input', ()=>{ allPage=1; loadAllMembers(); });
-$('#paidSearch')?.addEventListener('input', ()=>{ paidPage=1; loadPaidMembers(); });
-$('#unpaidSearch')?.addEventListener('input', ()=>{ unpaidPage=1; loadUnpaidMembers(); });
+$('#allSearch')?.addEventListener('input', () => { allPage = 1; loadAllMembers(); });
+$('#paidSearch')?.addEventListener('input', () => { paidPage = 1; loadPaidMembers(); });
+$('#unpaidSearch')?.addEventListener('input', () => { unpaidPage = 1; loadUnpaidMembers(); });
 
-$('#allPrev')?.addEventListener('click', ()=>{ if(allPage>1){ allPage--; loadAllMembers(); }});
-$('#allNext')?.addEventListener('click', ()=>{ allPage++; loadAllMembers(); });
-$('#paidPrev')?.addEventListener('click', ()=>{ if(paidPage>1){ paidPage--; loadPaidMembers(); }});
-$('#paidNext')?.addEventListener('click', ()=>{ paidPage++; loadPaidMembers(); });
-$('#unpaidPrev')?.addEventListener('click', ()=>{ if(unpaidPage>1){ unpaidPage--; loadUnpaidMembers(); }});
-$('#unpaidNext')?.addEventListener('click', ()=>{ unpaidPage++; loadUnpaidMembers(); });
+$('#allPrev')?.addEventListener('click', () => { if (allPage > 1) { allPage--; loadAllMembers(); } });
+$('#allNext')?.addEventListener('click', () => { allPage++; loadAllMembers(); });
+$('#paidPrev')?.addEventListener('click', () => { if (paidPage > 1) { paidPage--; loadPaidMembers(); } });
+$('#paidNext')?.addEventListener('click', () => { paidPage++; loadPaidMembers(); });
+$('#unpaidPrev')?.addEventListener('click', () => { if (unpaidPage > 1) { unpaidPage--; loadUnpaidMembers(); } });
+$('#unpaidNext')?.addEventListener('click', () => { unpaidPage++; loadUnpaidMembers(); });
 
-['paidFeeMembership','paidFeeCertificate','paidFeeIdcard','paidLogicAll'].forEach(id=>{
-  document.getElementById(id)?.addEventListener('change', ()=>{ paidPage=1; loadPaidMembers(); });
+['paidFeeMembership', 'paidFeeCertificate', 'paidFeeIdcard', 'paidLogicAll'].forEach(id => {
+  document.getElementById(id)?.addEventListener('change', () => { paidPage = 1; loadPaidMembers(); });
 });
 
 // If you're using Bootstrap tabs, these fire when shown
@@ -962,7 +994,7 @@ document.getElementById('tab-members-unpaid')?.addEventListener('shown.bs.tab', 
 
 // ===== initial loads =====
 loadHomeSettings();
-['sliders','services','projects','features','offers','blogs','faqs','team'].forEach(loadList);
+['sliders', 'services', 'projects', 'features', 'offers', 'blogs', 'faqs', 'team', 'members-all', 'members-paid', 'members-unpaid'].forEach(loadList);
 
 </script>
 
