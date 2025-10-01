@@ -424,7 +424,23 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<script src="/admin/admin.js"></script>
+
+
+<script>
+// Basic authentication check
+const token = localStorage.getItem('jwt');
+if (!token) {
+  window.location.replace('/admin/login.php');
+}
+
+// Simple logout function
+document.getElementById('logoutBtn')?.addEventListener('click', function() {
+  localStorage.removeItem('jwt');
+  localStorage.removeItem('token');
+  window.location.replace('/index.php');
+});
+</script>
+
 <script>
 
 
@@ -804,14 +820,109 @@ document.querySelectorAll('[data-reset]')?.forEach(btn => {
   btn.addEventListener('click', () => resetForm(btn.getAttribute('data-reset')));
 });
 
-// ===== MEMBERS (All / Paid / Unpaid) =====
-function toCSV(rows) {
-  if (!rows?.length) return '';
-  const headers = Object.keys(rows[0]);
-  const esc = v => '"' + String(v ?? '').replace(/"/g, '""') + '"';
-  return [headers.join(','), ...rows.map(r => headers.map(h => esc(r[h])).join(','))].join('\n');
+
+// ===== SIMPLIFIED MEMBERS LOADING =====
+async function loadMembersSimple(type) {
+  try {
+    let endpoint = '';
+    switch(type) {
+      case 'all': endpoint = '/api/members'; break;
+      case 'paid': endpoint = '/api/members/paid'; break;
+      case 'unpaid': endpoint = '/api/members/unpaid'; break;
+    }
+
+    const res = await fetch(endpoint, {
+      headers: {
+        'Authorization': 'Bearer ' + (localStorage.getItem('jwt') || ''),
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (!res.ok) throw new Error('Failed to load');
+    
+    const items = await res.json();
+    const tbody = document.getElementById(`list-members-${type}`);
+    const countEl = document.getElementById(`${type}Count`);
+    
+    if (!tbody) return;
+
+    // Clear existing content
+    tbody.innerHTML = '';
+
+    if (!items.length) {
+      tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-4">No members found</td></tr>';
+      if (countEl) countEl.textContent = '0 results';
+      return;
+    }
+
+    // Render rows
+    items.forEach((item, i) => {
+      const row = document.createElement('tr');
+      
+      if (type === 'all') {
+        const created = item?.createdAt ? new Date(item.createdAt).toLocaleDateString() : '';
+        row.innerHTML = `
+          <td>${i + 1}</td>
+          <td>${item?.name || ''}</td>
+          <td>${item?.email || ''}</td>
+          <td>${item?.memberId || item?.memberCode || ''}</td>
+          <td>${item?.state || item?.lga || ''}</td>
+          <td>${created}</td>
+        `;
+      } 
+      else if (type === 'paid') {
+        const flags = summarizePaidFlags(item);
+        const paidList = [flags.membership ? 'Membership' : '', flags.certificate ? 'Certificate' : '', flags.idcard ? 'ID Card' : '']
+          .filter(Boolean).join(' / ');
+        row.innerHTML = `
+          <td>${i + 1}</td>
+          <td>${item?.name || ''}</td>
+          <td>${item?.email || ''}</td>
+          <td>${item?.memberId || item?.memberCode || ''}</td>
+          <td>${item?.state || item?.lga || ''}</td>
+          <td>${paidList || '-'}</td>
+        `;
+      }
+      else if (type === 'unpaid') {
+        const missing = unpaidListFromFlags(summarizePaidFlags(item));
+        row.innerHTML = `
+          <td>${i + 1}</td>
+          <td>${item?.name || ''}</td>
+          <td>${item?.email || ''}</td>
+          <td>${item?.memberId || item?.memberCode || ''}</td>
+          <td>${item?.state || item?.lga || ''}</td>
+          <td>${missing || 'All paid'}</td>
+        `;
+      }
+      
+      tbody.appendChild(row);
+    });
+
+    if (countEl) countEl.textContent = `${items.length} result(s)`;
+
+  } catch (err) {
+    console.error(`loadMembersSimple(${type}) error:`, err);
+    const tbody = document.getElementById(`list-members-${type}`);
+    if (tbody) {
+      tbody.innerHTML = '<tr><td colspan="6" class="text-center text-danger py-4">Failed to load members</td></tr>';
+    }
+  }
 }
 
+// Replace the complex member loading functions with simple ones
+async function loadAllMembers() {
+  await loadMembersSimple('all');
+}
+
+async function loadPaidMembers() {
+  await loadMembersSimple('paid');
+}
+
+async function loadUnpaidMembers() {
+  await loadMembersSimple('unpaid');
+}
+
+// Keep your existing helper functions
 function summarizePaidFlags(m) {
   const paid = { membership: false, certificate: false, idcard: false };
   if (Array.isArray(m?.payments)) {
@@ -836,86 +947,20 @@ function unpaidListFromFlags(flags) {
   return missing.join(', ');
 }
 
-async function fetchMembers(
-  kind,
-  { logic = 'any', fees = ['membership', 'certificate', 'idcard'], search = '', page = 1, limit = PAGE_SIZE }
-) {
-  try {
-    const params = new URLSearchParams({
-      filter: kind,
-      logic,
-      fees: fees.join(','),
-      search,
-      page,
-      limit
-    }).toString();
+// Update event listeners to use the new simple functions
+$('#btnReloadAll')?.addEventListener('click', loadAllMembers);
+$('#btnReloadPaid')?.addEventListener('click', loadPaidMembers);
+$('#btnReloadUnpaid')?.addEventListener('click', loadUnpaidMembers);
 
-    let res = await authFetch(`/api/members?${params}`);
-    if (res?.ok) {
-      const data = await res.json();
-      if (Array.isArray(data)) {
-        return { items: data.slice(0, limit), total: data.length, page, limit };
-      }
-      return data;
-    }
+// Remove the old complex search and pagination code for now
+$('#allSearch')?.addEventListener('input', () => loadAllMembers());
+$('#paidSearch')?.addEventListener('input', () => loadPaidMembers());
+$('#unpaidSearch')?.addEventListener('input', () => loadUnpaidMembers());
 
-    const s = (search || '').trim().toLowerCase();
-    const applyFilters = (list) => {
-      const filtered = (list || []).filter(m => {
-        const flags = summarizePaidFlags(m);
-        const count = fees.filter(f => flags[f]).length;
-        const isPaid = (logic === 'all') ? (count === fees.length) : (count >= 1);
-        const hay = [m?.name, m?.email, m?.memberId || m?.memberCode || '', m?.state || m?.lga || ''].join(' ').toLowerCase();
-        const match = !s || hay.includes(s);
-        if (kind === 'paid') return isPaid && match;
-        if (kind === 'unpaid') return (!flags.membership && !flags.certificate && !flags.idcard) && match;
-        return match && (m?.isRegistered !== false);
-      });
-      const start = (page - 1) * limit, end = start + limit;
-      return { items: filtered.slice(start, end), total: filtered.length, page, limit };
-    };
-
-    if (kind === 'all') {
-      const [paidRes, unpaidRes] = await Promise.all([
-        authFetch(`/api/members/paid`),
-        authFetch(`/api/members/unpaid`)
-      ]);
-      const paid = paidRes?.ok ? await paidRes.json() : [];
-      const unpaid = unpaidRes?.ok ? await unpaidRes.json() : [];
-      return applyFilters([...paid, ...unpaid]);
-    }
-
-    res = await authFetch(`/api/members/${kind}`);
-    if (!res?.ok) return { items: [], total: 0, page, limit };
-    const list = await res.json();
-    return applyFilters(list);
-  } catch (err) {
-    console.error('fetchMembers error:', err);
-    return { items: [], total: 0, page, limit };
-  }
-}
-
-// All
-const allSearchInput = $('#allSearch');
-async function loadAllMembers() {
-  const search = allSearchInput?.value?.trim() || '';
-  const { items = [], total = 0 } = await fetchMembers('all', { search, page: allPage });
-  const tbody = $('#list-members-all');
-  if (tbody) {
-    tbody.innerHTML = items.map((m, i) => {
-      const created = m?.createdAt ? new Date(m.createdAt).toLocaleDateString() : '';
-      return `<tr>
-        <td>${(allPage - 1) * PAGE_SIZE + i + 1}</td>
-        <td>${m?.name || ''}</td>
-        <td>${m?.email || ''}</td>
-        <td>${m?.memberId || m?.memberCode || ''}</td>
-        <td>${m?.state || m?.lga || ''}</td>
-        <td>${created}</td>
-      </tr>`;
-    }).join('');
-  }
-  $('#allCount') && ($('#allCount').textContent = `${total} result(s)`);
-}
+// Load members when tabs are shown
+document.getElementById('tab-members-all')?.addEventListener('shown.bs.tab', loadAllMembers);
+document.getElementById('tab-members-paid')?.addEventListener('shown.bs.tab', loadPaidMembers);
+document.getElementById('tab-members-unpaid')?.addEventListener('shown.bs.tab', loadUnpaidMembers);
 
 // Paid
 async function loadPaidMembers() {
