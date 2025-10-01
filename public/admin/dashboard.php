@@ -434,7 +434,7 @@ if (!token) {
 }
 
 // ADD THIS LINE - define your API base URL
-const API_BASE = 'http://localhost:5000/api'; // or whatever your API base path is
+const API_BASE = '/api'; // or whatever your API base path is
 
 
 // Add this after API_BASE definition
