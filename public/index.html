@@ -1459,5 +1459,92 @@ s0.parentNode.insertBefore(s1,s0);
 <!--End of Tawk.to Script-->
 <script src="/js/public.home.js"></script>
   <script src="/js/home-dynamic.js"></script>
+
+  <script>
+// Load dynamic content from admin dashboard
+async function loadDynamicContent() {
+  try {
+    const response = await fetch('/admin/data/home.json');
+    if (!response.ok) throw new Error('Failed to load content');
+    
+    const data = await response.json();
+    
+    // Update sliders
+    if (data.sliders && data.sliders.length > 0) {
+      updateSliders(data.sliders);
+    }
+    
+    // Update services
+    if (data.services && data.services.length > 0) {
+      updateServices(data.services);
+    }
+    
+    // Update other sections as needed
+    console.log('Dynamic content loaded successfully');
+    
+  } catch (error) {
+    console.error('Failed to load dynamic content:', error);
+    // Fallback to static content (current behavior)
+  }
+}
+
+function updateSliders(sliders) {
+  const carousel = document.querySelector('.header-carousel');
+  if (!carousel) return;
+  
+  // Clear existing slides
+  carousel.innerHTML = '';
+  
+  // Add new slides from admin data
+  sliders.forEach(slide => {
+    const slideHTML = `
+      <div class="header-carousel-item">
+        <img src="${slide.image}" class="img-fluid w-100" alt="Slide">
+        <div class="carousel-caption">
+          <div class="container">
+            <div class="row g-5">
+              <div class="col-lg-7 animated fadeInLeft">
+                <div class="text-sm-center text-md-start">
+                  <h4 class="text-white text-uppercase fw-bold mb-4">${slide.kicker || ''}</h4>
+                  <h1 class="display-1 text-white mb-4">${slide.headline}</h1>
+                  <p class="mb-5 fs-5">${slide.text || ''}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+    carousel.insertAdjacentHTML('beforeend', slideHTML);
+  });
+}
+
+function updateServices(services) {
+  const servicesContainer = document.querySelector('.services-container');
+  if (!servicesContainer) return;
+  
+  servicesContainer.innerHTML = '';
+  
+  services.forEach(service => {
+    const serviceHTML = `
+      <div class="col-md-6 col-lg-4 wow fadeInUp" data-wow-delay="0.2s">
+        <div class="service-item">
+          <div class="service-img">
+            <img src="${service.image}" class="img-fluid rounded-top w-100" alt="">
+          </div>
+          <div class="rounded-bottom p-4">
+            <a href="#" class="h4 d-inline-block mb-4">${service.title}</a>
+            <p class="mb-4">${service.description}</p>
+          </div>
+        </div>
+      </div>
+    `;
+    servicesContainer.insertAdjacentHTML('beforeend', serviceHTML);
+  });
+}
+
+// Load content when page loads
+document.addEventListener('DOMContentLoaded', loadDynamicContent);
+</script>
 </body>
 </html>
