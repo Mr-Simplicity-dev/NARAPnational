@@ -5,6 +5,7 @@
   <title>NARAP Admin Dashboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     :root{ --brand:#0a7f41; }
     body { background:#f7f8fa }
@@ -17,6 +18,10 @@
     .req::after { content:" *"; color:#e11d48; font-weight:600 }
     .table td, .table th { vertical-align: middle; }
     .shadow-sm-soft{ box-shadow:0 10px 28px rgba(10,127,65,.08) }
+    .image-upload-container { border: 2px dashed #dee2e6; border-radius: 8px; padding: 20px; text-align: center; background: #f8f9fa; }
+    .image-preview { max-width: 200px; max-height: 150px; margin: 10px auto; display: none; }
+    .upload-placeholder { color: #6c757d; }
+    .notification { position: fixed; top: 20px; right: 20px; z-index: 1050; min-width: 300px; }
   </style>
 </head>
 <body>
@@ -27,6 +32,9 @@
       <button class="btn btn-outline-secondary btn-sm" id="logoutBtn" type="button">Logout</button>
     </div>
   </div>
+
+  <!-- Notification Area -->
+  <div id="notificationArea" class="notification"></div>
 
   <!-- Tabs -->
   <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
@@ -66,8 +74,25 @@
               <div class="form-text text-muted">Each line becomes a paragraph on the homepage.</div>
             </div>
             <div class="col-md-6">
-              <label class="form-label">About Image URL</label>
-              <input name="about.image" class="form-control" placeholder="/uploads/about.jpg">
+              <label class="form-label">About Image</label>
+              <div class="image-upload-container" data-target="aboutImage">
+                <div class="upload-placeholder">
+                  <i class="fas fa-cloud-upload-alt fa-2x mb-2"></i>
+                  <p>Click to upload or drag and drop</p>
+                  <p class="small">PNG, JPG, GIF up to 5MB</p>
+                </div>
+                <img class="image-preview img-fluid rounded" id="aboutImagePreview">
+                <input type="file" class="d-none" accept="image/*" id="aboutImageUpload">
+                <input type="hidden" name="about.image" id="aboutImageUrl">
+              </div>
+              <div class="d-flex mt-2 gap-2">
+                <button type="button" class="btn btn-outline-primary btn-sm" onclick="document.getElementById('aboutImageUpload').click()">
+                  <i class="fas fa-upload me-1"></i> Choose Image
+                </button>
+                <button type="button" class="btn btn-outline-danger btn-sm" onclick="clearImageUpload('aboutImage')">
+                  <i class="fas fa-times me-1"></i> Clear
+                </button>
+              </div>
             </div>
             <div class="col-12 sticky-actions">
               <button class="btn btn-brand" type="submit">Save About</button>
@@ -91,7 +116,27 @@
             <div class="col-md-4"><label class="form-label">Blog Title</label><input name="blog.title" class="form-control" placeholder="Our Blog & News"></div>
             <div class="col-md-4"><label class="form-label">Blog Show Count</label><input name="blog.showCount" type="number" min="1" max="12" class="form-control" placeholder="3"></div>
             <div class="col-md-4"><label class="form-label">FAQs Title</label><input name="faqs.title" class="form-control" placeholder="Frequently Asked Questions"></div>
-            <div class="col-md-8"><label class="form-label">FAQs Side Image URL</label><input name="faqs.image" class="form-control" placeholder="/uploads/faqs.jpg"></div>
+            <div class="col-md-8">
+              <label class="form-label">FAQs Side Image</label>
+              <div class="image-upload-container" data-target="faqsImage">
+                <div class="upload-placeholder">
+                  <i class="fas fa-cloud-upload-alt fa-2x mb-2"></i>
+                  <p>Click to upload or drag and drop</p>
+                  <p class="small">PNG, JPG, GIF up to 5MB</p>
+                </div>
+                <img class="image-preview img-fluid rounded" id="faqsImagePreview">
+                <input type="file" class="d-none" accept="image/*" id="faqsImageUpload">
+                <input type="hidden" name="faqs.image" id="faqsImageUrl">
+              </div>
+              <div class="d-flex mt-2 gap-2">
+                <button type="button" class="btn btn-outline-primary btn-sm" onclick="document.getElementById('faqsImageUpload').click()">
+                  <i class="fas fa-upload me-1"></i> Choose Image
+                </button>
+                <button type="button" class="btn btn-outline-danger btn-sm" onclick="clearImageUpload('faqsImage')">
+                  <i class="fas fa-times me-1"></i> Clear
+                </button>
+              </div>
+            </div>
             <div class="col-md-4"><label class="form-label">Team Title</label><input name="team.title" class="form-control" placeholder="Meet Our Executive"></div>
             <div class="col-12 sticky-actions">
               <button class="btn btn-brand" type="submit">Save Sections</button>
@@ -115,7 +160,27 @@
           <div class="col-md-6"><label class="form-label">CTA1 Href</label><input name="cta1.href" class="form-control" placeholder="#video"></div>
           <div class="col-md-6"><label class="form-label">CTA2 Label</label><input name="cta2.label" class="form-control" placeholder="Contact Us"></div>
           <div class="col-md-6"><label class="form-label">CTA2 Href</label><input name="cta2.href" class="form-control" placeholder="#contact"></div>
-          <div class="col-md-8"><label class="form-label req">Image URL</label><input name="image" class="form-control" placeholder="/uploads/slider/slide1.jpg"></div>
+          <div class="col-md-8">
+            <label class="form-label req">Slider Image</label>
+            <div class="image-upload-container" data-target="sliderImage">
+              <div class="upload-placeholder">
+                <i class="fas fa-cloud-upload-alt fa-2x mb-2"></i>
+                <p>Click to upload or drag and drop</p>
+                <p class="small">PNG, JPG, GIF up to 5MB</p>
+              </div>
+              <img class="image-preview img-fluid rounded" id="sliderImagePreview">
+              <input type="file" class="d-none" accept="image/*" id="sliderImageUpload">
+              <input type="hidden" name="image" id="sliderImageUrl">
+            </div>
+            <div class="d-flex mt-2 gap-2">
+              <button type="button" class="btn btn-outline-primary btn-sm" onclick="document.getElementById('sliderImageUpload').click()">
+                <i class="fas fa-upload me-1"></i> Choose Image
+              </button>
+              <button type="button" class="btn btn-outline-danger btn-sm" onclick="clearImageUpload('sliderImage')">
+                <i class="fas fa-times me-1"></i> Clear
+              </button>
+            </div>
+          </div>
           <div class="col-md-4"><label class="form-label">Order</label><input name="order" type="number" class="form-control" placeholder="1"></div>
           <div class="col-12 sticky-actions">
             <button class="btn btn-brand" type="submit">Save Slider</button>
@@ -142,7 +207,27 @@
         <form id="form-service" class="row g-3">
           <input type="hidden" name="_id">
           <div class="col-md-6"><label class="form-label req">Title</label><input name="title" class="form-control"></div>
-          <div class="col-md-6"><label class="form-label">Image URL</label><input name="image" class="form-control" placeholder="/uploads/services/1.jpg"></div>
+          <div class="col-md-6">
+            <label class="form-label">Service Image</label>
+            <div class="image-upload-container" data-target="serviceImage">
+              <div class="upload-placeholder">
+                <i class="fas fa-cloud-upload-alt fa-2x mb-2"></i>
+                <p>Click to upload or drag and drop</p>
+                <p class="small">PNG, JPG, GIF up to 5MB</p>
+              </div>
+              <img class="image-preview img-fluid rounded" id="serviceImagePreview">
+              <input type="file" class="d-none" accept="image/*" id="serviceImageUpload">
+              <input type="hidden" name="image" id="serviceImageUrl">
+            </div>
+            <div class="d-flex mt-2 gap-2">
+              <button type="button" class="btn btn-outline-primary btn-sm" onclick="document.getElementById('serviceImageUpload').click()">
+                <i class="fas fa-upload me-1"></i> Choose Image
+              </button>
+              <button type="button" class="btn btn-outline-danger btn-sm" onclick="clearImageUpload('serviceImage')">
+                <i class="fas fa-times me-1"></i> Clear
+              </button>
+            </div>
+          </div>
           <div class="col-12"><label class="form-label">Description</label><textarea name="description" class="form-control" rows="3"></textarea></div>
           <div class="col-md-6"><label class="form-label">Link (optional)</label><input name="link" class="form-control" placeholder="/services#install"></div>
           <div class="col-12 sticky-actions">
@@ -168,7 +253,27 @@
           <input type="hidden" name="_id">
           <div class="col-md-6"><label class="form-label req">Title</label><input name="title" class="form-control"></div>
           <div class="col-md-6"><label class="form-label">Category</label><input name="category" class="form-control" placeholder="HVAC"></div>
-          <div class="col-md-6"><label class="form-label">Image URL</label><input name="image" class="form-control" placeholder="/uploads/projects/1.jpg"></div>
+          <div class="col-md-6">
+            <label class="form-label">Project Image</label>
+            <div class="image-upload-container" data-target="projectImage">
+              <div class="upload-placeholder">
+                <i class="fas fa-cloud-upload-alt fa-2x mb-2"></i>
+                <p>Click to upload or drag and drop</p>
+                <p class="small">PNG, JPG, GIF up to 5MB</p>
+              </div>
+              <img class="image-preview img-fluid rounded" id="projectImagePreview">
+              <input type="file" class="d-none" accept="image/*" id="projectImageUpload">
+              <input type="hidden" name="image" id="projectImageUrl">
+            </div>
+            <div class="d-flex mt-2 gap-2">
+              <button type="button" class="btn btn-outline-primary btn-sm" onclick="document.getElementById('projectImageUpload').click()">
+                <i class="fas fa-upload me-1"></i> Choose Image
+              </button>
+              <button type="button" class="btn btn-outline-danger btn-sm" onclick="clearImageUpload('projectImage')">
+                <i class="fas fa-times me-1"></i> Clear
+              </button>
+            </div>
+          </div>
           <div class="col-md-6"><label class="form-label">Link</label><input name="link" class="form-control" placeholder="/projects/slug"></div>
           <div class="col-12"><label class="form-label">Description</label><textarea name="description" class="form-control" rows="3"></textarea></div>
           <div class="col-12 sticky-actions">
@@ -218,7 +323,27 @@
         <form id="form-offer" class="row g-3">
           <input type="hidden" name="_id">
           <div class="col-md-6"><label class="form-label req">Title</label><input name="title" class="form-control"></div>
-          <div class="col-md-6"><label class="form-label">Image URL</label><input name="image" class="form-control" placeholder="/uploads/offers/1.jpg"></div>
+          <div class="col-md-6">
+            <label class="form-label">Offer Image</label>
+            <div class="image-upload-container" data-target="offerImage">
+              <div class="upload-placeholder">
+                <i class="fas fa-cloud-upload-alt fa-2x mb-2"></i>
+                <p>Click to upload or drag and drop</p>
+                <p class="small">PNG, JPG, GIF up to 5MB</p>
+              </div>
+              <img class="image-preview img-fluid rounded" id="offerImagePreview">
+              <input type="file" class="d-none" accept="image/*" id="offerImageUpload">
+              <input type="hidden" name="image" id="offerImageUrl">
+            </div>
+            <div class="d-flex mt-2 gap-2">
+              <button type="button" class="btn btn-outline-primary btn-sm" onclick="document.getElementById('offerImageUpload').click()">
+                <i class="fas fa-upload me-1"></i> Choose Image
+              </button>
+              <button type="button" class="btn btn-outline-danger btn-sm" onclick="clearImageUpload('offerImage')">
+                <i class="fas fa-times me-1"></i> Clear
+              </button>
+            </div>
+          </div>
           <div class="col-12"><label class="form-label">Description</label><textarea name="description" class="form-control" rows="3"></textarea></div>
           <div class="col-12 sticky-actions">
             <button class="btn btn-brand" type="submit">Save Offer</button>
@@ -245,7 +370,27 @@
           <div class="col-md-6"><label class="form-label">Slug</label><input name="slug" class="form-control" placeholder="auto-generated if blank"></div>
           <div class="col-12"><label class="form-label">Excerpt</label><textarea name="excerpt" class="form-control" rows="2"></textarea></div>
           <div class="col-12"><label class="form-label">Content (HTML or Markdown)</label><textarea name="content" class="form-control" rows="6"></textarea></div>
-          <div class="col-md-6"><label class="form-label">Image URL</label><input name="image" class="form-control" placeholder="/uploads/blog/1.jpg"></div>
+          <div class="col-md-6">
+            <label class="form-label">Blog Image</label>
+            <div class="image-upload-container" data-target="blogImage">
+              <div class="upload-placeholder">
+                <i class="fas fa-cloud-upload-alt fa-2x mb-2"></i>
+                <p>Click to upload or drag and drop</p>
+                <p class="small">PNG, JPG, GIF up to 5MB</p>
+              </div>
+              <img class="image-preview img-fluid rounded" id="blogImagePreview">
+              <input type="file" class="d-none" accept="image/*" id="blogImageUpload">
+              <input type="hidden" name="image" id="blogImageUrl">
+            </div>
+            <div class="d-flex mt-2 gap-2">
+              <button type="button" class="btn btn-outline-primary btn-sm" onclick="document.getElementById('blogImageUpload').click()">
+                <i class="fas fa-upload me-1"></i> Choose Image
+              </button>
+              <button type="button" class="btn btn-outline-danger btn-sm" onclick="clearImageUpload('blogImage')">
+                <i class="fas fa-times me-1"></i> Clear
+              </button>
+            </div>
+          </div>
           <div class="col-12 sticky-actions">
             <button class="btn btn-brand" type="submit">Save Blog</button>
             <button class="btn btn-outline-secondary" type="button" data-reset="#form-blog">Reset</button>
@@ -292,7 +437,27 @@
           <input type="hidden" name="_id">
           <div class="col-md-4"><label class="form-label req">Name</label><input name="name" class="form-control"></div>
           <div class="col-md-4"><label class="form-label req">Role</label><input name="role" class="form-control"></div>
-          <div class="col-md-4"><label class="form-label">Image URL</label><input name="image" class="form-control" placeholder="/uploads/team/1.jpg"></div>
+          <div class="col-md-4">
+            <label class="form-label">Team Member Image</label>
+            <div class="image-upload-container" data-target="teamImage">
+              <div class="upload-placeholder">
+                <i class="fas fa-cloud-upload-alt fa-2x mb-2"></i>
+                <p>Click to upload or drag and drop</p>
+                <p class="small">PNG, JPG, GIF up to 5MB</p>
+              </div>
+              <img class="image-preview img-fluid rounded" id="teamImagePreview">
+              <input type="file" class="d-none" accept="image/*" id="teamImageUpload">
+              <input type="hidden" name="image" id="teamImageUrl">
+            </div>
+            <div class="d-flex mt-2 gap-2">
+              <button type="button" class="btn btn-outline-primary btn-sm" onclick="document.getElementById('teamImageUpload').click()">
+                <i class="fas fa-upload me-1"></i> Choose Image
+              </button>
+              <button type="button" class="btn btn-outline-danger btn-sm" onclick="clearImageUpload('teamImage')">
+                <i class="fas fa-times me-1"></i> Clear
+              </button>
+            </div>
+          </div>
           <div class="col-md-4"><label class="form-label">Facebook</label><input name="facebook" class="form-control" placeholder="https://facebook.com/..."></div>
           <div class="col-md-4"><label class="form-label">Twitter</label><input name="twitter" class="form-control" placeholder="https://twitter.com/..."></div>
           <div class="col-md-4"><label class="form-label">LinkedIn</label><input name="linkedin" class="form-control" placeholder="https://linkedin.com/in/..."></div>
@@ -425,12 +590,195 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
 <script>
+// ===== IMAGE UPLOAD FUNCTIONALITY =====
 
-// Basic authentication check
+// Initialize all image upload components
+function initializeImageUploads() {
+  // Set up all image upload containers
+  document.querySelectorAll('.image-upload-container').forEach(container => {
+    const target = container.getAttribute('data-target');
+    const fileInput = document.getElementById(`${target}Upload`);
+    const preview = document.getElementById(`${target}Preview`);
+    const urlInput = document.getElementById(`${target}Url`);
+    
+    if (!fileInput || !preview || !urlInput) return;
+    
+    // Click handler for the container
+    container.addEventListener('click', function(e) {
+      if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'BUTTON') {
+        fileInput.click();
+      }
+    });
+    
+    // File input change handler
+    fileInput.addEventListener('change', function(e) {
+      if (this.files && this.files[0]) {
+        const file = this.files[0];
+        
+        // Validate file type
+        if (!file.type.match('image.*')) {
+          showNotification('Please select a valid image file (PNG, JPG, GIF)', 'error');
+          return;
+        }
+        
+        // Validate file size (5MB)
+        if (file.size > 5 * 1024 * 1024) {
+          showNotification('Image must be less than 5MB', 'error');
+          return;
+        }
+        
+        // Show preview
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          preview.src = e.target.result;
+          preview.style.display = 'block';
+          container.querySelector('.upload-placeholder').style.display = 'none';
+        };
+        reader.readAsDataURL(file);
+        
+        // Upload the file
+        uploadImage(file, target);
+      }
+    });
+    
+    // Drag and drop functionality
+    container.addEventListener('dragover', function(e) {
+      e.preventDefault();
+      container.style.borderColor = '#0a7f41';
+      container.style.backgroundColor = '#e8f5e8';
+    });
+    
+    container.addEventListener('dragleave', function(e) {
+      e.preventDefault();
+      container.style.borderColor = '#dee2e6';
+      container.style.backgroundColor = '#f8f9fa';
+    });
+    
+    container.addEventListener('drop', function(e) {
+      e.preventDefault();
+      container.style.borderColor = '#dee2e6';
+      container.style.backgroundColor = '#f8f9fa';
+      
+      if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+        fileInput.files = e.dataTransfer.files;
+        const event = new Event('change');
+        fileInput.dispatchEvent(event);
+      }
+    });
+  });
+}
+
+// Upload image to server
+async function uploadImage(file, target) {
+  try {
+    showNotification(`Uploading ${file.name}...`, 'info');
+    
+    const formData = new FormData();
+    formData.append('image', file);
+    
+    const token = localStorage.getItem('jwt');
+    if (!token) {
+      throw new Error('Not authenticated');
+    }
+    
+    const response = await fetch('/api/upload', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      },
+      body: formData
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Upload failed: ${response.statusText}`);
+    }
+    
+    const result = await response.json();
+    
+    if (result.success && result.url) {
+      // Set the URL in the hidden input
+      document.getElementById(`${target}Url`).value = result.url;
+      showNotification('Image uploaded successfully!', 'success');
+    } else {
+      throw new Error(result.message || 'Upload failed');
+    }
+  } catch (error) {
+    console.error('Image upload error:', error);
+    showNotification(`Upload failed: ${error.message}`, 'error');
+    
+    // Reset the file input and preview
+    clearImageUpload(target);
+  }
+}
+
+// Clear image upload
+function clearImageUpload(target) {
+  const fileInput = document.getElementById(`${target}Upload`);
+  const preview = document.getElementById(`${target}Preview`);
+  const urlInput = document.getElementById(`${target}Url`);
+  const container = document.querySelector(`[data-target="${target}"]`);
+  
+  if (fileInput) fileInput.value = '';
+  if (preview) {
+    preview.src = '';
+    preview.style.display = 'none';
+  }
+  if (urlInput) urlInput.value = '';
+  if (container) {
+    container.querySelector('.upload-placeholder').style.display = 'block';
+  }
+}
+
+// Set image from URL (for editing)
+function setImageFromUrl(target, url) {
+  const preview = document.getElementById(`${target}Preview`);
+  const urlInput = document.getElementById(`${target}Url`);
+  const container = document.querySelector(`[data-target="${target}"]`);
+  
+  if (url && preview && urlInput && container) {
+    preview.src = url;
+    preview.style.display = 'block';
+    urlInput.value = url;
+    container.querySelector('.upload-placeholder').style.display = 'none';
+  }
+}
+
+// Notification system
+function showNotification(message, type = 'info') {
+  const notificationArea = document.getElementById('notificationArea');
+  if (!notificationArea) return;
+  
+  const alertClass = {
+    'success': 'alert-success',
+    'error': 'alert-danger',
+    'warning': 'alert-warning',
+    'info': 'alert-info'
+  }[type] || 'alert-info';
+  
+  const notification = document.createElement('div');
+  notification.className = `alert ${alertClass} alert-dismissible fade show`;
+  notification.innerHTML = `
+    ${message}
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  `;
+  
+  notificationArea.appendChild(notification);
+  
+  // Auto remove after 5 seconds
+  setTimeout(() => {
+    if (notification.parentNode) {
+      notification.remove();
+    }
+  }, 5000);
+}
+
+// Initialize when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+  initializeImageUploads();
+});
+
+// ===== BASIC AUTHENTICATION CHECK =====
 const token = localStorage.getItem('jwt');
 if (!token) {
   window.location.replace('/admin/login.php');
@@ -439,24 +787,24 @@ if (!token) {
 // Define your API base URL
 const API_BASE = '/api';
 
-// Add this after API_BASE definition
+// Auth fetch function
 async function authFetch(url, options = {}) {
   const token = localStorage.getItem('jwt');
+  if (!token) {
+    console.error('No JWT token found in authFetch');
+    window.location.href = '/admin/login.php';
+    return;
+  }
+  
   return fetch(url, {
     ...options,
     headers: {
-      ...options.headers,
-      'Authorization': `Bearer ${token}`
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+      ...options.headers
     }
   });
 }
-
-// Simple logout function
-document.getElementById('logoutBtn')?.addEventListener('click', function() {
-  localStorage.removeItem('jwt');
-  localStorage.removeItem('token');
-  window.location.replace('/index.php');
-});
 
 // ===== SAFE HELPERS =====
 const PAGE_SIZE = window.PAGE_SIZE || 20;
@@ -471,6 +819,46 @@ const json = (opts = {}) => ({
 
 // Defensive selector
 const $ = (sel) => document.querySelector(sel);
+
+// ===== HELPER FUNCTIONS =====
+function summarizePaidFlags(item) {
+  const flags = {
+    membership: item?.membershipPaid || false,
+    certificate: item?.certificatePaid || false,
+    idcard: item?.idCardPaid || false
+  };
+  
+  // Check for alternative field names
+  if (typeof item?.paidFlags === 'object') {
+    flags.membership = flags.membership || item.paidFlags.membership || false;
+    flags.certificate = flags.certificate || item.paidFlags.certificate || false;
+    flags.idcard = flags.idcard || item.paidFlags.idcard || false;
+  }
+  
+  return flags;
+}
+
+function unpaidListFromFlags(flags) {
+  const unpaid = [];
+  if (!flags.membership) unpaid.push('Membership');
+  if (!flags.certificate) unpaid.push('Certificate');
+  if (!flags.idcard) unpaid.push('ID Card');
+  return unpaid.length ? unpaid.join(', ') : 'All paid';
+}
+
+function resetForm(sel) {
+  const f = document.querySelector(sel);
+  if (!f) return;
+  f.reset();
+  const id = f.querySelector('[name="_id"]');
+  if (id) id.value = '';
+  
+  // Clear all image uploads in this form
+  f.querySelectorAll('.image-upload-container').forEach(container => {
+    const target = container.getAttribute('data-target');
+    if (target) clearImageUpload(target);
+  });
+}
 
 // ===== LOADING INDICATORS =====
 function showLoading(selector) {
@@ -494,6 +882,32 @@ function hideButtonLoading(button) {
   const originalHTML = button.getAttribute('data-original-html');
   if (originalHTML) {
     button.innerHTML = originalHTML;
+  }
+}
+
+// ===== PAGINATION FUNCTIONS =====
+function paginateData(data, page, pageSize = PAGE_SIZE) {
+  const start = (page - 1) * pageSize;
+  const end = start + pageSize;
+  return data.slice(start, end);
+}
+
+function updatePagination(type, filteredData, currentPage) {
+  const totalPages = Math.ceil(filteredData.length / PAGE_SIZE);
+  const countEl = document.getElementById(`${type}Count`);
+  const prevBtn = document.getElementById(`${type}Prev`);
+  const nextBtn = document.getElementById(`${type}Next`);
+  
+  if (countEl) {
+    countEl.textContent = `${filteredData.length} result(s) - Page ${currentPage} of ${totalPages}`;
+  }
+  
+  if (prevBtn) {
+    prevBtn.disabled = currentPage <= 1;
+  }
+  
+  if (nextBtn) {
+    nextBtn.disabled = currentPage >= totalPages;
   }
 }
 
@@ -615,7 +1029,7 @@ function filterPaidMembers(data, requireAll) {
   });
 }
 
-// ===== UPDATED MEMBERS LOADING WITH ALL FEATURES =====
+// ===== MEMBERS LOADING =====
 async function loadMembersSimple(type) {
   try {
     let endpoint = '';
@@ -644,6 +1058,13 @@ async function loadMembersSimple(type) {
       case 'unpaid': currentUnpaidData = items || []; break;
     }
     
+    // Reset to page 1 when loading new data
+    switch(type) {
+      case 'all': allPage = 1; break;
+      case 'paid': paidPage = 1; break;
+      case 'unpaid': unpaidPage = 1; break;
+    }
+    
     // Apply filters and render
     renderFilteredMembers(type);
     
@@ -660,12 +1081,14 @@ function renderFilteredMembers(type) {
   let data = [];
   let searchTerm = '';
   let filteredData = [];
+  let currentPage = 1;
   
   switch(type) {
     case 'all':
       data = currentAllData;
       searchTerm = $('#allSearch')?.value || '';
       filteredData = filterMembers(data, searchTerm, 'all');
+      currentPage = allPage;
       break;
       
     case 'paid':
@@ -675,12 +1098,14 @@ function renderFilteredMembers(type) {
       let paidFiltered = filterMembers(data, searchTerm, 'paid');
       paidFiltered = filterPaidMembers(paidFiltered, requireAll);
       filteredData = paidFiltered;
+      currentPage = paidPage;
       break;
       
     case 'unpaid':
       data = currentUnpaidData;
       searchTerm = $('#unpaidSearch')?.value || '';
       filteredData = filterMembers(data, searchTerm, 'unpaid');
+      currentPage = unpaidPage;
       break;
   }
   
@@ -698,14 +1123,18 @@ function renderFilteredMembers(type) {
     return;
   }
 
+  // Apply pagination
+  const paginatedData = paginateData(filteredData, currentPage);
+  
   // Render rows
-  filteredData.forEach((item, i) => {
+  paginatedData.forEach((item, i) => {
+    const globalIndex = (currentPage - 1) * PAGE_SIZE + i + 1;
     const row = document.createElement('tr');
     
     if (type === 'all') {
       const created = item?.createdAt ? new Date(item.createdAt).toLocaleDateString() : '';
       row.innerHTML = `
-        <td>${i + 1}</td>
+        <td>${globalIndex}</td>
         <td>${item?.name || ''}</td>
         <td>${item?.email || ''}</td>
         <td>${item?.memberId || item?.memberCode || ''}</td>
@@ -718,7 +1147,7 @@ function renderFilteredMembers(type) {
       const paidList = [flags.membership ? 'Membership' : '', flags.certificate ? 'Certificate' : '', flags.idcard ? 'ID Card' : '']
         .filter(Boolean).join(' / ');
       row.innerHTML = `
-        <td>${i + 1}</td>
+        <td>${globalIndex}</td>
         <td>${item?.name || ''}</td>
         <td>${item?.email || ''}</td>
         <td>${item?.memberId || item?.memberCode || ''}</td>
@@ -729,7 +1158,7 @@ function renderFilteredMembers(type) {
     else if (type === 'unpaid') {
       const missing = unpaidListFromFlags(summarizePaidFlags(item));
       row.innerHTML = `
-        <td>${i + 1}</td>
+        <td>${globalIndex}</td>
         <td>${item?.name || ''}</td>
         <td>${item?.email || ''}</td>
         <td>${item?.memberId || item?.memberCode || ''}</td>
@@ -741,39 +1170,42 @@ function renderFilteredMembers(type) {
     tbody.appendChild(row);
   });
 
-  if (countEl) countEl.textContent = `${filteredData.length} result(s)`;
+  // Update pagination controls
+  updatePagination(type, filteredData, currentPage);
 }
 
-// ===== EXPORT HANDLERS =====
-async function handleExport(type) {
+// ===== LOGOUT FUNCTION =====
+async function handleLogout() {
+  if (!confirm('Are you sure you want to logout?')) {
+    return;
+  }
+
   try {
-    const button = $(`#btnExport${type.charAt(0).toUpperCase() + type.slice(1)}`);
-    showButtonLoading(button, 'Exporting...');
-    
-    // Get current filtered data for export
-    let dataToExport = [];
-    switch(type) {
-      case 'all': dataToExport = filterMembers(currentAllData, $('#allSearch')?.value || '', 'all'); break;
-      case 'paid': 
-        let paidData = filterMembers(currentPaidData, $('#paidSearch')?.value || '', 'paid');
-        const requireAll = $('#paidLogicAll')?.checked || false;
-        dataToExport = filterPaidMembers(paidData, requireAll);
-        break;
-      case 'unpaid': dataToExport = filterMembers(currentUnpaidData, $('#unpaidSearch')?.value || '', 'unpaid'); break;
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+      logoutBtn.disabled = true;
+      logoutBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Logging out...';
     }
+
+    // Clear all authentication data
+    localStorage.removeItem('jwt');
+    sessionStorage.clear();
     
-    const csv = convertToCSV(dataToExport, type);
-    const filename = `${type}-members-${new Date().toISOString().split('T')[0]}.csv`;
-    
-    downloadCSV(csv, filename);
-    
-    setTimeout(() => hideButtonLoading(button), 1000);
-    
-  } catch (err) {
-    console.error(`Export ${type} error:`, err);
-    const button = $(`#btnExport${type.charAt(0).toUpperCase() + type.slice(1)}`);
-    hideButtonLoading(button);
-    alert('Export failed. Please try again.');
+    // Clear all cookies
+    document.cookie.split(';').forEach(cookie => {
+      const eqPos = cookie.indexOf('=');
+      const name = eqPos > -1 ? cookie.substr(0, eqPos).trim() : cookie;
+      document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`;
+    });
+
+    // Immediate redirect to login page
+    window.location.href = '/admin/login.php';
+
+  } catch (error) {
+    console.error('Logout error:', error);
+    // Fallback redirect
+    localStorage.clear();
+    window.location.href = '/admin/login.php';
   }
 }
 
@@ -841,48 +1273,95 @@ function enhanceFormSubmissions() {
   });
 }
 
-// ===== EVENT LISTENERS FOR ALL FEATURES =====
-document.addEventListener('DOMContentLoaded', function() {
-  // Search functionality
-  $('#allSearch')?.addEventListener('input', () => renderFilteredMembers('all'));
-  $('#paidSearch')?.addEventListener('input', () => renderFilteredMembers('paid'));
-  $('#unpaidSearch')?.addEventListener('input', () => renderFilteredMembers('unpaid'));
-  
-  // Paid member filter options
-  $('#paidFeeMembership')?.addEventListener('change', () => renderFilteredMembers('paid'));
-  $('#paidFeeCertificate')?.addEventListener('change', () => renderFilteredMembers('paid'));
-  $('#paidFeeIdcard')?.addEventListener('change', () => renderFilteredMembers('paid'));
-  $('#paidLogicAll')?.addEventListener('change', () => renderFilteredMembers('paid'));
-  
-  // Export functionality
-  $('#btnExportAll')?.addEventListener('click', () => handleExport('all'));
-  $('#btnExportPaid')?.addEventListener('click', () => handleExport('paid'));
-  $('#btnExportUnpaid')?.addEventListener('click', () => handleExport('unpaid'));
-  
-  // Reload buttons with loading states
-  $('#btnReloadAll')?.addEventListener('click', async () => {
-    showButtonLoading($('#btnReloadAll'), 'Reloading...');
-    await loadMembersSimple('all');
-    hideButtonLoading($('#btnReloadAll'));
+// ===== PAGINATION HANDLERS =====
+function setupPaginationHandlers() {
+  // All members pagination
+  $('#allPrev')?.addEventListener('click', () => {
+    if (allPage > 1) {
+      allPage--;
+      renderFilteredMembers('all');
+    }
   });
   
-  $('#btnReloadPaid')?.addEventListener('click', async () => {
-    showButtonLoading($('#btnReloadPaid'), 'Reloading...');
-    await loadMembersSimple('paid');
-    hideButtonLoading($('#btnReloadPaid'));
+  $('#allNext')?.addEventListener('click', () => {
+    const filteredData = filterMembers(currentAllData, $('#allSearch')?.value || '', 'all');
+    const totalPages = Math.ceil(filteredData.length / PAGE_SIZE);
+    if (allPage < totalPages) {
+      allPage++;
+      renderFilteredMembers('all');
+    }
   });
   
-  $('#btnReloadUnpaid')?.addEventListener('click', async () => {
-    showButtonLoading($('#btnReloadUnpaid'), 'Reloading...');
-    await loadMembersSimple('unpaid');
-    hideButtonLoading($('#btnReloadUnpaid'));
+  // Paid members pagination
+  $('#paidPrev')?.addEventListener('click', () => {
+    if (paidPage > 1) {
+      paidPage--;
+      renderFilteredMembers('paid');
+    }
   });
   
-  // Setup missing functionality
-  setupFormResetButtons();
-  setupAutoSlugGeneration();
-  enhanceFormSubmissions();
-});
+  $('#paidNext')?.addEventListener('click', () => {
+    const searchTerm = $('#paidSearch')?.value || '';
+    const requireAll = $('#paidLogicAll')?.checked || false;
+    let paidFiltered = filterMembers(currentPaidData, searchTerm, 'paid');
+    paidFiltered = filterPaidMembers(paidFiltered, requireAll);
+    const totalPages = Math.ceil(paidFiltered.length / PAGE_SIZE);
+    if (paidPage < totalPages) {
+      paidPage++;
+      renderFilteredMembers('paid');
+    }
+  });
+  
+  // Unpaid members pagination
+  $('#unpaidPrev')?.addEventListener('click', () => {
+    if (unpaidPage > 1) {
+      unpaidPage--;
+      renderFilteredMembers('unpaid');
+    }
+  });
+  
+  $('#unpaidNext')?.addEventListener('click', () => {
+    const filteredData = filterMembers(currentUnpaidData, $('#unpaidSearch')?.value || '', 'unpaid');
+    const totalPages = Math.ceil(filteredData.length / PAGE_SIZE);
+    if (unpaidPage < totalPages) {
+      unpaidPage++;
+      renderFilteredMembers('unpaid');
+    }
+  });
+}
+
+// ===== EXPORT HANDLERS =====
+async function handleExport(type) {
+  try {
+    const button = $(`#btnExport${type.charAt(0).toUpperCase() + type.slice(1)}`);
+    showButtonLoading(button, 'Exporting...');
+    
+    // Get current filtered data for export (all data, not just current page)
+    let dataToExport = [];
+    switch(type) {
+      case 'all': dataToExport = filterMembers(currentAllData, $('#allSearch')?.value || '', 'all'); break;
+      case 'paid': 
+        let paidData = filterMembers(currentPaidData, $('#paidSearch')?.value || '', 'paid');
+        const requireAll = $('#paidLogicAll')?.checked || false;
+        dataToExport = filterPaidMembers(paidData, requireAll);
+        break;
+      case 'unpaid': dataToExport = filterMembers(currentUnpaidData, $('#unpaidSearch')?.value || '', 'unpaid'); break;
+    }
+    
+    const csv = convertToCSV(dataToExport, type);
+    const filename = `${type}-members-${new Date().toISOString().split('T')[0]}.csv`;
+    
+    downloadCSV(csv, filename);
+    
+    setTimeout(() => hideButtonLoading(button), 1000);
+    
+  } catch (err) {
+    console.error(`Export ${type} error:`, err);
+    const button = $(`#btnExport${type.charAt(0).toUpperCase() + type.slice(1)}`);
+    hideButtonLoading(button);
+    alert('Export failed. Please try again.');
+  }
+}
 
 // ===== HOME SETTINGS =====
 async function loadHomeSettings() {
@@ -905,7 +1384,11 @@ async function loadHomeSettings() {
         ? data.about.paragraphs.join('\n')
         : (data?.about?.paragraphs || '')
     );
-    set('about.image', data?.about?.image);
+    
+    // Set about image
+    if (data?.about?.image) {
+      setImageFromUrl('aboutImage', data.about.image);
+    }
 
     const pairs = [
       ['services', 'title'], ['services', 'subtitle'],
@@ -923,57 +1406,15 @@ async function loadHomeSettings() {
       const v = data?.[k1]?.[k2];
       el.value = (v ?? '') + '';
     });
+    
+    // Set FAQs image
+    if (data?.faqs?.image) {
+      setImageFromUrl('faqsImage', data.faqs.image);
+    }
   } catch (e) {
     console.error('loadHomeSettings error:', e);
   }
 }
-
-$('#form-home-about')?.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  try {
-    const fd = new FormData(e.target);
-    const payload = {
-      about: {
-        title: fd.get('about.title') || '',
-        headline: fd.get('about.headline') || '',
-        paragraphs: (fd.get('about.paragraphs') || '')
-          .replace(/\r\n/g, '\n')
-          .split('\n')
-          .map(s => s.trim())
-          .filter(Boolean),
-        image: fd.get('about.image') || ''
-      }
-    };
-    const res = await authFetch(`${API_BASE}/settings/home`, json({ method: 'PUT', body: JSON.stringify(payload) }));
-    $('#aboutStatus') && ($('#aboutStatus').textContent = res.ok ? 'Saved.' : 'Failed.');
-    if (res.ok) loadHomeSettings();
-  } catch (err) {
-    console.error('About save error:', err);
-    $('#aboutStatus') && ($('#aboutStatus').textContent = 'Failed.');
-  }
-});
-
-$('#form-home-sections')?.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  try {
-    const fd = new FormData(e.target);
-    const payload = {
-      services: { title: fd.get('services.title') || '', subtitle: fd.get('services.subtitle') || '' },
-      projects: { title: fd.get('projects.title') || '', subtitle: fd.get('projects.subtitle') || '' },
-      features: { title: fd.get('features.title') || '', headline: fd.get('features.headline') || '' },
-      offer: { title: fd.get('offer.title') || '' },
-      blog: { title: fd.get('blog.title') || '', showCount: Number(fd.get('blog.showCount') || 3) || 3 },
-      faqs: { title: fd.get('faqs.title') || '', image: fd.get('faqs.image') || '' },
-      team: { title: fd.get('team.title') || '' }
-    };
-    const res = await authFetch(`${API_BASE}/settings/home`, json({ method: 'PUT', body: JSON.stringify(payload) }));
-    $('#sectionsStatus') && ($('#sectionsStatus').textContent = res.ok ? 'Saved.' : 'Failed.');
-    if (res.ok) loadHomeSettings();
-  } catch (err) {
-    console.error('Sections save error:', err);
-    $('#sectionsStatus') && ($('#sectionsStatus').textContent = 'Failed.');
-  }
-});
 
 // ===== GENERIC CRUD (content sections) =====
 const resources = {
@@ -987,7 +1428,7 @@ const resources = {
       const c1Href = fd.get('cta1.href') || '';
       const c2Label = fd.get('cta2.label') || '';
       const c2Href = fd.get('cta2.href') || '';
-      const image = fd.get('image') || '';
+      const image = document.getElementById('sliderImageUrl')?.value || '';
       const order = Number(fd.get('order') || 0) || 0;
       return {
         kicker, headline, text,
@@ -1023,14 +1464,25 @@ const resources = {
   },
   services: {
     endpoint: '/services', listEl: '#list-services', form: '#form-service', status: '#serviceStatus',
-    toPayload: (fd) => ({ title: fd.get('title') || '', description: fd.get('description') || '', image: fd.get('image') || '', link: fd.get('link') || '' }),
+    toPayload: (fd) => ({ 
+      title: fd.get('title') || '', 
+      description: fd.get('description') || '', 
+      image: document.getElementById('serviceImageUrl')?.value || '', 
+      link: fd.get('link') || '' 
+    }),
     renderRow: (item, i) => `<tr><td>${i + 1}</td><td>${item.image ? '<img class="img-thumb" src="' + item.image + '">' : ''}</td><td>${item.title || ''}</td><td>${item.description || ''}</td><td>${item.link || ''}</td>
     <td class="text-end"><button class="btn btn-sm btn-outline-primary" data-edit="services" data-id="${item._id}">Edit</button>
     <button class="btn btn-sm btn-outline-danger" data-del="services" data-id="${item._id}">Delete</button></td></tr>`
   },
   projects: {
     endpoint: '/projects', listEl: '#list-projects', form: '#form-project', status: '#projectStatus',
-    toPayload: (fd) => ({ title: fd.get('title') || '', category: fd.get('category') || '', description: fd.get('description') || '', image: fd.get('image') || '', link: fd.get('link') || '' }),
+    toPayload: (fd) => ({ 
+      title: fd.get('title') || '', 
+      category: fd.get('category') || '', 
+      description: fd.get('description') || '', 
+      image: document.getElementById('projectImageUrl')?.value || '', 
+      link: fd.get('link') || '' 
+    }),
     renderRow: (item, i) => `<tr><td>${i + 1}</td><td>${item.image ? '<img class="img-thumb" src="' + item.image + '">' : ''}</td><td>${item.title || ''}</td><td>${item.category || ''}</td><td>${item.link || ''}</td>
     <td class="text-end"><button class="btn btn-sm btn-outline-primary" data-edit="projects" data-id="${item._id}">Edit</button>
     <button class="btn btn-sm btn-outline-danger" data-del="projects" data-id="${item._id}">Delete</button></td></tr>`
@@ -1044,14 +1496,24 @@ const resources = {
   },
   offers: {
     endpoint: '/offers', listEl: '#list-offers', form: '#form-offer', status: '#offerStatus',
-    toPayload: (fd) => ({ title: fd.get('title') || '', description: fd.get('description') || '', image: fd.get('image') || '' }),
+    toPayload: (fd) => ({ 
+      title: fd.get('title') || '', 
+      description: fd.get('description') || '', 
+      image: document.getElementById('offerImageUrl')?.value || '' 
+    }),
     renderRow: (item, i) => `<tr><td>${i + 1}</td><td>${item.image ? '<img class="img-thumb" src="' + item.image + '">' : ''}</td><td>${item.title || ''}</td>
     <td class="text-end"><button class="btn btn-sm btn-outline-primary" data-edit="offers" data-id="${item._id}">Edit</button>
     <button class="btn btn-sm btn-outline-danger" data-del="offers" data-id="${item._id}">Delete</button></td></tr>`
   },
   blogs: {
     endpoint: '/blogs', listEl: '#list-blogs', form: '#form-blog', status: '#blogStatus',
-    toPayload: (fd) => ({ title: fd.get('title') || '', slug: fd.get('slug') || '', excerpt: fd.get('excerpt') || '', content: fd.get('content') || '', image: fd.get('image') || '' }),
+    toPayload: (fd) => ({ 
+      title: fd.get('title') || '', 
+      slug: fd.get('slug') || '', 
+      excerpt: fd.get('excerpt') || '', 
+      content: fd.get('content') || '', 
+      image: document.getElementById('blogImageUrl')?.value || '' 
+    }),
     renderRow: (item, i) => `<tr><td>${i + 1}</td><td>${item.image ? '<img class="img-thumb" src="' + item.image + '">' : ''}</td><td>${item.title || ''}</td><td>${item.slug || ''}</td>
     <td class="text-end"><button class="btn btn-sm btn-outline-primary" data-edit="blogs" data-id="${item._id}">Edit</button>
     <button class="btn btn-sm btn-outline-danger" data-del="blogs" data-id="${item._id}">Delete</button></td></tr>`
@@ -1065,7 +1527,14 @@ const resources = {
   },
   team: {
     endpoint: '/team', listEl: '#list-team', form: '#form-team', status: '#teamStatus',
-    toPayload: (fd) => ({ name: fd.get('name') || '', role: fd.get('role') || '', image: fd.get('image') || '', facebook: fd.get('facebook') || '', twitter: fd.get('twitter') || '', linkedin: fd.get('linkedin') || '' }),
+    toPayload: (fd) => ({ 
+      name: fd.get('name') || '', 
+      role: fd.get('role') || '', 
+      image: document.getElementById('teamImageUrl')?.value || '', 
+      facebook: fd.get('facebook') || '', 
+      twitter: fd.get('twitter') || '', 
+      linkedin: fd.get('linkedin') || '' 
+    }),
     renderRow: (item, i) => `<tr><td>${i + 1}</td><td>${item.image ? '<img class="img-thumb" src="' + item.image + '">' : ''}</td><td>${item.name || ''}</td><td>${item.role || ''}</td>
     <td class="text-end"><button class="btn btn-sm btn-outline-primary" data-edit="team" data-id="${item._id}">Edit</button>
     <button class="btn btn-sm btn-outline-danger" data-del="team" data-id="${item._id}">Delete</button></td></tr>`
@@ -1089,14 +1558,6 @@ async function loadList(key) {
   } catch (e) {
     console.error(`loadList(${key}) error:`, e);
   }
-}
-
-function resetForm(sel) {
-  const f = document.querySelector(sel);
-  if (!f) return;
-  f.reset();
-  const id = f.querySelector('[name="_id"]');
-  if (id) id.value = '';
 }
 
 function fillFormFromItem(formSel, item) {
@@ -1127,6 +1588,28 @@ function fillFormFromItem(formSel, item) {
       const el = form.querySelector(`[name="${name}"]`);
       if (el) el.value = (val ?? '') + '';
     });
+    
+    // Set image preview for slider
+    if (item.image || item.imageUrl) {
+      setImageFromUrl('sliderImage', item.image || item.imageUrl);
+    }
+  }
+  
+  // Set image previews for other forms
+  if (formSel === '#form-service' && (item.image)) {
+    setImageFromUrl('serviceImage', item.image);
+  }
+  if (formSel === '#form-project' && (item.image)) {
+    setImageFromUrl('projectImage', item.image);
+  }
+  if (formSel === '#form-offer' && (item.image)) {
+    setImageFromUrl('offerImage', item.image);
+  }
+  if (formSel === '#form-blog' && (item.image)) {
+    setImageFromUrl('blogImage', item.image);
+  }
+  if (formSel === '#form-team' && (item.image)) {
+    setImageFromUrl('teamImage', item.image);
   }
 }
 
@@ -1161,65 +1644,176 @@ async function deleteItem(key, id) {
   }
 }
 
-Object.keys(resources).forEach(key => {
-  const formSel = resources[key].form;
-  document.querySelector(formSel)?.addEventListener('submit', (e) => createOrUpdate(e, key));
+// ===== EVENT LISTENERS FOR ALL FEATURES =====
+document.addEventListener('DOMContentLoaded', function() {
+  // Add logout button event listener
+  const logoutBtn = document.getElementById('logoutBtn');
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', handleLogout);
+  }
+
+  // Search functionality
+  $('#allSearch')?.addEventListener('input', () => {
+    allPage = 1; // Reset to page 1 when searching
+    renderFilteredMembers('all');
+  });
+  $('#paidSearch')?.addEventListener('input', () => {
+    paidPage = 1; // Reset to page 1 when searching
+    renderFilteredMembers('paid');
+  });
+  $('#unpaidSearch')?.addEventListener('input', () => {
+    unpaidPage = 1; // Reset to page 1 when searching
+    renderFilteredMembers('unpaid');
+  });
+  
+  // Paid member filter options
+  $('#paidFeeMembership')?.addEventListener('change', () => {
+    paidPage = 1; // Reset to page 1 when changing filters
+    renderFilteredMembers('paid');
+  });
+  $('#paidFeeCertificate')?.addEventListener('change', () => {
+    paidPage = 1; // Reset to page 1 when changing filters
+    renderFilteredMembers('paid');
+  });
+  $('#paidFeeIdcard')?.addEventListener('change', () => {
+    paidPage = 1; // Reset to page 1 when changing filters
+    renderFilteredMembers('paid');
+  });
+  $('#paidLogicAll')?.addEventListener('change', () => {
+    paidPage = 1; // Reset to page 1 when changing filters
+    renderFilteredMembers('paid');
+  });
+  
+  // Export functionality
+  $('#btnExportAll')?.addEventListener('click', () => handleExport('all'));
+  $('#btnExportPaid')?.addEventListener('click', () => handleExport('paid'));
+  $('#btnExportUnpaid')?.addEventListener('click', () => handleExport('unpaid'));
+  
+  // Reload buttons with loading states
+  $('#btnReloadAll')?.addEventListener('click', async () => {
+    showButtonLoading($('#btnReloadAll'), 'Reloading...');
+    await loadMembersSimple('all');
+    hideButtonLoading($('#btnReloadAll'));
+  });
+  
+  $('#btnReloadPaid')?.addEventListener('click', async () => {
+    showButtonLoading($('#btnReloadPaid'), 'Reloading...');
+    await loadMembersSimple('paid');
+    hideButtonLoading($('#btnReloadPaid'));
+  });
+  
+  $('#btnReloadUnpaid')?.addEventListener('click', async () => {
+    showButtonLoading($('#btnReloadUnpaid'), 'Reloading...');
+    await loadMembersSimple('unpaid');
+    hideButtonLoading($('#btnReloadUnpaid'));
+  });
+  
+  // Setup missing functionality
+  setupFormResetButtons();
+  setupAutoSlugGeneration();
+  enhanceFormSubmissions();
+  setupPaginationHandlers(); // Setup pagination handlers
+  
+  // Add reset button handler for slider form
+  $('#resetSliderForm')?.addEventListener('click', () => resetForm('#form-slider'));
+  
+  // Form submissions
+  $('#form-home-about')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    try {
+      const fd = new FormData(e.target);
+      const payload = {
+        about: {
+          title: fd.get('about.title') || '',
+          headline: fd.get('about.headline') || '',
+          paragraphs: (fd.get('about.paragraphs') || '')
+            .replace(/\r\n/g, '\n')
+            .split('\n')
+            .map(s => s.trim())
+            .filter(Boolean),
+          image: document.getElementById('aboutImageUrl')?.value || ''
+        }
+      };
+      const res = await authFetch(`${API_BASE}/settings/home`, json({ method: 'PUT', body: JSON.stringify(payload) }));
+      $('#aboutStatus') && ($('#aboutStatus').textContent = res.ok ? 'Saved.' : 'Failed.');
+      if (res.ok) loadHomeSettings();
+    } catch (err) {
+      console.error('About save error:', err);
+      $('#aboutStatus') && ($('#aboutStatus').textContent = 'Failed.');
+    }
+  });
+
+  $('#form-home-sections')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    try {
+      const fd = new FormData(e.target);
+      const payload = {
+        services: { title: fd.get('services.title') || '', subtitle: fd.get('services.subtitle') || '' },
+        projects: { title: fd.get('projects.title') || '', subtitle: fd.get('projects.subtitle') || '' },
+        features: { title: fd.get('features.title') || '', headline: fd.get('features.headline') || '' },
+        offer: { title: fd.get('offer.title') || '' },
+        blog: { title: fd.get('blog.title') || '', showCount: Number(fd.get('blog.showCount') || 3) || 3 },
+        faqs: { title: fd.get('faqs.title') || '', image: document.getElementById('faqsImageUrl')?.value || '' },
+        team: { title: fd.get('team.title') || '' }
+      };
+      const res = await authFetch(`${API_BASE}/settings/home`, json({ method: 'PUT', body: JSON.stringify(payload) }));
+      $('#sectionsStatus') && ($('#sectionsStatus').textContent = res.ok ? 'Saved.' : 'Failed.');
+      if (res.ok) loadHomeSettings();
+    } catch (err) {
+      console.error('Sections save error:', err);
+      $('#sectionsStatus') && ($('#sectionsStatus').textContent = 'Failed.');
+    }
+  });
+
+  // Generic CRUD form submissions
+  Object.keys(resources).forEach(key => {
+    const formSel = resources[key].form;
+    document.querySelector(formSel)?.addEventListener('submit', (e) => createOrUpdate(e, key));
+  });
+
+  // Edit and delete buttons
+  document.body.addEventListener('click', async (e) => {
+    const editBtn = e.target.closest?.('[data-edit]');
+    const delBtn = e.target.closest?.('[data-del]');
+    if (editBtn) {
+      const key = editBtn.getAttribute('data-edit');
+      const id = editBtn.getAttribute('data-id');
+      const cfg = resources[key];
+      if (!cfg) return;
+      const res = await authFetch(`${API_BASE}${cfg.endpoint}/${id}`);
+      if (!res?.ok) return;
+      const item = await res.json();
+      fillFormFromItem(cfg.form, item);
+    }
+    if (delBtn) {
+      const key = delBtn.getAttribute('data-del');
+      const id = delBtn.getAttribute('data-id');
+      deleteItem(key, id);
+    }
+  });
 });
 
-document.body.addEventListener('click', async (e) => {
-  const editBtn = e.target.closest?.('[data-edit]');
-  const delBtn = e.target.closest?.('[data-del]');
-  if (editBtn) {
-    const key = editBtn.getAttribute('data-edit');
-    const id = editBtn.getAttribute('data-id');
-    const cfg = resources[key];
-    if (!cfg) return;
-    const res = await authFetch(`${API_BASE}${cfg.endpoint}/${id}`);
-    if (!res?.ok) return;
-    const item = await res.json();
-    fillFormFromItem(cfg.form, item);
-  }
-  if (delBtn) {
-    const key = delBtn.getAttribute('data-del');
-    const id = delBtn.getAttribute('data-id');
-    deleteItem(key, id);
-  }
-});
+// ===== MISSING MEMBER LOADING FUNCTIONS =====
+function loadAllMembers() {
+  return loadMembersSimple('all');
+}
+
+function loadPaidMembers() {
+  return loadMembersSimple('paid');
+}
+
+function loadUnpaidMembers() {
+  return loadMembersSimple('unpaid');
+}
 
 // ===== INITIAL LOADS =====
 loadHomeSettings();
 Object.keys(resources).forEach(loadList);
-loadMembersSimple('all');
-loadMembersSimple('paid');
-loadMembersSimple('unpaid');
 
-// ===== HELPER FUNCTIONS =====
-function summarizePaidFlags(item) {
-  const flags = {
-    membership: item?.membershipPaid || false,
-    certificate: item?.certificatePaid || false,
-    idcard: item?.idCardPaid || false
-  };
-  
-  // Check for alternative field names
-  if (typeof item?.paidFlags === 'object') {
-    flags.membership = flags.membership || item.paidFlags.membership || false;
-    flags.certificate = flags.certificate || item.paidFlags.certificate || false;
-    flags.idcard = flags.idcard || item.paidFlags.idcard || false;
-  }
-  
-  return flags;
-}
-
-function unpaidListFromFlags(flags) {
-  const unpaid = [];
-  if (!flags.membership) unpaid.push('Membership');
-  if (!flags.certificate) unpaid.push('Certificate');
-  if (!flags.idcard) unpaid.push('ID Card');
-  return unpaid.length ? unpaid.join(', ') : 'All paid';
-}
-
+// Load members when tabs are shown
+document.getElementById('tab-members-all')?.addEventListener('shown.bs.tab', loadAllMembers);
+document.getElementById('tab-members-paid')?.addEventListener('shown.bs.tab', loadPaidMembers);
+document.getElementById('tab-members-unpaid')?.addEventListener('shown.bs.tab', loadUnpaidMembers);
 </script>
-
 </body>
 </html>

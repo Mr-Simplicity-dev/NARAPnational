@@ -31,6 +31,7 @@ import memberRoutes from './src/routes/member.js'; // singular
 import registrationsRoutes from './src/routes/members.js'; // plural
 import paidRoutes from './src/routes/paid.js';
 import unpaidRoutes from './src/routes/unpaid.js';
+import membersRoutes from './src/routes/members.js';
 
 
 const app = express();
@@ -184,7 +185,8 @@ app.use('/api/payments', paymentRoutes);
 app.use('/api/member', memberRoutes); // This handles /api/member/profile
 
 // Admin routes
-app.use('/api/members', requireAuth, requireAdmin, registrationsRoutes);
+// Fix the members route - use the main implementation
+app.use('/api/members', requireAuth, requireAdmin, membersRoutes);
 app.use('/api/members/paid', requireAuth, requireAdmin, paidRoutes);
 app.use('/api/members/unpaid', requireAuth, requireAdmin, unpaidRoutes);
 
