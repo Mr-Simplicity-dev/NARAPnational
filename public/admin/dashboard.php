@@ -651,18 +651,7 @@ if (container.dataset.initialized === 'true') {
 }
 container.dataset.initialized = 'true';
 
-// Container click handler - FIXED VERSION
-container.addEventListener('click', function(e) {
-  // Allow button clicks with onclick handlers to work
-  if (e.target.tagName === 'INPUT') {
-    return;
-  }
-  
-  // Only prevent clicks on buttons WITHOUT onclick handlers
-  if (e.target.tagName === 'BUTTON' && !e.target.hasAttribute('onclick')) {
-    return;
-  }
-  
+
   // Allow container clicks and drag-drop area clicks
   if (e.target === container || 
       e.target.closest('.upload-placeholder') || 
