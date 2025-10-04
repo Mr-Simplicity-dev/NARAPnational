@@ -624,6 +624,7 @@ const activeUploads = new Map();
 
 
 // Add debugging and ensure proper initialization
+// Add debugging and ensure proper initialization
 function initializeImageUploads() {
   console.log('Initializing image uploads...');
   
@@ -639,7 +640,7 @@ function initializeImageUploads() {
   
   if (containers.length === 0) {
     console.log('No image upload containers found yet, will retry...');
-    return false; // Return false to indicate not all containers are ready
+    return false;
   }
   
   containers.forEach(container => {
@@ -666,12 +667,15 @@ function initializeImageUploads() {
     }
     container.dataset.initialized = 'true';
 
-    // Container click handler
+    // Container click handler - FIXED: Remove the manual button click handlers
     container.addEventListener('click', function(e) {
-      // Allow container clicks and drag-drop area clicks
+      // Prevent the click from bubbling to parent elements
+      e.stopPropagation();
+      
+      // Allow container clicks and drag-drop area clicks, but NOT the buttons
       if (e.target === container || 
           e.target.closest('.upload-placeholder') || 
-          e.target.classList.contains('fa-cloud-upload-alt')) {
+          (e.target.classList && e.target.classList.contains('fa-cloud-upload-alt'))) {
         console.log('Container clicked, triggering file input for:', target);
         fileInput.click();
       }
@@ -680,7 +684,9 @@ function initializeImageUploads() {
     // File input change handler
     fileInput.addEventListener('change', function(e) {
       console.log('File input changed for:', target);
-      handleFileSelection(this.files[0], target);
+      if (this.files && this.files[0]) {
+        handleFileSelection(this.files[0], target);
+      }
     });
 
     // Drag and drop handlers
@@ -696,7 +702,6 @@ function initializeImageUploads() {
     container.addEventListener('dragleave', function(e) {
       e.preventDefault();
       e.stopPropagation();
-      // Only reset if not dragging over child elements
       if (!container.contains(e.relatedTarget)) {
         resetContainerStyle(container);
       }
@@ -720,7 +725,6 @@ function initializeImageUploads() {
   console.log('Image uploads initialization complete');
   return true;
 }
-
 // Helper function to reset container styling
 function resetContainerStyle(container) {
   container.style.borderColor = '#dee2e6';
@@ -913,35 +917,87 @@ function setImageFromUrl(target, url) {
 }
 
 // Initialize when DOM is loaded - WITH RETRY MECHANISM
+// Initialize when DOM is loaded - WITH RETRY MECHANISM
+// Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
-  console.log('DOM loaded, initializing image uploads...');
+  console.log('DOM loaded, initializing all functionality...');
   
-  // Initial attempt with a small delay
-  setTimeout(() => {
-    if (!initializeImageUploads()) {
-      // If containers weren't found, retry after a longer delay
-      console.log('Retrying image upload initialization...');
-      setTimeout(() => {
-        initializeImageUploads();
-      }, 500);
-    }
-  }, 100);
+  // Initialize image uploads
+  initializeImageUploads();
   
-  // Also initialize when tabs are shown (for dynamic content)
+  // Fix inline onclick handlers (replaces setupImageUploadButtons)
+  fixInlineHandlers();
+  
+  // Also initialize when tabs are shown
   document.querySelectorAll('[data-bs-toggle="tab"]').forEach(tab => {
     tab.addEventListener('shown.bs.tab', function() {
-      console.log('Tab shown, checking image uploads...');
+      console.log('Tab shown, reinitializing...');
       setTimeout(() => {
-        if (!imageUploadsInitialized) {
-          initializeImageUploads();
-        } else {
-          // Re-initialize any new containers that might have been added
-          reinitializeNewImages();
-        }
-      }, 50);
+        initializeImageUploads();
+        fixInlineHandlers(); // Also fix handlers for any new content in tabs
+      }, 100);
     });
   });
 });
+// Setup manual button handlers as fallback
+function setupManualImageUploadButtons() {
+  // Add click handlers to all "Choose Image" buttons
+  document.querySelectorAll('.btn-outline-primary').forEach(button => {
+    if (button.textContent.includes('Choose Image')) {
+      button.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        // Find the file input associated with this button
+        const container = this.closest('.col-md-6, .col-md-8');
+        if (container) {
+          const fileInput = container.querySelector('input[type="file"]');
+          if (fileInput) {
+            console.log('Manual button click, triggering file input');
+            fileInput.click();
+          }
+        }
+      });
+    }
+  });
+}
+
+// Quick fix: Convert inline onclick handlers to event listeners
+function fixInlineHandlers() {
+  console.log('Fixing inline onclick handlers...');
+  
+  // Find all buttons with onclick handlers and convert them
+  document.querySelectorAll('button[onclick*="click()"]').forEach(button => {
+    const onclick = button.getAttribute('onclick');
+    if (onclick && onclick.includes('getElementById') && onclick.includes('click()')) {
+      // Extract the target from the onclick string
+      const match = onclick.match(/getElementById\('([^']+)Upload'\)/);
+      if (match) {
+        const target = match[1];
+        button.removeAttribute('onclick');
+        button.setAttribute('data-target', target);
+        console.log('Fixed onclick handler for:', target);
+      }
+    }
+  });
+  
+  document.querySelectorAll('button[onclick*="clearImageUpload"]').forEach(button => {
+    const onclick = button.getAttribute('onclick');
+    if (onclick && onclick.includes('clearImageUpload')) {
+      // Extract the target from the onclick string
+      const match = onclick.match(/clearImageUpload\('([^']+)'\)/);
+      if (match) {
+        const target = match[1];
+        button.removeAttribute('onclick');
+        button.setAttribute('data-clear', target);
+        console.log('Fixed clear handler for:', target);
+      }
+    }
+  });
+  
+  // Now setup the event listeners
+  setupImageUploadButtons();
+}
 
 
 // Re-initialize only for newly added content
