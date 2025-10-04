@@ -637,65 +637,67 @@ function initializeImageUploads() {
     console.log('Setting up:', target);
     
     const fileInput = document.getElementById(`${target}Upload`);
-const preview = document.getElementById(`${target}Preview`);
-const urlInput = document.getElementById(`${target}Url`);
+    const preview = document.getElementById(`${target}Preview`);
+    const urlInput = document.getElementById(`${target}Url`);
 
-if (!fileInput || !preview || !urlInput) {
-  console.warn(`Missing elements for target: ${target}`);
-  return;
-}
+    if (!fileInput || !preview || !urlInput) {
+      console.warn(`Missing elements for target: ${target}`);
+      return;
+    }
 
-// Mark elements as initialized to prevent re-attachment
-if (container.dataset.initialized === 'true') {
-  return;
-}
-container.dataset.initialized = 'true';
+    // Mark elements as initialized to prevent re-attachment
+    if (container.dataset.initialized === 'true') {
+      return;
+    }
+    container.dataset.initialized = 'true';
 
+    // Container click handler - FIXED VERSION
+    container.addEventListener('click', function(e) {
+      // Allow container clicks and drag-drop area clicks
+      if (e.target === container || 
+          e.target.closest('.upload-placeholder') || 
+          e.target.classList.contains('fa-cloud-upload-alt')) {
+        console.log('Container clicked, triggering file input for:', target);
+        fileInput.click();
+      }
+    });
 
-  // Allow container clicks and drag-drop area clicks
-  if (e.target === container || 
-      e.target.closest('.upload-placeholder') || 
-      e.target.classList.contains('fa-cloud-upload-alt')) {
-    console.log('Container clicked, triggering file input for:', target);
-    fileInput.click();
-  }
-});
+    // File input change handler
+    fileInput.addEventListener('change', function(e) {
+      console.log('File input changed for:', target);
+      handleFileSelection(this.files[0], target);
+    });
 
-// File input change handler
-fileInput.addEventListener('change', function(e) {
-  console.log('File input changed for:', target);
-  handleFileSelection(this.files[0], target);
-});
+    // Drag and drop handlers
+    ['dragover', 'dragenter'].forEach(eventName => {
+      container.addEventListener(eventName, function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        container.style.borderColor = '#0a7f41';
+        container.style.backgroundColor = '#e8f5e8';
+      });
+    });
 
-// Drag and drop handlers
-['dragover', 'dragenter'].forEach(eventName => {
-  container.addEventListener(eventName, function(e) {
-    e.preventDefault();
-    e.stopPropagation();
-    container.style.borderColor = '#0a7f41';
-    container.style.backgroundColor = '#e8f5e8';
+    container.addEventListener('dragleave', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      // Only reset if not dragging over child elements
+      if (!container.contains(e.relatedTarget)) {
+        resetContainerStyle(container);
+      }
+    });
+
+    container.addEventListener('drop', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      resetContainerStyle(container);
+      
+      if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+        console.log('File dropped for:', target);
+        handleFileSelection(e.dataTransfer.files[0], target);
+      }
+    });
   });
-});
-
-container.addEventListener('dragleave', function(e) {
-  e.preventDefault();
-  e.stopPropagation();
-  // Only reset if not dragging over child elements
-  if (!container.contains(e.relatedTarget)) {
-    resetContainerStyle(container);
-  }
-});
-
-container.addEventListener('drop', function(e) {
-  e.preventDefault();
-  e.stopPropagation();
-  resetContainerStyle(container);
-  
-  if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-    console.log('File dropped for:', target);
-    handleFileSelection(e.dataTransfer.files[0], target);
-  }
-});
   
   imageUploadsInitialized = true;
   console.log('Image uploads initialization complete');
