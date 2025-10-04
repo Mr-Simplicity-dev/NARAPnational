@@ -653,18 +653,20 @@ container.dataset.initialized = 'true';
 
 // Container click handler - FIXED VERSION
 container.addEventListener('click', function(e) {
-  // Only trigger file input if clicking on the container itself or upload placeholder
-  // Don't trigger if clicking on buttons, inputs, or other interactive elements
-  if (e.target.tagName === 'INPUT' || 
-      (e.target.tagName === 'BUTTON' && !e.target.onclick) ||
-      e.target.closest('button:not([onclick])')) {
+  // Allow button clicks with onclick handlers to work
+  if (e.target.tagName === 'INPUT') {
     return;
   }
   
-  // Allow clicks on the container, placeholder, or icons to trigger file input
+  // Only prevent clicks on buttons WITHOUT onclick handlers
+  if (e.target.tagName === 'BUTTON' && !e.target.hasAttribute('onclick')) {
+    return;
+  }
+  
+  // Allow container clicks and drag-drop area clicks
   if (e.target === container || 
       e.target.closest('.upload-placeholder') || 
-      e.target.classList.contains('fas')) {
+      e.target.classList.contains('fa-cloud-upload-alt')) {
     console.log('Container clicked, triggering file input for:', target);
     fileInput.click();
   }
