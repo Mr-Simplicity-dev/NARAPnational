@@ -1,9 +1,13 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
+   <meta charset="utf-8" />
   <title>NARAP Admin Dashboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  
+  <!-- ADD THIS CSP META TAG -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; font-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net data:; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data: https:; connect-src 'self'">
+  
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
@@ -22,6 +26,18 @@
     .image-preview { max-width: 200px; max-height: 150px; margin: 10px auto; display: none; }
     .upload-placeholder { color: #6c757d; }
     .notification { position: fixed; top: 20px; right: 20px; z-index: 1050; min-width: 300px; }
+  
+  .image-upload-container {
+  cursor: pointer;
+  position: relative;
+}
+
+.image-upload-container .btn {
+  cursor: pointer;
+  position: relative;
+  z-index: 10;
+}
+
   </style>
 </head>
 <body>
@@ -591,129 +607,172 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-// ===== IMAGE UPLOAD FUNCTIONALITY =====
 
-// Initialize all image upload components
+
+
+
+// ===== IMAGE UPLOAD FUNCTIONALITY - FIXED VERSION =====
+
+// ===== IMPROVED IMAGE UPLOAD FUNCTIONALITY - NO DUPLICATE LISTENERS =====
+
+// Global flag to prevent multiple initializations
+let imageUploadsInitialized = false;
+
+// Store active upload references to prevent duplicates
+const activeUploads = new Map();
+
+// Initialize all image upload components - ONLY ONCE
 function initializeImageUploads() {
+  // Prevent multiple initializations
+  if (imageUploadsInitialized) {
+    console.log('Image uploads already initialized, skipping...');
+    return;
+  }
+  
+  console.log('Initializing image uploads...');
+  
   // Set up all image upload containers
   document.querySelectorAll('.image-upload-container').forEach(container => {
     const target = container.getAttribute('data-target');
+    console.log('Setting up:', target);
+    
     const fileInput = document.getElementById(`${target}Upload`);
     const preview = document.getElementById(`${target}Preview`);
     const urlInput = document.getElementById(`${target}Url`);
     
-    if (!fileInput || !preview || !urlInput) return;
+    if (!fileInput || !preview || !urlInput) {
+      console.warn(`Missing elements for target: ${target}`);
+      return;
+    }
     
-    // Click handler for the container
+    // Mark elements as initialized to prevent re-attachment
+    if (container.dataset.initialized === 'true') {
+      return;
+    }
+    container.dataset.initialized = 'true';
+    
+    // Container click handler - using event delegation
     container.addEventListener('click', function(e) {
-      if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'BUTTON') {
-        fileInput.click();
+      // Don't trigger file input if clicking on buttons or inputs
+      if (e.target.tagName === 'BUTTON' || e.target.tagName === 'INPUT' || e.target.closest('button')) {
+        return;
       }
+      console.log('Container clicked, triggering file input for:', target);
+      fileInput.click();
     });
     
     // File input change handler
     fileInput.addEventListener('change', function(e) {
-      if (this.files && this.files[0]) {
-        const file = this.files[0];
-        
-        // Validate file type
-        if (!file.type.match('image.*')) {
-          showNotification('Please select a valid image file (PNG, JPG, GIF)', 'error');
-          return;
-        }
-        
-        // Validate file size (5MB)
-        if (file.size > 5 * 1024 * 1024) {
-          showNotification('Image must be less than 5MB', 'error');
-          return;
-        }
-        
-        // Show preview
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          preview.src = e.target.result;
-          preview.style.display = 'block';
-          container.querySelector('.upload-placeholder').style.display = 'none';
-        };
-        reader.readAsDataURL(file);
-        
-        // Upload the file
-        uploadImage(file, target);
-      }
+      console.log('File input changed for:', target);
+      handleFileSelection(this.files[0], target);
     });
     
-    // Drag and drop functionality
-    container.addEventListener('dragover', function(e) {
-      e.preventDefault();
-      container.style.borderColor = '#0a7f41';
-      container.style.backgroundColor = '#e8f5e8';
+    // Drag and drop handlers
+    ['dragover', 'dragenter'].forEach(eventName => {
+      container.addEventListener(eventName, function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        container.style.borderColor = '#0a7f41';
+        container.style.backgroundColor = '#e8f5e8';
+      });
     });
     
     container.addEventListener('dragleave', function(e) {
       e.preventDefault();
-      container.style.borderColor = '#dee2e6';
-      container.style.backgroundColor = '#f8f9fa';
+      e.stopPropagation();
+      // Only reset if not dragging over child elements
+      if (!container.contains(e.relatedTarget)) {
+        resetContainerStyle(container);
+      }
     });
     
     container.addEventListener('drop', function(e) {
       e.preventDefault();
-      container.style.borderColor = '#dee2e6';
-      container.style.backgroundColor = '#f8f9fa';
+      e.stopPropagation();
+      resetContainerStyle(container);
       
       if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-        fileInput.files = e.dataTransfer.files;
-        const event = new Event('change');
-        fileInput.dispatchEvent(event);
+        console.log('File dropped for:', target);
+        handleFileSelection(e.dataTransfer.files[0], target);
       }
     });
   });
+  
+  imageUploadsInitialized = true;
+  console.log('Image uploads initialization complete');
 }
 
-// Upload image to server
-async function uploadImage(file, target) {
-  try {
-    showNotification(`Uploading ${file.name}...`, 'info');
-    
-    const formData = new FormData();
-    formData.append('image', file);
-    
-    const token = localStorage.getItem('jwt');
-    if (!token) {
-      throw new Error('Not authenticated');
-    }
-    
-    const response = await fetch('/api/upload', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`
-      },
-      body: formData
-    });
-    
-    if (!response.ok) {
-      throw new Error(`Upload failed: ${response.statusText}`);
-    }
-    
-    const result = await response.json();
-    
-    if (result.success && result.url) {
-      // Set the URL in the hidden input
-      document.getElementById(`${target}Url`).value = result.url;
-      showNotification('Image uploaded successfully!', 'success');
-    } else {
-      throw new Error(result.message || 'Upload failed');
-    }
-  } catch (error) {
-    console.error('Image upload error:', error);
-    showNotification(`Upload failed: ${error.message}`, 'error');
-    
-    // Reset the file input and preview
-    clearImageUpload(target);
+// Helper function to reset container styling
+function resetContainerStyle(container) {
+  container.style.borderColor = '#dee2e6';
+  container.style.backgroundColor = '#f8f9fa';
+}
+
+// Handle file selection with improved validation and feedback
+function handleFileSelection(file, target) {
+  if (!file) return;
+  
+  // Check if there's already an upload in progress for this target
+  if (activeUploads.has(target)) {
+    showNotification(`Upload already in progress for ${target}`, 'warning');
+    return;
   }
+  
+  // Validate file type
+  const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+  if (!validTypes.includes(file.type)) {
+    showNotification('Please select a valid image file (PNG, JPG, GIF, WEBP)', 'error');
+    return;
+  }
+  
+  // Validate file size (5MB)
+  const maxSize = 5 * 1024 * 1024;
+  if (file.size > maxSize) {
+    showNotification(`Image must be less than 5MB (current: ${(file.size / 1024 / 1024).toFixed(2)}MB)`, 'error');
+    return;
+  }
+  
+  // Show preview immediately
+  showImagePreview(file, target);
+  
+  // Upload the file
+  uploadImage(file, target);
 }
 
-// Clear image upload
+// Show image preview
+function showImagePreview(file, target) {
+  const preview = document.getElementById(`${target}Preview`);
+  const container = document.querySelector(`[data-target="${target}"]`);
+  
+  if (!preview || !container) return;
+  
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    preview.src = e.target.result;
+    preview.style.display = 'block';
+    
+    const placeholder = container.querySelector('.upload-placeholder');
+    if (placeholder) {
+      placeholder.style.display = 'none';
+    }
+  };
+  reader.onerror = function() {
+    showNotification('Failed to read image file', 'error');
+  };
+  reader.readAsDataURL(file);
+}
+
+// Clear image upload - IMPROVED
 function clearImageUpload(target) {
+  console.log('Clearing image upload for:', target);
+  
+  // Cancel any active upload
+  if (activeUploads.has(target)) {
+    const controller = activeUploads.get(target);
+    controller.abort();
+    activeUploads.delete(target);
+  }
+  
   const fileInput = document.getElementById(`${target}Upload`);
   const preview = document.getElementById(`${target}Preview`);
   const urlInput = document.getElementById(`${target}Url`);
@@ -726,28 +785,142 @@ function clearImageUpload(target) {
   }
   if (urlInput) urlInput.value = '';
   if (container) {
-    container.querySelector('.upload-placeholder').style.display = 'block';
+    const placeholder = container.querySelector('.upload-placeholder');
+    if (placeholder) {
+      placeholder.style.display = 'block';
+    }
+  }
+  
+  showNotification('Image cleared', 'info');
+}
+
+// Upload image to server with improved error handling and progress tracking
+async function uploadImage(file, target) {
+  // Create abort controller for this upload
+  const controller = new AbortController();
+  activeUploads.set(target, controller);
+  
+  try {
+    showNotification(`Uploading ${file.name}...`, 'info');
+    
+    const formData = new FormData();
+    formData.append('image', file);
+    
+    const token = localStorage.getItem('jwt');
+    if (!token) {
+      throw new Error('Not authenticated. Please log in again.');
+    }
+    
+    const response = await fetch('/api/upload', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      },
+      body: formData,
+      signal: controller.signal
+    });
+    
+    // Remove from active uploads
+    activeUploads.delete(target);
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Upload failed (${response.status}): ${errorText || response.statusText}`);
+    }
+    
+    const result = await response.json();
+    
+    if (result.success && result.url) {
+      // Set the URL in the hidden input
+      const urlInput = document.getElementById(`${target}Url`);
+      if (urlInput) {
+        urlInput.value = result.url;
+        showNotification('Image uploaded successfully!', 'success');
+      } else {
+        throw new Error('URL input field not found');
+      }
+    } else {
+      throw new Error(result.message || 'Upload failed - no URL returned');
+    }
+    
+  } catch (error) {
+    activeUploads.delete(target);
+    
+    if (error.name === 'AbortError') {
+      console.log('Upload cancelled for:', target);
+      showNotification('Upload cancelled', 'info');
+    } else {
+      console.error('Image upload error:', error);
+      showNotification(`Upload failed: ${error.message}`, 'error');
+      
+      // Reset the file input and preview on error
+      clearImageUpload(target);
+    }
   }
 }
 
-// Set image from URL (for editing)
+// Set image from URL (for editing) - IMPROVED
 function setImageFromUrl(target, url) {
+  if (!url) return;
+  
   const preview = document.getElementById(`${target}Preview`);
   const urlInput = document.getElementById(`${target}Url`);
   const container = document.querySelector(`[data-target="${target}"]`);
   
-  if (url && preview && urlInput && container) {
+  if (!preview || !urlInput || !container) {
+    console.warn(`Cannot set image for ${target} - missing elements`);
+    return;
+  }
+  
+  // Set the URL first
+  urlInput.value = url;
+  
+  // Create a new image to test if URL is valid
+  const testImg = new Image();
+  testImg.onload = function() {
     preview.src = url;
     preview.style.display = 'block';
-    urlInput.value = url;
-    container.querySelector('.upload-placeholder').style.display = 'none';
-  }
+    
+    const placeholder = container.querySelector('.upload-placeholder');
+    if (placeholder) {
+      placeholder.style.display = 'none';
+    }
+  };
+  testImg.onerror = function() {
+    console.error(`Failed to load image from URL: ${url}`);
+    showNotification('Failed to load image from URL', 'warning');
+  };
+  testImg.src = url;
 }
 
-// Notification system
+// Initialize when DOM is loaded - ONLY ONCE
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('DOM loaded, initializing image uploads...');
+  // Small delay to ensure all dynamic content is loaded
+  setTimeout(() => {
+    initializeImageUploads();
+  }, 100);
+});
+
+// Re-initialize only for newly added content (not for tab switches)
+// This is more efficient and prevents duplicate listeners
+function reinitializeNewImages() {
+  // Only initialize containers that haven't been initialized yet
+  document.querySelectorAll('.image-upload-container:not([data-initialized="true"])').forEach(container => {
+    const target = container.getAttribute('data-target');
+    console.log('Initializing new container:', target);
+    // Call initialization for this specific container
+    // This would need the initialization logic extracted into a separate function
+  });
+}
+
+// Notification system - IMPROVED
 function showNotification(message, type = 'info') {
   const notificationArea = document.getElementById('notificationArea');
-  if (!notificationArea) return;
+  if (!notificationArea) {
+    console.warn('Notification area not found');
+    return;
+  }
   
   const alertClass = {
     'success': 'alert-success',
@@ -756,9 +929,17 @@ function showNotification(message, type = 'info') {
     'info': 'alert-info'
   }[type] || 'alert-info';
   
+  const icon = {
+    'success': 'fa-check-circle',
+    'error': 'fa-exclamation-circle',
+    'warning': 'fa-exclamation-triangle',
+    'info': 'fa-info-circle'
+  }[type] || 'fa-info-circle';
+  
   const notification = document.createElement('div');
   notification.className = `alert ${alertClass} alert-dismissible fade show`;
   notification.innerHTML = `
+    <i class="fas ${icon} me-2"></i>
     ${message}
     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
   `;
@@ -768,15 +949,23 @@ function showNotification(message, type = 'info') {
   // Auto remove after 5 seconds
   setTimeout(() => {
     if (notification.parentNode) {
-      notification.remove();
+      notification.classList.remove('show');
+      setTimeout(() => notification.remove(), 150);
     }
   }, 5000);
 }
 
-// Initialize when DOM is loaded
-document.addEventListener('DOMContentLoaded', function() {
-  initializeImageUploads();
-});
+// Cleanup function to cancel all active uploads (call on logout/page unload)
+function cleanupUploads() {
+  activeUploads.forEach((controller, target) => {
+    console.log('Cancelling upload for:', target);
+    controller.abort();
+  });
+  activeUploads.clear();
+}
+
+// Call cleanup on page unload
+window.addEventListener('beforeunload', cleanupUploads);
 
 // ===== BASIC AUTHENTICATION CHECK =====
 const token = localStorage.getItem('jwt');
@@ -788,6 +977,7 @@ if (!token) {
 const API_BASE = '/api';
 
 // Auth fetch function
+// Auth fetch function
 async function authFetch(url, options = {}) {
   const token = localStorage.getItem('jwt');
   if (!token) {
@@ -796,14 +986,30 @@ async function authFetch(url, options = {}) {
     return;
   }
   
-  return fetch(url, {
-    ...options,
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json',
-      ...options.headers
+  try {
+    const response = await fetch(url, {
+      ...options,
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+        ...options.headers
+      }
+    });
+
+    // Handle token expiration
+    if (response.status === 401 || response.status === 403) {
+      console.warn('Token expired or invalid. Redirecting to login...');
+      localStorage.removeItem('jwt');
+      sessionStorage.clear();
+      window.location.href = '/admin/login.php';
+      return;
     }
-  });
+
+    return response;
+  } catch (error) {
+    console.error('AuthFetch error:', error);
+    throw error;
+  }
 }
 
 // ===== SAFE HELPERS =====
@@ -1187,6 +1393,23 @@ async function handleLogout() {
       logoutBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Logging out...';
     }
 
+    // Call server logout API first
+    const token = localStorage.getItem('jwt');
+    if (token) {
+      try {
+        await fetch('/api/auth/logout', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+      } catch (error) {
+        console.warn('Server logout failed:', error);
+        // Continue with client cleanup anyway
+      }
+    }
+
     // Clear all authentication data
     localStorage.removeItem('jwt');
     sessionStorage.clear();
@@ -1198,7 +1421,7 @@ async function handleLogout() {
       document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`;
     });
 
-    // Immediate redirect to login page
+    // Redirect to login page
     window.location.href = '/admin/login.php';
 
   } catch (error) {

@@ -27,12 +27,10 @@ import requireAdmin from './src/middleware/requireAdmin.js';
 import eventRoutes from './src/routes/events.js';
 import commentRoutes from './src/routes/comments.js';
 import paymentRoutes from './src/routes/payments.js';
-import memberRoutes from './src/routes/member.js'; // singular
-import registrationsRoutes from './src/routes/members.js'; // plural
+import memberRoutes from './src/routes/member.js'; // singular - individual member operations
+import membersRoutes from './src/routes/members.js'; // plural - admin member management
 import paidRoutes from './src/routes/paid.js';
 import unpaidRoutes from './src/routes/unpaid.js';
-import membersRoutes from './src/routes/members.js';
-
 
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
@@ -163,7 +161,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
 // Map legacy PHP links to single-page anchors
 app.get('/about.php', (req, res) => res.redirect('/#about'));
 
-// APIs - FIXED ROUTES
+// APIs - Public routes (no authentication required)
 app.use('/api/auth', authRoutes);
 app.use('/api/blogs', blogRoutes);
 app.use('/api/services', serviceRoutes);
@@ -181,17 +179,16 @@ app.use('/api/events', eventRoutes);
 app.use('/api/comments', commentRoutes);
 app.use('/api/payments', paymentRoutes);
 
-// Member routes - ONLY ONCE
+// Member routes - Individual member operations (authentication required but not admin)
 app.use('/api/member', memberRoutes); // This handles /api/member/profile
 
-// Admin routes
-// Fix the members route - use the main implementation
-app.use('/api/members', requireAuth, requireAdmin, membersRoutes);
+// Admin routes - Require authentication and admin role
+app.use('/api/members', requireAuth, requireAdmin, membersRoutes); // Admin member management
 app.use('/api/members/paid', requireAuth, requireAdmin, paidRoutes);
 app.use('/api/members/unpaid', requireAuth, requireAdmin, unpaidRoutes);
 
-// Health
-app.get('/healthz', (_req,res)=>res.json({ ok:true }));
+// Health check
+app.get('/healthz', (_req, res) => res.json({ ok: true }));
 
 // Global error handler
 app.use((err, req, res, next) => {

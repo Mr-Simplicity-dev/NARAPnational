@@ -21,8 +21,9 @@ router.get('/', async (req, res) => {
       return res.status(500).json({ message: 'User model not available' });
     }
     
+    // Simplified role query - only search for 'member' role
     const members = await User.find({ 
-      role: { $in: ['member', 'user', 'registrant'] } 
+      role: 'member'
     })
     .select('-password -__v')
     .sort({ createdAt: -1 })
@@ -33,7 +34,7 @@ router.get('/', async (req, res) => {
     // Format response for admin dashboard
     const formattedMembers = members.map(member => ({
       _id: member._id,
-      name: member.name || `${member.firstName} ${member.lastName}`.trim() || 'Unknown',
+      name: member.name || `${member.firstName || ''} ${member.lastName || ''}`.trim() || 'Unknown',
       email: member.email || '',
       memberId: member.memberId || member.memberCode || 'N/A',
       state: member.state || '',
@@ -54,13 +55,11 @@ router.get('/', async (req, res) => {
   }
 });
 
-// ... rest of the code remains the same
-
 // GET /api/members/paid - Paid members
 router.get('/paid', async (req, res) => {
   try {
     const paidMembers = await User.find({
-      role: { $in: ['member', 'user', 'registrant'] },
+      role: 'member',
       $or: [
         { membershipActive: true },
         { hasPaidMembership: true },
@@ -85,7 +84,7 @@ router.get('/paid', async (req, res) => {
 router.get('/unpaid', async (req, res) => {
   try {
     const unpaidMembers = await User.find({
-      role: { $in: ['member', 'user', 'registrant'] },
+      role: 'member',
       $and: [
         { membershipActive: { $ne: true } },
         { hasPaidMembership: { $ne: true } },
