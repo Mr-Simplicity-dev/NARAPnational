@@ -621,18 +621,28 @@ let imageUploadsInitialized = false;
 // Store active upload references to prevent duplicates
 const activeUploads = new Map();
 
-// Initialize all image upload components - ONLY ONCE
+
+
+// Add debugging and ensure proper initialization
 function initializeImageUploads() {
-  // Prevent multiple initializations
+  console.log('Initializing image uploads...');
+  
+  // Check if already initialized
   if (imageUploadsInitialized) {
     console.log('Image uploads already initialized, skipping...');
     return;
   }
   
-  console.log('Initializing image uploads...');
-  
   // Set up all image upload containers
-  document.querySelectorAll('.image-upload-container').forEach(container => {
+  const containers = document.querySelectorAll('.image-upload-container');
+  console.log('Found image upload containers:', containers.length);
+  
+  if (containers.length === 0) {
+    console.log('No image upload containers found yet, will retry...');
+    return false; // Return false to indicate not all containers are ready
+  }
+  
+  containers.forEach(container => {
     const target = container.getAttribute('data-target');
     console.log('Setting up:', target);
     
@@ -641,17 +651,22 @@ function initializeImageUploads() {
     const urlInput = document.getElementById(`${target}Url`);
 
     if (!fileInput || !preview || !urlInput) {
-      console.warn(`Missing elements for target: ${target}`);
+      console.warn(`Missing elements for target: ${target}`, {
+        fileInput: !!fileInput,
+        preview: !!preview,
+        urlInput: !!urlInput
+      });
       return;
     }
 
     // Mark elements as initialized to prevent re-attachment
     if (container.dataset.initialized === 'true') {
+      console.log('Already initialized:', target);
       return;
     }
     container.dataset.initialized = 'true';
 
-    // Container click handler - FIXED VERSION
+    // Container click handler
     container.addEventListener('click', function(e) {
       // Allow container clicks and drag-drop area clicks
       if (e.target === container || 
@@ -697,10 +712,13 @@ function initializeImageUploads() {
         handleFileSelection(e.dataTransfer.files[0], target);
       }
     });
+    
+    console.log('Successfully initialized:', target);
   });
   
   imageUploadsInitialized = true;
   console.log('Image uploads initialization complete');
+  return true;
 }
 
 // Helper function to reset container styling
@@ -894,25 +912,49 @@ function setImageFromUrl(target, url) {
   testImg.src = url;
 }
 
-// Initialize when DOM is loaded - ONLY ONCE
+// Initialize when DOM is loaded - WITH RETRY MECHANISM
 document.addEventListener('DOMContentLoaded', function() {
   console.log('DOM loaded, initializing image uploads...');
-  // Small delay to ensure all dynamic content is loaded
+  
+  // Initial attempt with a small delay
   setTimeout(() => {
-    initializeImageUploads();
+    if (!initializeImageUploads()) {
+      // If containers weren't found, retry after a longer delay
+      console.log('Retrying image upload initialization...');
+      setTimeout(() => {
+        initializeImageUploads();
+      }, 500);
+    }
   }, 100);
+  
+  // Also initialize when tabs are shown (for dynamic content)
+  document.querySelectorAll('[data-bs-toggle="tab"]').forEach(tab => {
+    tab.addEventListener('shown.bs.tab', function() {
+      console.log('Tab shown, checking image uploads...');
+      setTimeout(() => {
+        if (!imageUploadsInitialized) {
+          initializeImageUploads();
+        } else {
+          // Re-initialize any new containers that might have been added
+          reinitializeNewImages();
+        }
+      }, 50);
+    });
+  });
 });
 
-// Re-initialize only for newly added content (not for tab switches)
-// This is more efficient and prevents duplicate listeners
+
+// Re-initialize only for newly added content
 function reinitializeNewImages() {
-  // Only initialize containers that haven't been initialized yet
-  document.querySelectorAll('.image-upload-container:not([data-initialized="true"])').forEach(container => {
-    const target = container.getAttribute('data-target');
-    console.log('Initializing new container:', target);
-    // Call initialization for this specific container
-    // This would need the initialization logic extracted into a separate function
-  });
+  const newContainers = document.querySelectorAll('.image-upload-container:not([data-initialized="true"])');
+  if (newContainers.length > 0) {
+    console.log('Found new image upload containers:', newContainers.length);
+    // Temporarily reset the flag to allow re-initialization
+    const wasInitialized = imageUploadsInitialized;
+    imageUploadsInitialized = false;
+    initializeImageUploads();
+    imageUploadsInitialized = wasInitialized;
+  }
 }
 
 // Notification system - IMPROVED
