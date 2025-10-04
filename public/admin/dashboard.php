@@ -651,14 +651,23 @@ if (container.dataset.initialized === 'true') {
 }
 container.dataset.initialized = 'true';
 
-// Container click handler - using event delegation
+// Container click handler - FIXED VERSION
 container.addEventListener('click', function(e) {
-  // Don't trigger file input if clicking on buttons or inputs
-  if (e.target.tagName === 'BUTTON' || e.target.tagName === 'INPUT' || e.target.closest('button')) {
+  // Only trigger file input if clicking on the container itself or upload placeholder
+  // Don't trigger if clicking on buttons, inputs, or other interactive elements
+  if (e.target.tagName === 'INPUT' || 
+      (e.target.tagName === 'BUTTON' && !e.target.onclick) ||
+      e.target.closest('button:not([onclick])')) {
     return;
   }
-  console.log('Container clicked, triggering file input for:', target);
-  fileInput.click();
+  
+  // Allow clicks on the container, placeholder, or icons to trigger file input
+  if (e.target === container || 
+      e.target.closest('.upload-placeholder') || 
+      e.target.classList.contains('fas')) {
+    console.log('Container clicked, triggering file input for:', target);
+    fileInput.click();
+  }
 });
 
 // File input change handler
