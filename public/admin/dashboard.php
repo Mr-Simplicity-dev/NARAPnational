@@ -976,42 +976,63 @@ if (!token) {
 // Define your API base URL
 const API_BASE = '/api';
 
-// Auth fetch function
-// Auth fetch function
-async function authFetch(url, options = {}) {
-  const token = localStorage.getItem('jwt');
-  if (!token) {
-    console.error('No JWT token found in authFetch');
-    window.location.href = '/admin/login.php';
+// ===== LOGOUT FUNCTION =====
+async function handleLogout() {
+  if (!confirm('Are you sure you want to logout?')) {
     return;
   }
-  
-  try {
-    const response = await fetch(url, {
-      ...options,
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
-        ...options.headers
-      }
-    });
 
-    // Handle token expiration
-    if (response.status === 401 || response.status === 403) {
-      console.warn('Token expired or invalid. Redirecting to login...');
-      localStorage.removeItem('jwt');
-      sessionStorage.clear();
-      window.location.href = '/admin/login.php';
-      return;
+  try {
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+      logoutBtn.disabled = true;
+      logoutBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Logging out...';
     }
 
-    return response;
+    // Call server logout API first
+    const token = localStorage.getItem('jwt');
+    if (token) {
+      try {
+        const response = await fetch('/api/auth/logout', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (!response.ok && response.status < 500) {
+          console.warn('Server logout non-OK:', response.status);
+        }
+      } catch (error) {
+        console.warn('Server logout failed:', error);
+        // Continue with client cleanup anyway
+      }
+    }
+
+    // Clear all authentication data
+    localStorage.removeItem('jwt');
+    localStorage.removeItem('token');
+    sessionStorage.clear();
+    
+    // Clear all cookies
+    document.cookie.split(';').forEach(cookie => {
+      const eqPos = cookie.indexOf('=');
+      const name = eqPos > -1 ? cookie.substr(0, eqPos).trim() : cookie;
+      document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`;
+    });
+
+    // Redirect to login page
+    window.location.href = '/admin/login.php';
+
   } catch (error) {
-    console.error('AuthFetch error:', error);
-    throw error;
+    console.error('Logout error:', error);
+    // Fallback redirect
+    localStorage.clear();
+    sessionStorage.clear();
+    window.location.href = '/admin/login.php';
   }
 }
-
 // ===== SAFE HELPERS =====
 const PAGE_SIZE = window.PAGE_SIZE || 20;
 let allPage = 1, paidPage = 1, unpaidPage = 1;
@@ -2037,6 +2058,12 @@ Object.keys(resources).forEach(loadList);
 document.getElementById('tab-members-all')?.addEventListener('shown.bs.tab', loadAllMembers);
 document.getElementById('tab-members-paid')?.addEventListener('shown.bs.tab', loadPaidMembers);
 document.getElementById('tab-members-unpaid')?.addEventListener('shown.bs.tab', loadUnpaidMembers);
+
+// IMPORTANT: Load all members on initial page load
+console.log('🟡 Loading members on page load...');
+loadAllMembers();
+loadPaidMembers(); 
+loadUnpaidMembers();
 </script>
 </body>
 </html>

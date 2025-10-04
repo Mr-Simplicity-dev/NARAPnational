@@ -98,14 +98,15 @@ app.use(helmet({
         "https://pagead2.googlesyndication.com"
       ],
       "font-src": [
-        "'self'",
-        "data:",
-        "https://fonts.gstatic.com",
-        "https://use.fontawesome.com",
-        "https://cdn.jsdelivr.net",
-        "https://cdn.tawk.to",
-        "https://*.tawk.to"
-      ],
+  "'self'",
+  "data:",
+  "https://fonts.gstatic.com",
+  "https://use.fontawesome.com",
+  "https://cdn.jsdelivr.net",
+  "https://cdn.tawk.to",
+  "https://*.tawk.to",
+  "https://cdnjs.cloudflare.com"  // Add this line for FontAwesome
+],
       "frame-src": [
         "'self'",
         "https://www.facebook.com",

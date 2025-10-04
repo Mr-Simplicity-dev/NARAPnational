@@ -21,7 +21,7 @@ router.get('/', async (req, res) => {
       return res.status(500).json({ message: 'User model not available' });
     }
     
-    // Simplified role query - only search for 'member' role
+    // Only search for 'member' role since that's what's created in registration
     const members = await User.find({ 
       role: 'member'
     })
@@ -73,9 +73,26 @@ router.get('/paid', async (req, res) => {
     .sort({ createdAt: -1 })
     .lean();
 
-    res.json(paidMembers);
+    // Format response for admin dashboard
+    const formattedMembers = paidMembers.map(member => ({
+      _id: member._id,
+      name: member.name || `${member.firstName || ''} ${member.lastName || ''}`.trim() || 'Unknown',
+      email: member.email || '',
+      memberId: member.memberId || member.memberCode || 'N/A',
+      state: member.state || '',
+      lga: member.lga || '',
+      phone: member.phone || '',
+      createdAt: member.createdAt,
+      // Payment status
+      membershipPaid: member.membershipActive || member.hasPaidMembership || false,
+      certificatePaid: member.certificatePaid || member.hasPaidCertificate || false,
+      idCardPaid: member.idCardPaid || member.hasPaidIdCard || false
+    }));
+
+    res.json(formattedMembers);
 
   } catch (e) {
+    console.error('🔴 Error fetching paid members:', e);
     res.status(500).json({ message: 'Failed to load paid members: ' + e.message });
   }
 });
@@ -98,9 +115,26 @@ router.get('/unpaid', async (req, res) => {
     .sort({ createdAt: -1 })
     .lean();
 
-    res.json(unpaidMembers);
+    // Format response for admin dashboard
+    const formattedMembers = unpaidMembers.map(member => ({
+      _id: member._id,
+      name: member.name || `${member.firstName || ''} ${member.lastName || ''}`.trim() || 'Unknown',
+      email: member.email || '',
+      memberId: member.memberId || member.memberCode || 'N/A',
+      state: member.state || '',
+      lga: member.lga || '',
+      phone: member.phone || '',
+      createdAt: member.createdAt,
+      // Payment status
+      membershipPaid: member.membershipActive || member.hasPaidMembership || false,
+      certificatePaid: member.certificatePaid || member.hasPaidCertificate || false,
+      idCardPaid: member.idCardPaid || member.hasPaidIdCard || false
+    }));
+
+    res.json(formattedMembers);
 
   } catch (e) {
+    console.error('🔴 Error fetching unpaid members:', e);
     res.status(500).json({ message: 'Failed to load unpaid members: ' + e.message });
   }
 });
