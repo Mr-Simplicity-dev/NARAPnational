@@ -975,6 +975,41 @@ if (!token) {
 // Define your API base URL
 const API_BASE = '/api';
 
+// Auth fetch function
+async function authFetch(url, options = {}) {
+  const token = localStorage.getItem('jwt');
+  if (!token) {
+    console.error('No JWT token found in authFetch');
+    window.location.href = '/admin/login.php';
+    return;
+  }
+  
+  try {
+    const response = await fetch(url, {
+      ...options,
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+        ...options.headers
+      }
+    });
+
+    // Handle token expiration
+    if (response.status === 401 || response.status === 403) {
+      console.warn('Token expired or invalid. Redirecting to login...');
+      localStorage.removeItem('jwt');
+      sessionStorage.clear();
+      window.location.href = '/admin/login.php';
+      return;
+    }
+
+    return response;
+  } catch (error) {
+    console.error('AuthFetch error:', error);
+    throw error;
+  }
+}
+
 // ===== LOGOUT FUNCTION =====
 async function handleLogout() {
   if (!confirm('Are you sure you want to logout?')) {
