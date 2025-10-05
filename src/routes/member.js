@@ -42,10 +42,10 @@ router.patch('/profile', requireAuth, async (req, res) => {
 
     // Map allowed text fields from body
     const allowed = [
-      'firstName', 'lastName', 'otherNames', 'dob', 'gender', 'phone', 'email', 
-      'address', 'state', 'organization', 'position', 'yearsExperience', 
-      'specialization', 'certifications', 'profileCompleted', 'passportUrl', 'signatureUrl'
-    ];
+  'surname', 'firstName', 'lastName', 'otherNames', 'dob', 'gender', 'phone', 'email', 
+  'address', 'state', 'organization', 'position', 'yearsExperience', 
+  'specialization', 'certifications', 'profileCompleted', 'passportUrl', 'signatureUrl'
+];
     
     allowed.forEach(k => {
       if (k in req.body && req.body[k] !== undefined && req.body[k] !== null && String(req.body[k]).length) {
