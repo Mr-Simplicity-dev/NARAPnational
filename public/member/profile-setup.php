@@ -624,7 +624,13 @@
         const body = {};
         Array.from(form.elements).forEach(el=>{
           if (!el.name || el.type === 'file') return;
-          body[el.name] = (el.value || '').trim();
+          
+          // Map phoneNumber to phone for backend consistency
+          if (el.name === 'phoneNumber') {
+            body['phone'] = (el.value || '').trim();
+          } else {
+            body[el.name] = (el.value || '').trim();
+          }
         });
 
         // Save profile data - use the correct endpoint
@@ -666,7 +672,13 @@
         const body = {};
         Array.from(form.elements).forEach(el=>{
           if (!el.name || el.type === 'file') return;
-          body[el.name] = (el.value || '').trim();
+          
+          // Map phoneNumber to phone for backend consistency
+          if (el.name === 'phoneNumber') {
+            body['phone'] = (el.value || '').trim();
+          } else {
+            body[el.name] = (el.value || '').trim();
+          }
         });
 
         // Add profile completed flag

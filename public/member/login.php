@@ -75,22 +75,29 @@ document.getElementById('loginForm').addEventListener('submit', async (e)=>{
       if(profileRes.ok){
         const profile = await profileRes.json();
         
-    const isProfileComplete = 
-  (profile.surname || profile.lastName || profile.name) &&
-  (profile.otherNames || profile.firstName || profile.name) &&
+    // In login.php, replace the current profile completeness check with this:
+const isProfileComplete = 
+  profile.name && 
   profile.phone && 
   profile.state && 
+  profile.businessName &&
+  profile.businessAddress &&
+  profile.specialization &&
+  profile.position &&
+  profile.guarantor &&
   profile.passportUrl && 
   profile.signatureUrl &&
   profile.profileCompleted === true;
 
-        console.log('Profile completeness check:', {
-  surname: !!profile.surname,
-  otherNames: !!profile.otherNames,
-  firstName: !!profile.firstName,    // Keep for legacy debugging
-  lastName: !!profile.lastName,      // Keep for legacy debugging
+console.log('Profile completeness check:', {
+  name: !!profile.name,
   phone: !!profile.phone,
   state: !!profile.state,
+  businessName: !!profile.businessName,
+  businessAddress: !!profile.businessAddress,
+  specialization: !!profile.specialization,
+  position: !!profile.position,
+  guarantor: !!profile.guarantor,
   passportUrl: !!profile.passportUrl,
   signatureUrl: !!profile.signatureUrl,
   profileCompleted: profile.profileCompleted,

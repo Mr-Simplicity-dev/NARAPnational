@@ -22,12 +22,26 @@ const UserSchema = new mongoose.Schema({
   password: { type: String, required: true },
   role: { type: String, enum: ['admin', 'member'], default: 'member' },
   
-  // Additional member fields
+  // Additional member fields from profile form
   state: { type: String, trim: true },
   zone: { type: String, trim: true },
   guarantor: { type: String, trim: true },
   dob: { type: Date },
-  declare_agree: { type: Boolean, default: false }
+  declare_agree: { type: Boolean, default: false },
+  
+  // NEW FIELDS - Add these from your profile form
+  sex: { type: String, trim: true },
+  maritalStatus: { type: String, trim: true },
+  lga: { type: String, trim: true },
+  ward: { type: String, trim: true },
+  businessName: { type: String, trim: true },
+  businessAddress: { type: String, trim: true },
+  specialization: { type: String, trim: true },
+  position: { type: String, trim: true },
+  address: { type: String, trim: true },
+  nextOfKin: { type: String, trim: true },
+  guarantorAddress: { type: String, trim: true },
+  guarantorPosition: { type: String, trim: true }
 }, { timestamps: true });
 
 UserSchema.pre('validate', function(next){
