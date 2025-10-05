@@ -295,7 +295,7 @@ main, #member-settings{ padding-top: 8px; }
 </div>
 </div>
 <div style="margin-top:16px">
-<div style="font-weight:800;margin-bottom:8px">Recent Activity</div>
+<div style="font-weight:800;margin-bottom:8px">Member Details</div>
 <div class="list" id="recentList">
 <div class="muted">No recent activity yet.</div>
 </div>
@@ -348,16 +348,7 @@ main, #member-settings{ padding-top: 8px; }
 <span class="loading" id="payCertificateLoader" style="display: none;"></span>
 </button>
 </div>
-<!-- Debug Panel -->
-<div class="debug-panel">
-<div class="debug-title">API Debug Log</div>
-<div id="debugLogs">
-<div class="debug-log">Dashboard initialized. Checking token status...</div>
-</div>
-</div>
-</div>
-</div>
-</div>
+
 <script>
     (function(){
         // Debug logging
@@ -1071,6 +1062,118 @@ main, #member-settings{ padding-top: 8px; }
     sessionStorage.removeItem('profileUpdated');
     setTimeout(loadDashboardAvatar, 500);
   }
+})();
+</script>
+
+<script>
+// Load member data and display it properly
+(function() {
+    function getToken() {
+        return localStorage.getItem('jwt') || localStorage.getItem('token') || '';
+    }
+
+    // Load and display member data
+    async function loadMemberData() {
+        const token = getToken();
+        if (!token) {
+            window.location.href = '/member/login.php';
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/auth/me', {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (!response.ok) {
+                if (response.status === 401) {
+                    localStorage.removeItem('jwt');
+                    localStorage.removeItem('token');
+                    window.location.href = '/member/login.php';
+                    return;
+                }
+                throw new Error('Failed to load member data');
+            }
+
+            const user = await response.json();
+            displayMemberData(user);
+
+        } catch (error) {
+            console.error('Error loading member data:', error);
+            document.getElementById('hello').textContent = 'Welcome (Error loading data)';
+            document.getElementById('email').textContent = 'Error loading email';
+        }
+    }
+
+    // Display member data in the dashboard
+    function displayMemberData(user) {
+        // Update welcome message with actual name
+        const fullName = `${user.surname || ''} ${user.otherNames || ''}`.trim() || user.name || 'Member';
+        document.getElementById('hello').textContent = `Welcome, ${fullName}`;
+        
+        // Update email
+        document.getElementById('email').textContent = user.email || 'No email';
+        
+        // Update avatar if passport photo exists
+        if (user.passportUrl) {
+            const avatar = document.getElementById('avatar');
+            avatar.src = user.passportUrl;
+        }
+
+        // Add member details to recent activity section
+        const recentList = document.getElementById('recentList');
+        recentList.innerHTML = `
+            <div class="item">
+                <span>Full Name</span>
+                <span style="font-weight: 600">${fullName}</span>
+            </div>
+            <div class="item">
+                <span>Phone</span>
+                <span style="font-weight: 600">${user.phone || 'Not provided'}</span>
+            </div>
+            <div class="item">
+                <span>State</span>
+                <span style="font-weight: 600">${user.state || 'Not provided'}</span>
+            </div>
+            <div class="item">
+                <span>Zone</span>
+                <span style="font-weight: 600">${user.zone || 'Not provided'}</span>
+            </div>
+            <div class="item">
+                <span>Date of Birth</span>
+                <span style="font-weight: 600">${user.dob ? new Date(user.dob).toLocaleDateString() : 'Not provided'}</span>
+            </div>
+            <div class="item">
+                <span>Guarantor</span>
+                <span style="font-weight: 600">${user.guarantor || 'Not provided'}</span>
+            </div>
+            <div class="item">
+                <span>Member Since</span>
+                <span style="font-weight: 600">${user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'Unknown'}</span>
+            </div>
+            <div class="item">
+                <span>Membership Status</span>
+                <span class="pill ${user.hasPaidMembership ? 'ok' : 'warn'}">${user.hasPaidMembership ? 'ACTIVE' : 'PENDING'}</span>
+            </div>
+        `;
+
+        console.log('Member data loaded successfully:', user);
+    }
+
+    // Load member data when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        loadMemberData();
+    });
+
+    // Also load immediately if DOM is already ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', loadMemberData);
+    } else {
+        loadMemberData();
+    }
 })();
 </script>
 

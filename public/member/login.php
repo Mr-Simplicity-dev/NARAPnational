@@ -75,15 +75,14 @@ document.getElementById('loginForm').addEventListener('submit', async (e)=>{
       if(profileRes.ok){
         const profile = await profileRes.json();
         
-        // Define profile completeness criteria
-        const isProfileComplete = 
-          profile.firstName && 
-          profile.lastName && 
-          profile.phone && 
-          profile.state && 
-          profile.passportUrl && 
-          profile.signatureUrl &&
-          profile.profileCompleted === true;
+    const isProfileComplete = 
+  (profile.surname || profile.lastName) &&
+  (profile.otherNames || profile.firstName) &&
+  profile.phone && 
+  profile.state && 
+  profile.passportUrl && 
+  profile.signatureUrl &&
+  profile.profileCompleted === true;
 
         console.log('Profile completeness check:', {
           firstName: !!profile.firstName,
