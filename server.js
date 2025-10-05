@@ -1,5 +1,4 @@
 import 'dotenv/config';
-console.log('JWT_SECRET:', process.env.JWT_SECRET ? 'Loaded' : 'Missing');
 import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
