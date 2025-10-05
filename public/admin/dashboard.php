@@ -107,12 +107,15 @@
                 <input type="hidden" name="about.image" id="aboutImageUrl">
               </div>
               <div class="d-flex mt-2 gap-2">
-                <button type="button" class="btn btn-outline-primary btn-sm" onclick="document.getElementById('aboutImageUpload').click()">
-                  <i class="fas fa-upload me-1"></i> Choose Image
-                </button>
-                <button type="button" class="btn btn-outline-danger btn-sm" onclick="clearImageUpload('aboutImage')">
-                  <i class="fas fa-times me-1"></i> Clear
-                </button>
+                <!-- Choose Image buttons -->
+<button type="button" class="btn btn-outline-primary btn-sm" data-action="choose-image" data-target="aboutImage">
+  <i class="fas fa-upload me-1"></i> Choose Image
+</button>
+
+<!-- Clear buttons -->
+<button type="button" class="btn btn-outline-danger btn-sm" data-action="clear-image" data-target="aboutImage">
+  <i class="fas fa-times me-1"></i> Clear
+</button>
               </div>
             </div>
             <div class="col-12 sticky-actions">
@@ -150,12 +153,15 @@
                 <input type="hidden" name="faqs.image" id="faqsImageUrl">
               </div>
               <div class="d-flex mt-2 gap-2">
-                <button type="button" class="btn btn-outline-primary btn-sm" onclick="document.getElementById('faqsImageUpload').click()">
-                  <i class="fas fa-upload me-1"></i> Choose Image
-                </button>
-                <button type="button" class="btn btn-outline-danger btn-sm" onclick="clearImageUpload('faqsImage')">
-                  <i class="fas fa-times me-1"></i> Clear
-                </button>
+               <!-- Choose Image buttons -->
+<button type="button" class="btn btn-outline-primary btn-sm" data-action="choose-image" data-target="aboutImage">
+  <i class="fas fa-upload me-1"></i> Choose Image
+</button>
+
+<!-- Clear buttons -->
+<button type="button" class="btn btn-outline-danger btn-sm" data-action="clear-image" data-target="aboutImage">
+  <i class="fas fa-times me-1"></i> Clear
+</button>
               </div>
             </div>
             <div class="col-md-4"><label class="form-label">Team Title</label><input name="team.title" class="form-control" placeholder="Meet Our Executive"></div>
@@ -194,12 +200,15 @@
               <input type="hidden" name="image" id="sliderImageUrl">
             </div>
             <div class="d-flex mt-2 gap-2">
-              <button type="button" class="btn btn-outline-primary btn-sm" onclick="document.getElementById('sliderImageUpload').click()">
-                <i class="fas fa-upload me-1"></i> Choose Image
-              </button>
-              <button type="button" class="btn btn-outline-danger btn-sm" onclick="clearImageUpload('sliderImage')">
-                <i class="fas fa-times me-1"></i> Clear
-              </button>
+             <!-- Choose Image buttons -->
+<button type="button" class="btn btn-outline-primary btn-sm" data-action="choose-image" data-target="aboutImage">
+  <i class="fas fa-upload me-1"></i> Choose Image
+</button>
+
+<!-- Clear buttons -->
+<button type="button" class="btn btn-outline-danger btn-sm" data-action="clear-image" data-target="aboutImage">
+  <i class="fas fa-times me-1"></i> Clear
+</button>
             </div>
           </div>
           <div class="col-md-4"><label class="form-label">Order</label><input name="order" type="number" class="form-control" placeholder="1"></div>
@@ -2170,6 +2179,31 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 });
+
+ // Handle Choose Image buttons
+  document.addEventListener('click', function(e) {
+    if (e.target.matches('[data-action="choose-image"]') || 
+        e.target.closest('[data-action="choose-image"]')) {
+      
+      const button = e.target.closest('[data-action="choose-image"]');
+      const target = button.dataset.target;
+      const fileInput = document.getElementById(`${target}Upload`);
+      
+      if (fileInput) {
+        fileInput.click();
+      }
+    }
+    
+    // Handle Clear buttons
+    if (e.target.matches('[data-action="clear-image"]') || 
+        e.target.closest('[data-action="clear-image"]')) {
+      
+      const button = e.target.closest('[data-action="clear-image"]');
+      const target = button.dataset.target;
+      clearImageUpload(target);
+    }
+  });
+
 
 // ===== MISSING MEMBER LOADING FUNCTIONS =====
 function loadAllMembers() {
