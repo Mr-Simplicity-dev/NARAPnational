@@ -717,463 +717,496 @@ main, #member-settings{ padding-top: 8px; }
 </div>
 </div>
 </section>
+
 <script>
-(function(){
-  function getToken(){
-    return localStorage.getItem('token') || sessionStorage.getItem('token') || '';
+// Unified Member Dashboard Controller - Consolidated and Optimized
+(function() {
+  const API_BASE = '/api';
+  let userData = null;
+  
+  // Standardized token retrieval
+  function getToken() {
+    return localStorage.getItem('jwt') || 
+           localStorage.getItem('token') || 
+           localStorage.getItem('authToken') ||
+           sessionStorage.getItem('jwt') || 
+           sessionStorage.getItem('token') || 
+           sessionStorage.getItem('authToken') || '';
   }
-  function showAlert(el, type, msg){
-    el.classList.remove('d-none','alert-success','alert-danger','alert-warning');
+  
+  // Clear authentication data
+  function clearAuth() {
+    localStorage.removeItem('jwt');
+    localStorage.removeItem('token');
+    localStorage.removeItem('authToken');
+    sessionStorage.removeItem('jwt');
+    sessionStorage.removeItem('token');
+    sessionStorage.removeItem('authToken');
+    userData = null;
+  }
+  
+  // Alert functions for profile settings
+  function showAlert(el, type, msg) {
+    if (!el) return;
+    el.classList.remove('d-none', 'alert-success', 'alert-danger', 'alert-warning');
     el.classList.add('alert', 'alert-' + type);
     el.textContent = msg;
   }
-  function clearAlert(el){ if(!el) return; el.classList.add('d-none'); el.textContent = ''; }
-
-  // DOB selects
-  (function initDOB(){
-    var dSel = document.getElementById('dob_day');
-    var mSel = document.getElementById('dob_month');
-    var ySel = document.getElementById('dob_year');
-    if (!dSel || !mSel || !ySel) return;
-    for (var d=1; d<=31; d++){ var o=document.createElement('option'); o.value=d; o.textContent=d; dSel.appendChild(o); }
-    var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-    for (var m=1; m<=12; m++){ var o=document.createElement('option'); o.value=m; o.textContent=months[m-1]; mSel.appendChild(o); }
-    var now=new Date().getFullYear(), latest=now-16;
-    for (var y=latest; y>=1930; y--){ var o=document.createElement('option'); o.value=y; o.textContent=y; ySel.appendChild(o); }
-  })();
-
-  // Toggle password visibility
-  document.querySelectorAll('#member-settings .toggle-password').forEach(function(btn){
-    var sel = btn.getAttribute('data-target');
-    var target = sel ? document.querySelector(sel) : null;
-    var eye = btn.querySelector('.icon-eye');
-    var slash = btn.querySelector('.icon-eye-slash');
-    function render(){
-      var isPwd = target && target.type === 'password';
-      if (eye && slash){ eye.hidden = !isPwd; slash.hidden = isPwd; }
-      btn.setAttribute('title', isPwd ? 'Show password' : 'Hide password');
-      btn.setAttribute('aria-label', isPwd ? 'Show password' : 'Hide password');
+  
+  function clearAlert(el) {
+    if (!el) return;
+    el.classList.add('d-none');
+    el.textContent = '';
+  }
+  
+  // Notification system
+  function showNotification(message, isSuccess = false) {
+    const notification = document.getElementById('notification');
+    const notificationText = document.getElementById('notification-text');
+    
+    if (notification && notificationText) {
+      notificationText.textContent = message;
+      notification.className = isSuccess ? 'notification success show' : 'notification show';
+      setTimeout(() => notification.classList.remove('show'), 5000);
     }
-    render();
-    btn.addEventListener('click', function(){
-      if (!target) return;
-      target.type = (target.type === 'password') ? 'text' : 'password';
-      render();
-    });
-  });
-
-  // Load profile
-  async function loadProfile(){
-    var alert = document.getElementById('profileAlert');
-    clearAlert(alert);
-    var token = getToken();
-    if (!token){
-      showAlert(alert, 'warning', 'You are not logged in. Please log in again.');
+  }
+  
+  // Centralized user data loading
+  async function loadUserData(forceRefresh = false) {
+    if (userData && !forceRefresh) return userData;
+    
+    const token = getToken();
+    if (!token) {
+      window.location.href = '/member/login.php';
       return;
     }
-    try{
-      const res = await fetch('/api/member/profile', { headers: { Authorization: 'Bearer ' + token } });
-      if (!res.ok) throw new Error('Failed to load profile');
-      const user = await res.json();
+    
+    try {
+      const response = await fetch(`${API_BASE}/member/profile`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (!response.ok) {
+        if (response.status === 401) {
+          clearAuth();
+          window.location.href = '/member/login.php';
+          return;
+        }
+        throw new Error(`HTTP ${response.status}: Failed to load profile`);
+      }
+      
+      userData = await response.json();
+      return userData;
+      
+    } catch (error) {
+      console.error('Error loading user data:', error);
+      showNotification('Failed to load member data. Please refresh the page.');
+      throw error;
+    }
+  }
+  
+  // Update dashboard with user data
+  function updateDashboard(user) {
+    if (!user) return;
+    
+    // Update welcome message
+    const fullName = `${user.surname || ''} ${user.otherNames || ''}`.trim() || 
+                     user.name || 'Member';
+    const helloEl = document.getElementById('hello');
+    if (helloEl) helloEl.textContent = `Welcome, ${fullName}`;
+    
+    // Update email
+    const emailEl = document.getElementById('email');
+    if (emailEl) emailEl.textContent = user.email || 'No email';
+    
+    // Update avatar
+    const avatar = document.getElementById('avatar');
+    if (avatar && user.passportUrl) {
+      const testImage = new Image();
+      testImage.onload = () => avatar.src = user.passportUrl;
+      testImage.onerror = () => avatar.src = avatar.getAttribute('data-fallback') || '/uploads/slider/Narap.png';
+      testImage.src = user.passportUrl;
+    }
+    
+    // Update member details
+    const recentList = document.getElementById('recentList');
+    if (recentList) {
+      recentList.innerHTML = `
+        <div class="item">
+          <span>Full Name</span>
+          <span style="font-weight: 600">${fullName}</span>
+        </div>
+        <div class="item">
+          <span>Phone</span>
+          <span style="font-weight: 600">${user.phone || 'Not provided'}</span>
+        </div>
+        <div class="item">
+          <span>State</span>
+          <span style="font-weight: 600">${user.state || 'Not provided'}</span>
+        </div>
+        <div class="item">
+          <span>Zone</span>
+          <span style="font-weight: 600">${user.zone || 'Not provided'}</span>
+        </div>
+        <div class="item">
+          <span>Date of Birth</span>
+          <span style="font-weight: 600">${user.dob ? new Date(user.dob).toLocaleDateString() : 'Not provided'}</span>
+        </div>
+        <div class="item">
+          <span>Guarantor</span>
+          <span style="font-weight: 600">${user.guarantor || 'Not provided'}</span>
+        </div>
+        <div class="item">
+          <span>Member Since</span>
+          <span style="font-weight: 600">${user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'Unknown'}</span>
+        </div>
+        <div class="item">
+          <span>Membership Status</span>
+          <span class="pill" style="background: ${user.hasPaidMembership ? 'var(--ok)' : 'var(--warn)'}; color: white;">
+            ${user.hasPaidMembership ? 'ACTIVE' : 'PENDING'}
+          </span>
+        </div>
+      `;
+    }
+  }
+  
+  // DOB selects initialization
+  function initDOB() {
+    const dSel = document.getElementById('dob_day');
+    const mSel = document.getElementById('dob_month');
+    const ySel = document.getElementById('dob_year');
+    if (!dSel || !mSel || !ySel) return;
+    
+    // Days
+    for (let d = 1; d <= 31; d++) {
+      const o = document.createElement('option');
+      o.value = d;
+      o.textContent = d;
+      dSel.appendChild(o);
+    }
+    
+    // Months
+    const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    for (let m = 1; m <= 12; m++) {
+      const o = document.createElement('option');
+      o.value = m;
+      o.textContent = months[m-1];
+      mSel.appendChild(o);
+    }
+    
+    // Years
+    const now = new Date().getFullYear();
+    const latest = now - 16;
+    for (let y = latest; y >= 1930; y--) {
+      const o = document.createElement('option');
+      o.value = y;
+      o.textContent = y;
+      ySel.appendChild(o);
+    }
+  }
+  
+  // Password visibility toggle
+  function initPasswordToggle() {
+    document.querySelectorAll('#member-settings .toggle-password').forEach(function(btn) {
+      const sel = btn.getAttribute('data-target');
+      const target = sel ? document.querySelector(sel) : null;
+      const eye = btn.querySelector('.icon-eye');
+      const slash = btn.querySelector('.icon-eye-slash');
+      
+      function render() {
+        const isPwd = target && target.type === 'password';
+        if (eye && slash) {
+          eye.hidden = !isPwd;
+          slash.hidden = isPwd;
+        }
+        btn.setAttribute('title', isPwd ? 'Show password' : 'Hide password');
+        btn.setAttribute('aria-label', isPwd ? 'Show password' : 'Hide password');
+      }
+      
+      render();
+      btn.addEventListener('click', function() {
+        if (!target) return;
+        target.type = (target.type === 'password') ? 'text' : 'password';
+        render();
+      });
+    });
+  }
+  
+  // Load profile for settings form
+  async function loadProfile() {
+    const alert = document.getElementById('profileAlert');
+    clearAlert(alert);
+    
+    try {
+      const user = await loadUserData();
+      if (!user) return;
+      
       const f = document.getElementById('profileForm');
       if (!f) return;
-      f.surname.value     = user.surname || user.lastName || '';
-      f.otherNames.value  = user.otherNames || user.firstName || '';
-      f.phone.value       = user.phone || '';
-      f.email.value       = user.email || '';
-      f.state.value       = user.state || '';
-      f.zone.value        = user.zone || '';
-      f.guarantor.value   = user.guarantor || '';
-      if (user.dob){
+      
+      f.surname.value = user.surname || user.lastName || '';
+      f.otherNames.value = user.otherNames || user.firstName || '';
+      f.phone.value = user.phone || '';
+      f.email.value = user.email || '';
+      f.state.value = user.state || '';
+      f.zone.value = user.zone || '';
+      f.guarantor.value = user.guarantor || '';
+      
+      if (user.dob) {
         const dt = new Date(user.dob);
-        if (!isNaN(dt)){
+        if (!isNaN(dt)) {
           document.getElementById('dob_day').value = dt.getUTCDate();
-          document.getElementById('dob_month').value = dt.getUTCMonth()+1;
+          document.getElementById('dob_month').value = dt.getUTCMonth() + 1;
           document.getElementById('dob_year').value = dt.getUTCFullYear();
         }
       }
-    }catch(e){
-      showAlert(document.getElementById('profileAlert'), 'danger', e.message || 'Could not load profile');
+      
+      // Show passport preview if available
+      const preview = document.getElementById('passportPreview');
+      if (user.passportUrl && preview) {
+        preview.src = user.passportUrl;
+        preview.classList.remove('d-none');
+      }
+      
+    } catch (e) {
+      showAlert(alert, 'danger', e.message || 'Could not load profile');
     }
   }
-
+  
   // Save profile
-  async function saveProfile(){
-    var token = getToken();
-    var alert = document.getElementById('profileAlert');
+  async function saveProfile() {
+    const alert = document.getElementById('profileAlert');
     clearAlert(alert);
-    if (!token){
+    const token = getToken();
+    
+    if (!token) {
       showAlert(alert, 'warning', 'You are not logged in. Please log in again.');
       return;
     }
+    
     const f = document.getElementById('profileForm');
     const fd = new FormData(f);
-    if (!fd.get('dob_day') || !fd.get('dob_month') || !fd.get('dob_year')){
-      fd.delete('dob_day'); fd.delete('dob_month'); fd.delete('dob_year');
+    
+    if (!fd.get('dob_day') || !fd.get('dob_month') || !fd.get('dob_year')) {
+      fd.delete('dob_day');
+      fd.delete('dob_month');
+      fd.delete('dob_year');
     }
-    try{
-      const res = await fetch('/api/member/profile', {
+    
+    try {
+      const res = await fetch(`${API_BASE}/member/profile`, {
         method: 'PATCH',
         headers: { Authorization: 'Bearer ' + token },
         body: fd
       });
+      
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || 'Update failed');
+      
       showAlert(alert, 'success', 'Profile updated successfully.');
-      loadProfile();
-      // Refresh the avatar after profile update
-      loadDashboardAvatar();
-    }catch(e){
+      userData = null; // Clear cache to force refresh
+      await loadProfile();
+      await loadUserData(true); // Refresh dashboard
+      updateDashboard(userData);
+      
+    } catch (e) {
       showAlert(alert, 'danger', e.message || 'Update failed');
     }
   }
-
+  
   // Change password
-  async function changePassword(){
-    var alert = document.getElementById('pwdAlert');
+  async function changePassword() {
+    const alert = document.getElementById('pwdAlert');
     clearAlert(alert);
-    var token = getToken();
-    if (!token){
+    const token = getToken();
+    
+    if (!token) {
       showAlert(alert, 'warning', 'You are not logged in. Please log in again.');
       return;
     }
+    
     const f = document.getElementById('passwordForm');
     const currentPassword = f.currentPassword.value;
     const newPassword = f.newPassword.value;
     const confirmPassword = f.confirmPassword.value;
-    if (!currentPassword || !newPassword || !confirmPassword){
-      showAlert(alert,'warning','Please fill all password fields.');
+    
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      showAlert(alert, 'warning', 'Please fill all password fields.');
       return;
     }
-    if (newPassword !== confirmPassword){
-      showAlert(alert,'warning','New passwords do not match.');
+    
+    if (newPassword !== confirmPassword) {
+      showAlert(alert, 'warning', 'New passwords do not match.');
       return;
     }
-    try{
-      const res = await fetch('/api/member/profile/password', {
+    
+    try {
+      const res = await fetch(`${API_BASE}/auth/me/password`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + token
+        },
         body: JSON.stringify({ currentPassword, newPassword, confirmPassword })
       });
+      
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || 'Password change failed');
-      showAlert(alert,'success','Password updated.');
+      
+      showAlert(alert, 'success', 'Password updated.');
       f.reset();
-    }catch(e){
-      showAlert(alert,'danger', e.message || 'Password change failed');
+      
+    } catch (e) {
+      showAlert(alert, 'danger', e.message || 'Password change failed');
     }
   }
-
-  document.getElementById('btnSaveProfile')?.addEventListener('click', saveProfile);
-  document.getElementById('btnReloadProfile')?.addEventListener('click', loadProfile);
-  document.getElementById('btnChangePassword')?.addEventListener('click', changePassword);
-  document.getElementById('btnResetPasswordForm')?.addEventListener('click', function(){
-    document.getElementById('passwordForm').reset();
-  });
-
-  loadProfile();
-})();
-</script>
-<script>
-(function(){
-  // Preview passport file selection immediately
-  const file = document.querySelector('#profileForm input[name="passport"]');
-  const preview = document.getElementById('passportPreview');
-  if (file && preview){
-    file.addEventListener('change', function(){
-      if (file.files && file.files[0]){
-        const url = URL.createObjectURL(file.files[0]);
-        preview.src = url;
-        preview.classList.remove('d-none');
-      }
-    });
-  }
-
-  // Monkey patch loadProfile to also show current passport preview if server provides it
-  const __origLoad = (typeof loadProfile === 'function') ? loadProfile : null;
-  if (__origLoad){
-    window.loadProfile = async function(){
-      await __origLoad();
-      try{
-        const token = (localStorage.getItem('token') || sessionStorage.getItem('token') || '');
-        if (!token) return;
-        const res = await fetch('/api/member/profile', { headers: { Authorization: 'Bearer ' + token } });
-        if (!res.ok) return;
-        const user = await res.json();
-        if (user && user.passportUrl && preview){
-          preview.src = user.passportUrl;
+  
+  // Passport file preview
+  function initPassportPreview() {
+    const file = document.querySelector('#profileForm input[name="passport"]');
+    const preview = document.getElementById('passportPreview');
+    
+    if (file && preview) {
+      file.addEventListener('change', function() {
+        if (file.files && file.files[0]) {
+          const url = URL.createObjectURL(file.files[0]);
+          preview.src = url;
           preview.classList.remove('d-none');
         }
-      } catch(_){}
-    };
+      });
+    }
   }
-})();
-
-  // --- Header Account Settings dropdown ---
-  (function(){
+  
+  // Header dropdown menu
+  function initHeaderMenu() {
     const menu = document.getElementById('mdMenu');
     const toggle = document.getElementById('mdMenuToggle');
     if (!menu || !toggle) return;
-    function close(){ menu.classList.remove('open'); toggle.setAttribute('aria-expanded','false'); }
-    function open(){ menu.classList.add('open'); toggle.setAttribute('aria-expanded','true'); }
-    toggle.addEventListener('click', (e)=>{
+    
+    function close() {
+      menu.classList.remove('open');
+      toggle.setAttribute('aria-expanded', 'false');
+    }
+    
+    function open() {
+      menu.classList.add('open');
+      toggle.setAttribute('aria-expanded', 'true');
+    }
+    
+    toggle.addEventListener('click', (e) => {
       e.stopPropagation();
-      if (menu.classList.contains('open')) close(); else open();
+      if (menu.classList.contains('open')) close();
+      else open();
     });
-    document.addEventListener('click', (e)=>{
+    
+    document.addEventListener('click', (e) => {
       if (!menu.contains(e.target)) close();
     });
-  })();
-
-  // --- Account Settings panel controller ---
-  (function(){
+  }
+  
+  // Account Settings panel controller
+  function initSettingsPanels() {
     const section = document.getElementById('member-settings');
     const panels = section ? Array.from(section.querySelectorAll('.settings-panel')) : [];
-    function activate(panelName){
+    
+    function activate(panelName) {
       if (!section) return;
       section.style.display = 'block';
       panels.forEach(p => p.classList.remove('active'));
-      if (panelName === 'all'){
+      
+      if (panelName === 'all') {
         panels.forEach(p => p.classList.add('active'));
       } else {
         const target = section.querySelector(`.settings-panel[data-panel="${panelName}"]`);
         if (target) target.classList.add('active');
       }
+      
       section.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
-    function hideAll(){
+    
+    function hideAll() {
       if (!section) return;
       section.style.display = 'none';
       panels.forEach(p => p.classList.remove('active'));
     }
-    document.getElementById('linkEditProfile')?.addEventListener('click', (e)=>{ e.preventDefault(); activate('edit-profile'); });
-    document.getElementById('linkChangePassword')?.addEventListener('click', (e)=>{ e.preventDefault(); activate('change-password'); });
-    document.getElementById('linkShowAll')?.addEventListener('click', (e)=>{ e.preventDefault(); activate('all'); });
-    document.getElementById('linkHide')?.addEventListener('click', (e)=>{ e.preventDefault(); hideAll(); });
-  })();
-</script>
-
-<script>
-// Fixed function to load dashboard avatar from profile setup
-(function () {
-  const API_BASE = window.API_BASE || '/api';
-
-  // Auth fetch that reads the latest token on each call
-  function authFetch(url, opts = {}) {
-    const jwt = localStorage.getItem('jwt') || localStorage.getItem('token');
-    const headers = Object.assign(
-      { 'Content-Type': 'application/json' },
-      jwt ? { 'Authorization': 'Bearer ' + jwt } : {},
-      opts.headers || {}
-    );
-    return fetch(url, Object.assign({}, opts, { headers, credentials: 'include' }));
-  }
-
-  // Load user profile and update dashboard avatar
-  async function loadDashboardAvatar() {
-    try {
-      const img = document.getElementById('avatar');
-      if (!img) return;
-
-      // Try multiple endpoints for compatibility
-      const endpoints = [
-        `${API_BASE}/member/profile`,
-        `${API_BASE}/auth/me`,
-        `${API_BASE}/me`,
-        `${API_BASE}/users/me`,
-        `${API_BASE}/members/me`
-      ];
-      
-      let user = null;
-      for (const endpoint of endpoints) {
-        try {
-          const res = await authFetch(endpoint);
-          if (res && res.ok) {
-            user = await res.json();
-            break;
-          }
-        } catch (err) {
-          console.warn(`Failed to fetch from ${endpoint}:`, err);
-          continue;
-        }
-      }
-
-      if (!user) {
-        console.log('No user data found');
-        return;
-      }
-
-      // Try multiple possible field names for the passport image
-      const passportUrl = 
-        user.passportUrl ||
-        user.passport ||
-        (user.profile && user.profile.passportUrl) ||
-        (user.profile && user.profile.passport) ||
-        user.avatar ||
-        user.avatarUrl ||
-        user.photoUrl ||
-        user.image;
-
-      if (passportUrl && typeof passportUrl === 'string') {
-        // Create a new image to test if the URL is valid
-        const testImage = new Image();
-        testImage.onload = function() {
-          // Image loaded successfully, use it
-          img.src = passportUrl;
-          console.log('Dashboard avatar updated successfully');
-        };
-        testImage.onerror = function() {
-          // Image failed to load, use fallback
-          img.src = img.getAttribute('data-fallback') || '/uploads/slider/Narap.png';
-          console.log('Failed to load passport image, using fallback');
-        };
-        testImage.src = passportUrl;
-      } else {
-        // No passport image found, use fallback
-        img.src = img.getAttribute('data-fallback') || '/uploads/slider/Narap.png';
-        console.log('No passport image found, using fallback');
-      }
-      
-      // Also update welcome message and email if available
-      if (user.email) {
-        document.getElementById('email').textContent = user.email;
-      }
-      if (user.firstName || user.surname || user.otherNames) {
-        const name = user.firstName || user.otherNames || '';
-        const surname = user.surname || user.lastName || '';
-        document.getElementById('hello').textContent = `Welcome, ${name} ${surname}`.trim();
-      }
-      
-    } catch (err) {
-      console.error('Error loading dashboard avatar:', err);
-    }
-  }
-
-  // Make function globally available for manual refresh
-  window.loadDashboardAvatar = loadDashboardAvatar;
-
-  // Load avatar when page loads
-  document.addEventListener('DOMContentLoaded', function() {
-    setTimeout(loadDashboardAvatar, 100); // Small delay to ensure DOM is ready
-  });
-
-  // Also load when coming back from profile setup
-  if (sessionStorage.getItem('profileUpdated')) {
-    sessionStorage.removeItem('profileUpdated');
-    setTimeout(loadDashboardAvatar, 500);
-  }
-})();
-</script>
-
-<script>
-// Load member data and display it properly
-(function() {
-    function getToken() {
-        return localStorage.getItem('jwt') || localStorage.getItem('token') || '';
-    }
-
-    // Load and display member data
-    async function loadMemberData() {
-        const token = getToken();
-        if (!token) {
-            window.location.href = '/member/login.php';
-            return;
-        }
-
-        try {
-            const response = await fetch('/api/auth/me', {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
-            });
-
-            if (!response.ok) {
-                if (response.status === 401) {
-                    localStorage.removeItem('jwt');
-                    localStorage.removeItem('token');
-                    window.location.href = '/member/login.php';
-                    return;
-                }
-                throw new Error('Failed to load member data');
-            }
-
-            const user = await response.json();
-            displayMemberData(user);
-
-        } catch (error) {
-            console.error('Error loading member data:', error);
-            document.getElementById('hello').textContent = 'Welcome (Error loading data)';
-            document.getElementById('email').textContent = 'Error loading email';
-        }
-    }
-
-    // Display member data in the dashboard
-    function displayMemberData(user) {
-        // Update welcome message with actual name
-        const fullName = `${user.surname || ''} ${user.otherNames || ''}`.trim() || user.name || 'Member';
-        document.getElementById('hello').textContent = `Welcome, ${fullName}`;
-        
-        // Update email
-        document.getElementById('email').textContent = user.email || 'No email';
-        
-        // Update avatar if passport photo exists
-        if (user.passportUrl) {
-            const avatar = document.getElementById('avatar');
-            avatar.src = user.passportUrl;
-        }
-
-        // Add member details to recent activity section
-        const recentList = document.getElementById('recentList');
-        recentList.innerHTML = `
-            <div class="item">
-                <span>Full Name</span>
-                <span style="font-weight: 600">${fullName}</span>
-            </div>
-            <div class="item">
-                <span>Phone</span>
-                <span style="font-weight: 600">${user.phone || 'Not provided'}</span>
-            </div>
-            <div class="item">
-                <span>State</span>
-                <span style="font-weight: 600">${user.state || 'Not provided'}</span>
-            </div>
-            <div class="item">
-                <span>Zone</span>
-                <span style="font-weight: 600">${user.zone || 'Not provided'}</span>
-            </div>
-            <div class="item">
-                <span>Date of Birth</span>
-                <span style="font-weight: 600">${user.dob ? new Date(user.dob).toLocaleDateString() : 'Not provided'}</span>
-            </div>
-            <div class="item">
-                <span>Guarantor</span>
-                <span style="font-weight: 600">${user.guarantor || 'Not provided'}</span>
-            </div>
-            <div class="item">
-                <span>Member Since</span>
-                <span style="font-weight: 600">${user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'Unknown'}</span>
-            </div>
-            <div class="item">
-                <span>Membership Status</span>
-                <span class="pill ${user.hasPaidMembership ? 'ok' : 'warn'}">${user.hasPaidMembership ? 'ACTIVE' : 'PENDING'}</span>
-            </div>
-        `;
-
-        console.log('Member data loaded successfully:', user);
-    }
-
-    // Load member data when page loads
-    document.addEventListener('DOMContentLoaded', function() {
-        loadMemberData();
+    
+    document.getElementById('linkEditProfile')?.addEventListener('click', (e) => {
+      e.preventDefault();
+      activate('edit-profile');
     });
-
-    // Also load immediately if DOM is already ready
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', loadMemberData);
-    } else {
-        loadMemberData();
+    
+    document.getElementById('linkChangePassword')?.addEventListener('click', (e) => {
+      e.preventDefault();
+      activate('change-password');
+    });
+    
+    document.getElementById('linkShowAll')?.addEventListener('click', (e) => {
+      e.preventDefault();
+      activate('all');
+    });
+    
+    document.getElementById('linkHide')?.addEventListener('click', (e) => {
+      e.preventDefault();
+      hideAll();
+    });
+  }
+  
+  // Initialize dashboard
+  async function initDashboard() {
+    try {
+      // Show loading state
+      const helloEl = document.getElementById('hello');
+      if (helloEl) helloEl.textContent = 'Loading...';
+      
+      // Load user data and update dashboard
+      const user = await loadUserData();
+      if (user) {
+        updateDashboard(user);
+        console.log('Dashboard initialized successfully');
+      }
+      
+    } catch (error) {
+      const helloEl = document.getElementById('hello');
+      if (helloEl) helloEl.textContent = 'Welcome (Error loading data)';
+      console.error('Dashboard initialization error:', error);
     }
+  }
+  
+  // Event listeners
+  function initEventListeners() {
+    document.getElementById('btnSaveProfile')?.addEventListener('click', saveProfile);
+    document.getElementById('btnReloadProfile')?.addEventListener('click', loadProfile);
+    document.getElementById('btnChangePassword')?.addEventListener('click', changePassword);
+    document.getElementById('btnResetPasswordForm')?.addEventListener('click', function() {
+      document.getElementById('passwordForm')?.reset();
+    });
+  }
+  
+  // Make functions globally available
+  window.loadUserData = loadUserData;
+  window.refreshDashboard = () => loadUserData(true).then(updateDashboard);
+  window.loadDashboardAvatar = () => loadUserData(true).then(updateDashboard); // For compatibility
+  
+  // Initialize everything when DOM is ready
+  function init() {
+    initDOB();
+    initPasswordToggle();
+    initPassportPreview();
+    initHeaderMenu();
+    initSettingsPanels();
+    initEventListeners();
+    loadProfile();
+    initDashboard();
+  }
+  
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
 })();
 </script>
 
