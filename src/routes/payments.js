@@ -1,6 +1,6 @@
 import express from 'express';
 import axios from 'axios';
-import Payment from '../models/payment.js';
+import Payment from '../models/Payment.js';
 import User from '../models/User.js';
 import { requireAuth } from '../middleware/auth.js';
 

@@ -245,7 +245,9 @@ header .title .menu.open .menu-list{ display:block; }
 #member-settings .card{ position:relative; z-index:1; }
 /* Avoid header overlap with sticky header */
 main, #member-settings{ padding-top: 8px; }
-</style></head>
+</style>
+<script src="https://js.paystack.co/v1/inline.js"></script>
+</head>
 <body>
 <header>
 <div class="title">
@@ -348,12 +350,20 @@ main, #member-settings{ padding-top: 8px; }
 <span class="loading" id="payCertificateLoader" style="display: none;"></span>
 </button>
 </div>
+<!-- Debug Panel -->
+<div class="debug-panel">
+  <div class="debug-title">Payment Debug Log</div>
+  <div id="debugLogs">
+    <div class="debug-log">Dashboard initialized. Payment system ready...</div>
+  </div>
+</div>
 
 <script>
     (function(){
         // Debug logging
         function addDebugLog(message, isError = false) {
             const debugLogs = document.getElementById('debugLogs');
+            if (!debugLogs) return; // Safety check
             const logEntry = document.createElement('div');
             logEntry.className = isError ? 'debug-log debug-error' : 'debug-log';
             logEntry.textContent = new Date().toLocaleTimeString() + ' - ' + message;
@@ -366,12 +376,14 @@ main, #member-settings{ padding-top: 8px; }
             const notification = document.getElementById('notification');
             const notificationText = document.getElementById('notification-text');
             
-            notificationText.textContent = message;
-            notification.className = isSuccess ? 'notification success show' : 'notification show';
-            
-            setTimeout(() => {
-                notification.classList.remove('show');
-            }, 5000);
+            if (notification && notificationText) {
+                notificationText.textContent = message;
+                notification.className = isSuccess ? 'notification success show' : 'notification show';
+                
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 5000);
+            }
             
             addDebugLog(message, !isSuccess);
         }
@@ -379,21 +391,21 @@ main, #member-settings{ padding-top: 8px; }
         // Token expiration modal
         function showTokenExpiredModal() {
             const modal = document.getElementById('tokenExpiredModal');
-            modal.classList.add('show');
+            if (modal) modal.classList.add('show');
         }
 
         // Close modal
-        document.getElementById('modalCancel').addEventListener('click', function() {
-            document.getElementById('tokenExpiredModal').classList.remove('show');
+        document.getElementById('modalCancel')?.addEventListener('click', function() {
+            document.getElementById('tokenExpiredModal')?.classList.remove('show');
         });
 
         // Redirect to login
-        document.getElementById('modalLogin').addEventListener('click', function() {
+        document.getElementById('modalLogin')?.addEventListener('click', function() {
             window.location.href = '/member/login.php';
         });
 
         // Logout button
-        document.getElementById('logoutBtn').addEventListener('click', function() {
+        document.getElementById('logoutBtn')?.addEventListener('click', function() {
             // Clear all auth storage
             localStorage.removeItem('jwt');
             localStorage.removeItem('token');
@@ -423,6 +435,31 @@ main, #member-settings{ padding-top: 8px; }
                 addDebugLog(`Payment method selected: ${selectedPaymentMethod}`);
             });
         });
+
+        // Get current user data for payments
+        let currentUser = null;
+        
+        async function getCurrentUser() {
+            if (currentUser) return currentUser;
+            
+            try {
+                const response = await fetch('/api/member/profile', {
+                    headers: {
+                        'Authorization': 'Bearer ' + getToken(),
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    currentUser = await response.json();
+                    return currentUser;
+                }
+            } catch (error) {
+                addDebugLog('Error fetching user data: ' + error.message, true);
+            }
+            
+            return null;
+        }
 
         function getToken(){
             const ls = localStorage.getItem('jwt') || localStorage.getItem('token') || localStorage.getItem('authToken');
@@ -502,39 +539,140 @@ main, #member-settings{ padding-top: 8px; }
             });
         }
 
-        function startPayment(amount, purpose, buttonId){
+        // Payment verification function
+        async function verifyPayment(reference) {
+            try {
+                addDebugLog(`Verifying payment with reference: ${reference}`);
+                
+                const response = await fetch('/api/payments/verify', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + getToken()
+                    },
+                    body: JSON.stringify({ reference })
+                });
+                
+                const result = await response.json();
+                addDebugLog(`Verification response: ${JSON.stringify(result)}`);
+                
+                if (result.ok && result.status === 'success') {
+                    addDebugLog('Payment verified successfully!');
+                    showNotification('Payment successful and verified!', true);
+                    
+                    // Refresh page to show updated payment status
+                    setTimeout(() => {
+                        location.reload();
+                    }, 2000);
+                } else {
+                    addDebugLog('Payment verification failed: ' + result.message, true);
+                    showNotification('Payment verification failed: ' + (result.message || 'Unknown error'));
+                }
+            } catch (error) {
+                addDebugLog('Error verifying payment: ' + error.message, true);
+                showNotification('Error verifying payment: ' + error.message);
+            }
+        }
+
+        async function startPayment(amount, purpose, buttonId){
             // Show loading state
             const button = document.getElementById(buttonId);
             const buttonText = document.getElementById(buttonId + 'Text');
             const buttonLoader = document.getElementById(buttonId + 'Loader');
             
+            if (!button || !buttonText || !buttonLoader) {
+                addDebugLog('Payment button elements not found', true);
+                return;
+            }
+            
             button.disabled = true;
             buttonText.style.display = 'none';
             buttonLoader.style.display = 'inline-block';
             
-            paymentsInit(amount, purpose)
-                .then(({ reference }) => {
-                    addDebugLog(`Payment initialized successfully. Reference: ${reference}`);
-                    showNotification('Payment initialized successfully! Redirecting to payment gateway...', true);
+            try {
+                // Get user data for payment
+                const user = await getCurrentUser();
+                if (!user || !user.email) {
+                    throw new Error('User data not available for payment');
+                }
+                
+                // Initialize payment with backend
+                const { reference } = await paymentsInit(amount, purpose);
+                addDebugLog(`Payment initialized successfully. Reference: ${reference}`);
+                
+                // Check if Paystack is available
+                if (typeof PaystackPop === 'undefined') {
+                    addDebugLog('Paystack not loaded, using simulation mode', true);
+                    showNotification('Paystack not available. Using simulation mode.', false);
                     
-                    // In a real implementation, you would redirect to Paystack here
-                    // For now, we'll just reset the button and show a success message
+                    // Fallback to simulation
                     setTimeout(() => {
                         resetButton(buttonId);
                         showNotification('Payment simulation complete. In production, you would be redirected to Paystack.', true);
                     }, 2000);
-                })
-                .catch(e => {
-                    addDebugLog(`Payment initialization error: ${e.message}`, true);
-                    
-                    if (e.message.includes('Authentication failed')) {
-                        showNotification('Your session has expired. Please log in again.');
-                    } else {
-                        showNotification('Payment failed: ' + e.message);
+                    return;
+                }
+                
+                // Real Paystack Integration
+                addDebugLog('Opening Paystack payment gateway...');
+                showNotification('Opening payment gateway...', true);
+                
+                const paystackHandler = PaystackPop.setup({
+                    key: 'pk_test_your_public_key_here', // 🚨 REPLACE WITH YOUR ACTUAL PUBLIC KEY
+                    email: user.email,
+                    amount: amount,
+                    currency: 'NGN',
+                    ref: reference,
+                    metadata: {
+                        purpose: purpose,
+                        user_id: user._id,
+                        custom_fields: [
+                            {
+                                display_name: "Purpose",
+                                variable_name: "purpose",
+                                value: purpose
+                            },
+                            {
+                                display_name: "User ID", 
+                                variable_name: "user_id",
+                                value: user._id
+                            }
+                        ]
+                    },
+                    callback: function(response) {
+                        // Payment successful
+                        addDebugLog(`Payment successful! Reference: ${response.reference}`);
+                        showNotification('Payment successful! Verifying...', true);
+                        
+                        // Reset button first
+                        resetButton(buttonId);
+                        
+                        // Verify payment with backend
+                        verifyPayment(response.reference);
+                    },
+                    onClose: function() {
+                        // Payment cancelled or closed
+                        addDebugLog('Payment cancelled by user');
+                        showNotification('Payment was cancelled');
+                        resetButton(buttonId);
                     }
-                    
-                    resetButton(buttonId);
                 });
+                
+                // Open the payment modal
+                paystackHandler.openIframe();
+                
+            } catch (e) {
+                addDebugLog(`Payment initialization error: ${e.message}`, true);
+                
+                if (e.message.includes('Authentication failed')) {
+                    showNotification('Your session has expired. Please log in again.');
+                    showTokenExpiredModal();
+                } else {
+                    showNotification('Payment failed: ' + e.message);
+                }
+                
+                resetButton(buttonId);
+            }
         }
 
         function resetButton(buttonId) {
@@ -542,27 +680,29 @@ main, #member-settings{ padding-top: 8px; }
             const buttonText = document.getElementById(buttonId + 'Text');
             const buttonLoader = document.getElementById(buttonId + 'Loader');
             
-            button.disabled = false;
-            buttonText.style.display = 'inline-block';
-            buttonLoader.style.display = 'none';
+            if (button && buttonText && buttonLoader) {
+                button.disabled = false;
+                buttonText.style.display = 'inline-block';
+                buttonLoader.style.display = 'none';
+            }
         }
 
         // Set up payment button event listeners
-        document.getElementById('payMembership').addEventListener('click', () => {
+        document.getElementById('payMembership')?.addEventListener('click', () => {
             const amount = Number(document.getElementById('payMembership').getAttribute('data-amount-kobo') || 0);
             const purpose = document.getElementById('payMembership').getAttribute('data-purpose') || 'membership';
             if(!amount) return showNotification('Amount missing');
             startPayment(amount, purpose, 'payMembership');
         });
         
-        document.getElementById('payIdCard').addEventListener('click', () => {
+        document.getElementById('payIdCard')?.addEventListener('click', () => {
             const amount = Number(document.getElementById('payIdCard').getAttribute('data-amount-kobo') || 0);
             const purpose = document.getElementById('payIdCard').getAttribute('data-purpose') || 'idcard';
             if(!amount) return showNotification('Amount missing');
             startPayment(amount, purpose, 'payIdCard');
         });
         
-        document.getElementById('payCertificate').addEventListener('click', () => {
+        document.getElementById('payCertificate')?.addEventListener('click', () => {
             const amount = Number(document.getElementById('payCertificate').getAttribute('data-amount-kobo') || 0);
             const purpose = document.getElementById('payCertificate').getAttribute('data-purpose') || 'certificate';
             if(!amount) return showNotification('Amount missing');
@@ -578,8 +718,15 @@ main, #member-settings{ padding-top: 8px; }
         } else {
             addDebugLog('Token is valid on page load');
         }
+        
+        // Pre-load user data
+        getCurrentUser().then(user => {
+            if (user) {
+                addDebugLog(`User data loaded: ${user.email}`);
+            }
+        });
     })();
-    </script>
+</script>
 <section class="container my-4" id="member-settings">
 <div class="row g-4">
 <div class="col-12">
