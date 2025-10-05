@@ -42,6 +42,14 @@ if (!MONGO_URI) {
   process.exit(1);
 }
 
+
+mongoose.connect(MONGO_URI).then(() => {
+  console.log('✅ Mongo connected');
+}).catch(e => {
+  console.error('Mongo error', e);
+  process.exit(1);
+});
+
 // Middlewares
 app.use(helmet({
   crossOriginEmbedderPolicy: false,
