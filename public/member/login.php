@@ -85,16 +85,17 @@ document.getElementById('loginForm').addEventListener('submit', async (e)=>{
   profile.profileCompleted === true;
 
         console.log('Profile completeness check:', {
-          firstName: !!profile.firstName,
-          lastName: !!profile.lastName,
-          phone: !!profile.phone,
-          state: !!profile.state,
-          passportUrl: !!profile.passportUrl,
-          signatureUrl: !!profile.signatureUrl,
-          profileCompleted: profile.profileCompleted,
-          isComplete: isProfileComplete
-        });
-
+  surname: !!profile.surname,
+  otherNames: !!profile.otherNames,
+  firstName: !!profile.firstName,    // Keep for legacy debugging
+  lastName: !!profile.lastName,      // Keep for legacy debugging
+  phone: !!profile.phone,
+  state: !!profile.state,
+  passportUrl: !!profile.passportUrl,
+  signatureUrl: !!profile.signatureUrl,
+  profileCompleted: profile.profileCompleted,
+  isComplete: isProfileComplete
+});
         // Redirect based on profile completeness
         if(isProfileComplete){
           msg.textContent = 'Profile complete! Redirecting to dashboard...';
