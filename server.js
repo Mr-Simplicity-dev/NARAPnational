@@ -36,11 +36,11 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // DB
-const MONGO_URI = process.env.MONGO_URI || 'mongodb+srv://moshood2uall_db_user:MTOscBfON6XDKbGi@narapsite.dscc9gw.mongodb.net/?';
-mongoose.connect(MONGO_URI).then(() => console.log('✅ Mongo connected')).catch(e => {
-  console.error('Mongo error', e);
+const MONGO_URI = process.env.MONGO_URI;
+if (!MONGO_URI) {
+  console.error('MONGO_URI environment variable is required');
   process.exit(1);
-});
+}
 
 // Middlewares
 app.use(helmet({
