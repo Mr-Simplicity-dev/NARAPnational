@@ -75,34 +75,29 @@ document.getElementById('loginForm').addEventListener('submit', async (e)=>{
       if(profileRes.ok){
         const profile = await profileRes.json();
         
-    // In login.php, replace the current profile completeness check with this:
-const isProfileComplete = 
-  profile.name && 
-  profile.phone && 
-  profile.state && 
-  profile.businessName &&
-  profile.businessAddress &&
-  profile.specialization &&
-  profile.position &&
-  profile.guarantor &&
-  profile.passportUrl && 
-  profile.signatureUrl &&
-  profile.profileCompleted === true;
+        const isProfileComplete = 
+          (profile.surname || profile.lastName || profile.name) &&
+          (profile.otherNames || profile.firstName || profile.name) &&
+          profile.phone && 
+          profile.state && 
+          profile.passportUrl && 
+          profile.signatureUrl &&
+          profile.profileCompleted === true;
 
-console.log('Profile completeness check:', {
-  name: !!profile.name,
-  phone: !!profile.phone,
-  state: !!profile.state,
-  businessName: !!profile.businessName,
-  businessAddress: !!profile.businessAddress,
-  specialization: !!profile.specialization,
-  position: !!profile.position,
-  guarantor: !!profile.guarantor,
-  passportUrl: !!profile.passportUrl,
-  signatureUrl: !!profile.signatureUrl,
-  profileCompleted: profile.profileCompleted,
-  isComplete: isProfileComplete
-});
+        console.log('Profile completeness check:', {
+          surname: !!profile.surname,
+          otherNames: !!profile.otherNames,
+          firstName: !!profile.firstName,
+          lastName: !!profile.lastName,
+          name: !!profile.name,
+          phone: !!profile.phone,
+          state: !!profile.state,
+          passportUrl: !!profile.passportUrl,
+          signatureUrl: !!profile.signatureUrl,
+          profileCompleted: profile.profileCompleted,
+          isComplete: isProfileComplete
+        });
+
         // Redirect based on profile completeness
         if(isProfileComplete){
           msg.textContent = 'Profile complete! Redirecting to dashboard...';
