@@ -76,8 +76,8 @@ document.getElementById('loginForm').addEventListener('submit', async (e)=>{
         const profile = await profileRes.json();
         
     const isProfileComplete = 
-  (profile.surname || profile.lastName) &&
-  (profile.otherNames || profile.firstName) &&
+  (profile.surname || profile.lastName || profile.name) &&
+  (profile.otherNames || profile.firstName || profile.name) &&
   profile.phone && 
   profile.state && 
   profile.passportUrl && 
