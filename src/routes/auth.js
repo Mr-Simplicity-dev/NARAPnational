@@ -4,22 +4,11 @@ import path from 'path';
 import fs from 'fs';
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
+import { requireAuth } from '../middleware/auth.js';
 
 const router = express.Router();
 
-/* ----------------------------- auth middleware ---------------------------- */
-const requireAuth = (req, res, next) => {
-  try {
-    const auth = req.headers.authorization || '';
-    const token = auth.startsWith('Bearer ') ? auth.slice(7) : null;
-    if (!token) return res.status(401).json({ message: 'Unauthorized' });
-    const payload = jwt.verify(token, process.env.JWT_SECRET || 'secret');
-    req.user = { id: payload.id };
-    next();
-  } catch (e) {
-    return res.status(401).json({ message: 'Unauthorized' });
-  }
-};
+
 
 /* --------------------------------- uploads -------------------------------- */
 const memberPassportDir = path.join(process.cwd(), 'public', 'admin', 'uploads', 'passports');
