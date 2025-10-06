@@ -113,7 +113,6 @@
   <i class="fas fa-upload me-1"></i> Choose Image
 </button>
 
-<!-- Clear buttons -->
 <button type="button" class="btn btn-outline-danger btn-sm" data-action="clear-image" data-target="aboutImage">
   <i class="fas fa-times me-1"></i> Clear
 </button>
@@ -155,12 +154,11 @@
               </div>
               <div class="d-flex mt-2 gap-2">
                <!-- Choose Image buttons -->
-<button type="button" class="btn btn-outline-primary btn-sm" data-action="choose-image" data-target="aboutImage">
+<button type="button" class="btn btn-outline-primary btn-sm" data-action="choose-image" data-target="faqsImage">
   <i class="fas fa-upload me-1"></i> Choose Image
 </button>
 
-<!-- Clear buttons -->
-<button type="button" class="btn btn-outline-danger btn-sm" data-action="clear-image" data-target="aboutImage">
+<button type="button" class="btn btn-outline-danger btn-sm" data-action="clear-image" data-target="faqsImage">
   <i class="fas fa-times me-1"></i> Clear
 </button>
               </div>
@@ -202,12 +200,11 @@
             </div>
             <div class="d-flex mt-2 gap-2">
              <!-- Choose Image buttons -->
-<button type="button" class="btn btn-outline-primary btn-sm" data-action="choose-image" data-target="aboutImage">
+<button type="button" class="btn btn-outline-primary btn-sm" data-action="choose-image" data-target="sliderImage">
   <i class="fas fa-upload me-1"></i> Choose Image
 </button>
 
-<!-- Clear buttons -->
-<button type="button" class="btn btn-outline-danger btn-sm" data-action="clear-image" data-target="aboutImage">
+<button type="button" class="btn btn-outline-danger btn-sm" data-action="clear-image" data-target="sliderImage">
   <i class="fas fa-times me-1"></i> Clear
 </button>
             </div>
@@ -251,12 +248,13 @@
               <input type="hidden" name="image" id="serviceImageUrl">
             </div>
             <div class="d-flex mt-2 gap-2">
-              <button type="button" class="btn btn-outline-primary btn-sm" onclick="document.getElementById('serviceImageUpload').click()">
-                <i class="fas fa-upload me-1"></i> Choose Image
-              </button>
-              <button type="button" class="btn btn-outline-danger btn-sm" onclick="clearImageUpload('serviceImage')">
-                <i class="fas fa-times me-1"></i> Clear
-              </button>
+              <button type="button" class="btn btn-outline-primary btn-sm" data-action="choose-image" data-target="serviceImage">
+  <i class="fas fa-upload me-1"></i> Choose Image
+</button>
+
+<button type="button" class="btn btn-outline-danger btn-sm" data-action="clear-image" data-target="serviceImage">
+  <i class="fas fa-times me-1"></i> Clear
+</button>
             </div>
           </div>
           <div class="col-12"><label class="form-label">Description</label><textarea name="description" class="form-control" rows="3"></textarea></div>
@@ -297,12 +295,13 @@
               <input type="hidden" name="image" id="projectImageUrl">
             </div>
             <div class="d-flex mt-2 gap-2">
-              <button type="button" class="btn btn-outline-primary btn-sm" onclick="document.getElementById('projectImageUpload').click()">
-                <i class="fas fa-upload me-1"></i> Choose Image
-              </button>
-              <button type="button" class="btn btn-outline-danger btn-sm" onclick="clearImageUpload('projectImage')">
-                <i class="fas fa-times me-1"></i> Clear
-              </button>
+             <button type="button" class="btn btn-outline-primary btn-sm" data-action="choose-image" data-target="projectImage">
+  <i class="fas fa-upload me-1"></i> Choose Image
+</button>
+
+<button type="button" class="btn btn-outline-danger btn-sm" data-action="clear-image" data-target="projectImage">
+  <i class="fas fa-times me-1"></i> Clear
+</button>
             </div>
           </div>
           <div class="col-md-6"><label class="form-label">Link</label><input name="link" class="form-control" placeholder="/projects/slug"></div>
@@ -414,12 +413,13 @@
               <input type="hidden" name="image" id="blogImageUrl">
             </div>
             <div class="d-flex mt-2 gap-2">
-              <button type="button" class="btn btn-outline-primary btn-sm" onclick="document.getElementById('blogImageUpload').click()">
-                <i class="fas fa-upload me-1"></i> Choose Image
-              </button>
-              <button type="button" class="btn btn-outline-danger btn-sm" onclick="clearImageUpload('blogImage')">
-                <i class="fas fa-times me-1"></i> Clear
-              </button>
+           <button type="button" class="btn btn-outline-primary btn-sm" data-action="choose-image" data-target="blogImage">
+  <i class="fas fa-upload me-1"></i> Choose Image
+</button>
+
+<button type="button" class="btn btn-outline-danger btn-sm" data-action="clear-image" data-target="blogImage">
+  <i class="fas fa-times me-1"></i> Clear
+</button>
             </div>
           </div>
           <div class="col-12 sticky-actions">
@@ -481,12 +481,13 @@
               <input type="hidden" name="image" id="teamImageUrl">
             </div>
             <div class="d-flex mt-2 gap-2">
-              <button type="button" class="btn btn-outline-primary btn-sm" onclick="document.getElementById('teamImageUpload').click()">
-                <i class="fas fa-upload me-1"></i> Choose Image
-              </button>
-              <button type="button" class="btn btn-outline-danger btn-sm" onclick="clearImageUpload('teamImage')">
-                <i class="fas fa-times me-1"></i> Clear
-              </button>
+              <button type="button" class="btn btn-outline-primary btn-sm" data-action="choose-image" data-target="teamImage">
+  <i class="fas fa-upload me-1"></i> Choose Image
+</button>
+
+<button type="button" class="btn btn-outline-danger btn-sm" data-action="clear-image" data-target="teamImage">
+  <i class="fas fa-times me-1"></i> Clear
+</button>
             </div>
           </div>
           <div class="col-md-4"><label class="form-label">Facebook</label><input name="facebook" class="form-control" placeholder="https://facebook.com/..."></div>
