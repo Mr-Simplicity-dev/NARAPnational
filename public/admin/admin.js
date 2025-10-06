@@ -772,7 +772,10 @@ async function loadMembersSimple(type) {
     
     if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
     
-    const items = await res.json();
+    // FIX: Handle both response formats
+    const response = await res.json();
+    const items = response.data || response; // Use .data if it exists, otherwise use the response directly
+    
     console.log(`Loaded ${items?.length || 0} ${type} members:`, items);
     
     // Store the data for filtering/export
@@ -1237,7 +1240,11 @@ async function loadList(key) {
     if (!cfg) return;
     const res = await authFetch(`${API_BASE}${cfg.endpoint}`);
     if (!res?.ok) return;
-    const items = await res.json();
+    
+    // FIX: Handle both response formats
+    const response = await res.json();
+    const items = response.data || response; // Use .data if it exists, otherwise use the response directly
+    
     const html = (items || [])
       .slice()
       .sort((a, b) => (Number(a?.order ?? 0)) - (Number(b?.order ?? 0)))
