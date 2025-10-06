@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
+  <link rel="icon" type="image/png" href="/uploads/slider/Narap.png"/>
    <meta charset="utf-8" />
   <title>NARAP Admin Dashboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
