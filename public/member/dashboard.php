@@ -7,16 +7,16 @@
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <meta http-equiv="Content-Security-Policy" content="
     default-src 'self'; 
-    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://d2mpatx37cqexb.cloudfront.net https://use.fontawesome.com https://embed.tawk.to https://cdn.tawk.to https://*.tawk.to https://paystack.com; 
+    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://d2mpatx37cqexb.cloudfront.net https://use.fontawesome.com https://embed.tawk.to https://cdn.tawk.to https://*.tawk.to https://paystack.com https://*.paystack.com; 
     font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com https://use.fontawesome.com; 
     script-src 'self' 'unsafe-inline' https://js.paystack.co https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://api.paystack.com; 
-    connect-src 'self' https://api.paystack.co https://api.paystack.com; 
-    frame-src https://js.paystack.co https://*.paystack.com https://paystack.com;
-    child-src https://js.paystack.co https://*.paystack.com;
+    connect-src 'self' https://api.paystack.co https://checkout.paystack.com; 
+    frame-src 'self' https://js.paystack.co https://*.paystack.com https://checkout.paystack.com;
+    child-src 'self' https://js.paystack.co https://*.paystack.com https://checkout.paystack.com;
 ">
 <title>Member Dashboard · Payments</title>
 <!-- Add CSP meta tag to allow Paystack resources -->
-<meta http-equiv="Content-Security-Policy" content="style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://d2mpatx37cqexb.cloudfront.net https://use.fontawesome.com https://embed.tawk.to https://cdn.tawk.to https://*.tawk.to https://paystack.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com https://use.fontawesome.com; script-src 'self' 'unsafe-inline' https://js.paystack.co https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; connect-src 'self' https://api.paystack.co; frame-src https://js.paystack.co">
+<!-- <meta http-equiv="Content-Security-Policy" content="style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://d2mpatx37cqexb.cloudfront.net https://use.fontawesome.com https://embed.tawk.to https://cdn.tawk.to https://*.tawk.to https://paystack.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com https://use.fontawesome.com; script-src 'self' 'unsafe-inline' https://js.paystack.co https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; connect-src 'self' https://api.paystack.co; frame-src https://js.paystack.co"> -->
 <style>
         :root {
             --brand: #0ea5e9; --ink: #0f172a; --muted: #64748b;
