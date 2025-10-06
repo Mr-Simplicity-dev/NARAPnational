@@ -1483,29 +1483,6 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 });
 
- // Handle Choose Image buttons
-  document.addEventListener('click', function(e) {
-    if (e.target.matches('[data-action="choose-image"]') || 
-        e.target.closest('[data-action="choose-image"]')) {
-      
-      const button = e.target.closest('[data-action="choose-image"]');
-      const target = button.dataset.target;
-      const fileInput = document.getElementById(`${target}Upload`);
-      
-      if (fileInput) {
-        fileInput.click();
-      }
-    }
-    
-    // Handle Clear buttons
-    if (e.target.matches('[data-action="clear-image"]') || 
-        e.target.closest('[data-action="clear-image"]')) {
-      
-      const button = e.target.closest('[data-action="clear-image"]');
-      const target = button.dataset.target;
-      clearImageUpload(target);
-    }
-  });
 
 
 // ===== MISSING MEMBER LOADING FUNCTIONS =====
