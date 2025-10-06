@@ -104,18 +104,22 @@ function initializeImageUploads() {
 }
 
 // Helper function to reset container styling
+// Helper function to reset container styling
+function resetContainerStyle(container) {
+  container.style.borderColor = '#dee2e6';
+  container.style.backgroundColor = '#f8f9fa';
+}
+
+// Setup button event handlers - SINGLE FUNCTION ONLY
 function setupImageUploadButtons() {
   console.log('Setting up image upload buttons...');
   
   // Remove any existing inline onclick handlers and replace with event listeners
-  document.querySelectorAll('button').forEach(button => {
+  document.querySelectorAll('button[onclick]').forEach(button => {
     const onclick = button.getAttribute('onclick');
     
-    if (!onclick) return; // Skip buttons that already don't have onclick
-    
-    // Handle "Choose Image" buttons - more flexible pattern matching
-    if (onclick.includes('.click()') || onclick.includes('Upload').includes('click')) {
-      // Extract the target from various patterns
+    // Handle "Choose Image" buttons - comprehensive pattern matching
+    if (onclick.includes('.click()') || (onclick.includes('Upload') && onclick.includes('click'))) {
       let target = null;
       
       // Pattern: document.getElementById('targetUpload').click()
@@ -128,57 +132,23 @@ function setupImageUploadButtons() {
         button.removeAttribute('onclick');
         button.setAttribute('data-action', 'choose-image');
         button.setAttribute('data-target', target);
-        console.log('Converted inline choose handler for:', target);
+        console.log('✅ Converted choose button for:', target);
       }
     }
     
-    // Handle "Clear" buttons - more flexible pattern matching
-    if (onclick.includes('clearImageUpload') || onclick.includes('clear')) {
+    // Handle "Clear" buttons
+    if (onclick.includes('clearImageUpload')) {
       let match = onclick.match(/clearImageUpload\('([^']+)'\)/);
       if (match) {
         const target = match[1];
         button.removeAttribute('onclick');
         button.setAttribute('data-action', 'clear-image');
         button.setAttribute('data-target', target);
-        console.log('Converted inline clear handler for:', target);
+        console.log('✅ Converted clear button for:', target);
       }
     }
   });
 }
-// Setup button event handlers
-function setupImageUploadButtons() {
-  console.log('Setting up image upload buttons...');
-  
-  // Remove any existing inline onclick handlers and replace with event listeners
-  document.querySelectorAll('button').forEach(button => {
-    const onclick = button.getAttribute('onclick');
-    
-    // Handle "Choose Image" buttons
-    if (onclick && onclick.includes('click()')) {
-      const match = onclick.match(/getElementById\('([^']+)Upload'\)/);
-      if (match) {
-        const target = match[1];
-        button.removeAttribute('onclick');
-        button.setAttribute('data-action', 'choose-image');
-        button.setAttribute('data-target', target);
-        console.log('Converted inline choose handler for:', target);
-      }
-    }
-    
-    // Handle "Clear" buttons  
-    if (onclick && onclick.includes('clearImageUpload')) {
-      const match = onclick.match(/clearImageUpload\('([^']+)'\)/);
-      if (match) {
-        const target = match[1];
-        button.removeAttribute('onclick');
-        button.setAttribute('data-action', 'clear-image');
-        button.setAttribute('data-target', target);
-        console.log('Converted inline clear handler for:', target);
-      }
-    }
-  });
-}
-
 // Handle file selection
 function handleFileSelection(file, target) {
   if (!file) return;
