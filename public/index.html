@@ -1462,7 +1462,7 @@ s0.parentNode.insertBefore(s1,s0);
 // Load dynamic content from admin dashboard
 async function loadDynamicContent() {
   try {
-    const response = await fetch('/admin/data/home.json');
+    const response = await fetch('/api/settings/home');
     if (!response.ok) throw new Error('Failed to load content');
     
     const data = await response.json();
