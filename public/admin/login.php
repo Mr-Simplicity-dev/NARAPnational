@@ -57,63 +57,123 @@
   </main>
 
   <script>
-  (function(){
-    // clean any leaked query (?identifier=...&password=...) from URL bar
-    try { history.replaceState(null,'',location.pathname); } catch(_) {}
+(function(){
+  // clean any leaked query (?identifier=...&password=...) from URL bar
+  try { history.replaceState(null,'',location.pathname); } catch(_) {}
 
-    const msg  = document.getElementById('loginMsg');
-    const form = document.getElementById('loginForm');
-    const btn  = document.getElementById('loginBtn');
+  const msg  = document.getElementById('loginMsg');
+  const form = document.getElementById('loginForm');
+  const btn  = document.getElementById('loginBtn');
 
-    const LOGIN_URL = '/api/auth/login';   // matches your server routes
-    const ME_URL    = '/api/auth/me';
+  const LOGIN_URL = '/api/auth/login';
+  const ME_URL    = '/api/auth/me';
 
-    function show(type, text){
-      msg.style.display = 'block';
-      msg.className = 'msg ' + (type === 'ok' ? 'ok' : 'err');
-      msg.textContent = text;
-    }
-    function clearMsg(){ msg.style.display = 'none'; }
+  function show(type, text){
+    msg.style.display = 'block';
+    msg.className = 'msg ' + (type === 'ok' ? 'ok' : 'err');
+    msg.textContent = text;
+  }
+  function clearMsg(){ msg.style.display = 'none'; }
 
-    function saveJwt(tok){ try { if (tok) localStorage.setItem('jwt', tok); } catch(_) {} }
-
-    async function verifyCookieThenGo(){
-      try {
-        const r = await fetch(ME_URL, { credentials: 'include' });
-        if (r.ok && !localStorage.getItem('jwt')) localStorage.setItem('jwt','cookie');
-      } catch(_){}
-      window.location.replace('/admin/dashboard.php');
-    }
-
-    async function login(email, password){
-      btn.disabled = true; clearMsg();
-      try{
-        const res = await fetch(LOGIN_URL, {
-          method:'POST',
-          headers:{ 'Content-Type':'application/json' },
-          credentials:'include',
-          body: JSON.stringify({ email, password })
-        });
-        const data = await res.json().catch(()=>({}));
-        if (!res.ok) throw new Error(data.message || 'Login failed');
-
-        saveJwt(data.token || data.jwt || (data.data && data.data.token));
-        show('ok','Login successful. Redirecting…');
-        await verifyCookieThenGo();
-      } catch(e){
-        show('err', e && e.message ? e.message : 'Login failed');
-        btn.disabled = false;
+  async function verifyTokenAndRedirect(token) {
+    try {
+      console.log('Verifying token...');
+      
+      // Verify the token is valid by making an authenticated request
+      const response = await fetch(ME_URL, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      console.log('Token verification response:', response.status);
+      
+      if (response.ok) {
+        show('ok', 'Login successful. Redirecting…');
+        // Wait for the message to show, then redirect
+        setTimeout(() => {
+          console.log('Redirecting to dashboard...');
+          window.location.href = '/admin/dashboard.php';
+        }, 1500);
+      } else {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || 'Token verification failed');
       }
+    } catch (error) {
+      console.error('Token verification error:', error);
+      show('err', 'Login verification failed: ' + error.message);
+      btn.disabled = false;
+      // Clear the invalid token
+      localStorage.removeItem('jwt');
     }
+  }
 
-    form.addEventListener('submit', function(e){
-      e.preventDefault();
-      const email = document.getElementById('loginIdentifier').value.trim();
-      const password = document.getElementById('loginPassword').value;
-      if (!email || !password) { show('err','Enter your email and password.'); return; }
-      login(email, password);
-    });
-  })();
-  </script>
+  async function login(email, password){
+    btn.disabled = true; 
+    clearMsg();
+    
+    try{
+      console.log('Attempting login...');
+      const res = await fetch(LOGIN_URL, {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json' 
+        },
+        body: JSON.stringify({ email, password })
+      });
+      
+      const data = await res.json().catch(() => ({}));
+      console.log('Login response:', data);
+      
+      if (!res.ok) {
+        throw new Error(data.message || `Login failed (${res.status})`);
+      }
+
+      // Check if login was successful (new backend format)
+      if (!data.success) {
+        throw new Error(data.message || 'Login failed');
+      }
+
+      // Extract token from response
+      const token = data.token;
+      
+      if (!token) {
+        throw new Error('No authentication token received');
+      }
+
+      // Store the token
+      localStorage.setItem('jwt', token);
+      console.log('Token stored successfully:', token);
+
+      // Verify token and redirect
+      await verifyTokenAndRedirect(token);
+      
+    } catch(e){
+      console.error('Login error:', e);
+      show('err', e.message || 'Login failed');
+      btn.disabled = false;
+    }
+  }
+
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    const email = document.getElementById('loginIdentifier').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    if (!email || !password) { 
+      show('err','Enter your email and password.'); 
+      return; 
+    }
+    login(email, password);
+  });
+
+  // Check if already logged in
+  const existingToken = localStorage.getItem('jwt');
+  if (existingToken && existingToken !== 'cookie') {
+    console.log('Found existing token, verifying...');
+    verifyTokenAndRedirect(existingToken);
+  }
+})();
+</script>
 </body>
 </html>

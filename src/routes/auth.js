@@ -161,13 +161,24 @@ router.post('/login', async (req, res) => {
   try {
     const { email = '', password = '' } = req.body || {};
     const user = await User.findOne({ email: email.toLowerCase().trim() }).select('+password');
-    if (!user) return res.status(400).json({ message: 'Invalid credentials' });
+    if (!user) return res.status(400).json({ 
+      success: false, 
+      message: 'Invalid credentials' 
+    });
+    
     const ok = await user.comparePassword(password);
-    if (!ok) return res.status(400).json({ message: 'Invalid credentials' });
+    if (!ok) return res.status(400).json({ 
+      success: false, 
+      message: 'Invalid credentials' 
+    });
 
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET || 'secret', { expiresIn: '7d' });
+    
+    // ✅ Fixed response format - matches what frontend expects
     res.json({
-      token,
+      success: true,
+      token: token,
+      message: 'Login successful',
       user: {
         id: user._id,
         name: user.name,
@@ -185,7 +196,10 @@ router.post('/login', async (req, res) => {
       }
     });
   } catch (e) {
-    res.status(400).json({ message: e.message || 'Login failed' });
+    res.status(400).json({ 
+      success: false, 
+      message: e.message || 'Login failed' 
+    });
   }
 });
 
