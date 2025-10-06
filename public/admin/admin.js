@@ -885,57 +885,6 @@ function renderFilteredMembers(type) {
   updatePagination(type, filteredData, currentPage);
 }
 
-// ===== LOGOUT FUNCTION =====
-async function handleLogout() {
-  if (!confirm('Are you sure you want to logout?')) {
-    return;
-  }
-
-  try {
-    const logoutBtn = document.getElementById('logoutBtn');
-    if (logoutBtn) {
-      logoutBtn.disabled = true;
-      logoutBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Logging out...';
-    }
-
-    // Call server logout API first
-    const token = localStorage.getItem('jwt');
-    if (token) {
-      try {
-        await fetch('/api/auth/logout', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        });
-      } catch (error) {
-        console.warn('Server logout failed:', error);
-        // Continue with client cleanup anyway
-      }
-    }
-
-    // Clear all authentication data
-    localStorage.removeItem('jwt');
-    sessionStorage.clear();
-    
-    // Clear all cookies
-    document.cookie.split(';').forEach(cookie => {
-      const eqPos = cookie.indexOf('=');
-      const name = eqPos > -1 ? cookie.substr(0, eqPos).trim() : cookie;
-      document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`;
-    });
-
-    // Redirect to login page
-    window.location.href = '/admin/login.php';
-
-  } catch (error) {
-    console.error('Logout error:', error);
-    // Fallback redirect
-    localStorage.clear();
-    window.location.href = '/admin/login.php';
-  }
-}
 
 // ===== MISSING FUNCTIONALITY IMPLEMENTATION =====
 
