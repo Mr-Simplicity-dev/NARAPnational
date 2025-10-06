@@ -2,9 +2,21 @@
 
 <html lang="en">
 <head>
+   <link rel="icon" type="image/png" href="/uploads/slider/Narap.png"/>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta http-equiv="Content-Security-Policy" content="
+    default-src 'self'; 
+    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://d2mpatx37cqexb.cloudfront.net https://use.fontawesome.com https://embed.tawk.to https://cdn.tawk.to https://*.tawk.to https://paystack.com; 
+    font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com https://use.fontawesome.com; 
+    script-src 'self' 'unsafe-inline' https://js.paystack.co https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://api.paystack.com; 
+    connect-src 'self' https://api.paystack.co https://api.paystack.com; 
+    frame-src https://js.paystack.co https://*.paystack.com https://paystack.com;
+    child-src https://js.paystack.co https://*.paystack.com;
+">
 <title>Member Dashboard · Payments</title>
+<!-- Add CSP meta tag to allow Paystack resources -->
+<meta http-equiv="Content-Security-Policy" content="style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://d2mpatx37cqexb.cloudfront.net https://use.fontawesome.com https://embed.tawk.to https://cdn.tawk.to https://*.tawk.to https://paystack.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com https://use.fontawesome.com; script-src 'self' 'unsafe-inline' https://js.paystack.co https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; connect-src 'self' https://api.paystack.co; frame-src https://js.paystack.co">
 <style>
         :root {
             --brand: #0ea5e9; --ink: #0f172a; --muted: #64748b;
@@ -247,6 +259,14 @@ header .title .menu.open .menu-list{ display:block; }
 main, #member-settings{ padding-top: 8px; }
 </style>
 <script src="https://js.paystack.co/v1/inline.js"></script>
+<script>
+// Check if Paystack loaded properly
+if (typeof PaystackPop === 'undefined') {
+    console.error('Paystack script failed to load!');
+} else {
+    console.log('Paystack script loaded successfully');
+}
+</script>
 </head>
 <body>
 <header>
@@ -358,6 +378,7 @@ main, #member-settings{ padding-top: 8px; }
   </div>
 </div>
 
+
 <script>
     (function(){
         // Debug logging
@@ -369,6 +390,12 @@ main, #member-settings{ padding-top: 8px; }
             logEntry.textContent = new Date().toLocaleTimeString() + ' - ' + message;
             debugLogs.appendChild(logEntry);
             debugLogs.scrollTop = debugLogs.scrollHeight;
+            // Also log to console for debugging
+            if (isError) {
+                console.error(message);
+            } else {
+                console.log(message);
+            }
         }
 
         // Notification system
@@ -443,6 +470,7 @@ main, #member-settings{ padding-top: 8px; }
             if (currentUser) return currentUser;
             
             try {
+                addDebugLog('Fetching user profile data...');
                 const response = await fetch('/api/member/profile', {
                     headers: {
                         'Authorization': 'Bearer ' + getToken(),
@@ -452,7 +480,10 @@ main, #member-settings{ padding-top: 8px; }
                 
                 if (response.ok) {
                     currentUser = await response.json();
+                    addDebugLog('User profile loaded successfully');
                     return currentUser;
+                } else {
+                    addDebugLog(`Failed to load user profile: ${response.status}`, true);
                 }
             } catch (error) {
                 addDebugLog('Error fetching user data: ' + error.message, true);
@@ -536,6 +567,10 @@ main, #member-settings{ padding-top: 8px; }
                 }
                 
                 return response.json();
+            })
+            .catch(error => {
+                addDebugLog(`Payment init error: ${error.message}`, true);
+                throw error;
             });
         }
 
@@ -574,107 +609,147 @@ main, #member-settings{ padding-top: 8px; }
             }
         }
 
-        async function startPayment(amount, purpose, buttonId){
-            // Show loading state
-            const button = document.getElementById(buttonId);
-            const buttonText = document.getElementById(buttonId + 'Text');
-            const buttonLoader = document.getElementById(buttonId + 'Loader');
-            
-            if (!button || !buttonText || !buttonLoader) {
-                addDebugLog('Payment button elements not found', true);
-                return;
-            }
-            
-            button.disabled = true;
-            buttonText.style.display = 'none';
-            buttonLoader.style.display = 'inline-block';
-            
-            try {
-                // Get user data for payment
-                const user = await getCurrentUser();
-                if (!user || !user.email) {
-                    throw new Error('User data not available for payment');
-                }
-                
-                // Initialize payment with backend
-                const { reference } = await paymentsInit(amount, purpose);
-                addDebugLog(`Payment initialized successfully. Reference: ${reference}`);
-                
-                // Check if Paystack is available
-                if (typeof PaystackPop === 'undefined') {
-                    addDebugLog('Paystack not loaded, using simulation mode', true);
-                    showNotification('Paystack not available. Using simulation mode.', false);
-                    
-                    // Fallback to simulation
-                    setTimeout(() => {
-                        resetButton(buttonId);
-                        showNotification('Payment simulation complete. In production, you would be redirected to Paystack.', true);
-                    }, 2000);
-                    return;
-                }
-                
-                // Real Paystack Integration
-                addDebugLog('Opening Paystack payment gateway...');
-                showNotification('Opening payment gateway...', true);
-                
-                const paystackHandler = PaystackPop.setup({
-                    key: 'pk_test_your_public_key_here', // 🚨 REPLACE WITH YOUR ACTUAL PUBLIC KEY
-                    email: user.email,
-                    amount: amount,
-                    currency: 'NGN',
-                    ref: reference,
-                    metadata: {
-                        purpose: purpose,
-                        user_id: user._id,
-                        custom_fields: [
-                            {
-                                display_name: "Purpose",
-                                variable_name: "purpose",
-                                value: purpose
-                            },
-                            {
-                                display_name: "User ID", 
-                                variable_name: "user_id",
-                                value: user._id
-                            }
-                        ]
-                    },
-                    callback: function(response) {
-                        // Payment successful
-                        addDebugLog(`Payment successful! Reference: ${response.reference}`);
-                        showNotification('Payment successful! Verifying...', true);
-                        
-                        // Reset button first
-                        resetButton(buttonId);
-                        
-                        // Verify payment with backend
-                        verifyPayment(response.reference);
-                    },
-                    onClose: function() {
-                        // Payment cancelled or closed
-                        addDebugLog('Payment cancelled by user');
-                        showNotification('Payment was cancelled');
-                        resetButton(buttonId);
-                    }
-                });
-                
-                // Open the payment modal
-                paystackHandler.openIframe();
-                
-            } catch (e) {
-                addDebugLog(`Payment initialization error: ${e.message}`, true);
-                
-                if (e.message.includes('Authentication failed')) {
-                    showNotification('Your session has expired. Please log in again.');
-                    showTokenExpiredModal();
-                } else {
-                    showNotification('Payment failed: ' + e.message);
-                }
-                
-                resetButton(buttonId);
-            }
+        async function startPayment(amount, purpose, buttonId) {
+    console.log(`Starting payment: ${purpose}, Amount: ${amount}, Button: ${buttonId}`);
+    
+    // Show loading state
+    const button = document.getElementById(buttonId);
+    const buttonText = document.getElementById(buttonId + 'Text');
+    const buttonLoader = document.getElementById(buttonId + 'Loader');
+    
+    if (!button || !buttonText || !buttonLoader) {
+        addDebugLog('Payment button elements not found', true);
+        return;
+    }
+    
+    button.disabled = true;
+    buttonText.style.display = 'none';
+    buttonLoader.style.display = 'inline-block';
+    
+    // Reduced timeout for faster feedback
+    const paymentTimeout = setTimeout(() => {
+        addDebugLog('Payment process timed out - Paystack modal may have failed to open', true);
+        showNotification('Payment gateway is taking too long. Please check your popup blocker and try again.');
+        resetButton(buttonId);
+    }, 15000); // Reduced from 30s to 15s
+    
+    try {
+        // Get user data for payment
+        addDebugLog('Loading user data for payment...');
+        const user = await getCurrentUser();
+        if (!user || !user.email) {
+            throw new Error('User data not available for payment');
+        }
+        
+        addDebugLog(`User data loaded: ${user.email}`);
+        
+        // Initialize payment with backend
+        addDebugLog('Calling paymentsInit API...');
+        const paymentData = await paymentsInit(amount, purpose);
+        console.log('Payment init response:', paymentData);
+        
+        if (!paymentData.reference) {
+            throw new Error('No payment reference returned from server');
+        }
+        
+        const reference = paymentData.reference;
+        addDebugLog(`Payment initialized successfully. Reference: ${reference}`);
+        
+        // Enhanced Paystack availability check
+        if (typeof PaystackPop === 'undefined') {
+            addDebugLog('Paystack not loaded properly', true);
+            showNotification('Payment gateway not available. Please refresh the page and try again.', false);
+            resetButton(buttonId);
+            clearTimeout(paymentTimeout);
+            return;
         }
 
+        // Validate amount
+        if (typeof amount !== 'number' || amount <= 0) {
+            throw new Error(`Invalid amount: ${amount}`);
+        }
+
+        // Enhanced Paystack Integration with better error handling
+        addDebugLog('Setting up Paystack payment gateway...');
+        
+        const paystackOptions = {
+            key: 'pk_live_24159afdd489928d4e500cff2eafb7d08b0f0d3f',
+            email: user.email,
+            amount: amount,
+            currency: 'NGN',
+            ref: reference,
+            metadata: {
+                purpose: purpose,
+                user_id: user._id,
+                custom_fields: [
+                    {
+                        display_name: "Purpose",
+                        variable_name: "purpose",
+                        value: purpose
+                    },
+                    {
+                        display_name: "User ID", 
+                        variable_name: "user_id",
+                        value: user._id
+                    }
+                ]
+            },
+            callback: function(response) {
+                clearTimeout(paymentTimeout);
+                addDebugLog(`Payment successful! Reference: ${response.reference}`);
+                showNotification('Payment successful! Verifying...', true);
+                resetButton(buttonId);
+                verifyPayment(response.reference);
+            },
+            onClose: function() {
+                clearTimeout(paymentTimeout);
+                addDebugLog('Payment window closed by user');
+                showNotification('Payment was cancelled or window closed');
+                resetButton(buttonId);
+            }
+        };
+
+        // Add error handling for Paystack setup
+        try {
+            addDebugLog('Creating Paystack handler...');
+            const paystackHandler = PaystackPop.setup(paystackOptions);
+            
+            // Small delay to ensure DOM is ready
+            setTimeout(() => {
+                try {
+                    addDebugLog('Opening Paystack iframe...');
+                    paystackHandler.openIframe();
+                    addDebugLog('Paystack iframe opened successfully');
+                } catch (iframeError) {
+                    clearTimeout(paymentTimeout);
+                    addDebugLog('Paystack iframe error: ' + iframeError.message, true);
+                    showNotification('Failed to open payment window. Please check popup blockers.');
+                    resetButton(buttonId);
+                }
+            }, 100);
+            
+        } catch (setupError) {
+            clearTimeout(paymentTimeout);
+            addDebugLog('Paystack setup error: ' + setupError.message, true);
+            showNotification('Payment gateway configuration error. Please try again.');
+            resetButton(buttonId);
+        }
+        
+    } catch (e) {
+        clearTimeout(paymentTimeout);
+        addDebugLog(`Payment initialization error: ${e.message}`, true);
+        console.error('Payment error:', e);
+        
+        if (e.message.includes('Authentication failed')) {
+            showNotification('Your session has expired. Please log in again.');
+            showTokenExpiredModal();
+        } else {
+            showNotification('Payment failed: ' + e.message);
+        }
+        
+        resetButton(buttonId);
+    }
+}
         function resetButton(buttonId) {
             const button = document.getElementById(buttonId);
             const buttonText = document.getElementById(buttonId + 'Text');
@@ -687,26 +762,71 @@ main, #member-settings{ padding-top: 8px; }
             }
         }
 
-        // Set up payment button event listeners
-        document.getElementById('payMembership')?.addEventListener('click', () => {
-            const amount = Number(document.getElementById('payMembership').getAttribute('data-amount-kobo') || 0);
-            const purpose = document.getElementById('payMembership').getAttribute('data-purpose') || 'membership';
-            if(!amount) return showNotification('Amount missing');
-            startPayment(amount, purpose, 'payMembership');
-        });
+function checkPopupBlocker() {
+    const popup = window.open('', '_blank', 'width=100,height=100');
+    if (!popup || popup.closed || typeof popup.closed === 'undefined') {
+        addDebugLog('Popup blocker detected', true);
+        showNotification('Popup blocker detected! Please allow popups for this site to make payments.');
+        return true;
+    }
+    popup.close();
+    return false;
+}
+
+        // Set up payment button event listeners with better error handling
+        function setupPaymentButton(buttonId) {
+    const button = document.getElementById(buttonId);
+    if (!button) {
+        addDebugLog(`Payment button ${buttonId} not found`, true);
+        return;
+    }
+    
+    button.addEventListener('click', function(e) {
+        e.preventDefault();
+        console.log(`Payment button clicked: ${buttonId}`);
         
-        document.getElementById('payIdCard')?.addEventListener('click', () => {
-            const amount = Number(document.getElementById('payIdCard').getAttribute('data-amount-kobo') || 0);
-            const purpose = document.getElementById('payIdCard').getAttribute('data-purpose') || 'idcard';
-            if(!amount) return showNotification('Amount missing');
-            startPayment(amount, purpose, 'payIdCard');
-        });
+        // Check for popup blockers
+        if (checkPopupBlocker()) {
+            return;
+        }
         
-        document.getElementById('payCertificate')?.addEventListener('click', () => {
-            const amount = Number(document.getElementById('payCertificate').getAttribute('data-amount-kobo') || 0);
-            const purpose = document.getElementById('payCertificate').getAttribute('data-purpose') || 'certificate';
-            if(!amount) return showNotification('Amount missing');
-            startPayment(amount, purpose, 'payCertificate');
+        const amount = Number(button.getAttribute('data-amount-kobo') || 0);
+        const purpose = button.getAttribute('data-purpose') || 'membership';
+        
+        if(!amount) {
+            showNotification('Amount missing');
+            return;
+        }
+        
+        addDebugLog(`Starting payment for ${purpose} with amount ${amount}`);
+        startPayment(amount, purpose, buttonId);
+    });
+}
+
+// Enhanced Paystack script loading verification
+function verifyPaystackLoaded() {
+    if (typeof PaystackPop === 'undefined') {
+        addDebugLog('Paystack script not loaded properly', true);
+        showNotification('Payment system is still loading. Please wait a moment and try again.', false);
+        return false;
+    }
+    
+    if (typeof PaystackPop.setup !== 'function') {
+        addDebugLog('PaystackPop.setup function not available', true);
+        showNotification('Payment gateway configuration error. Please refresh the page.', false);
+        return false;
+    }
+    
+    addDebugLog('Paystack script verified and ready');
+    return true;
+}
+        // Initialize payment buttons
+        document.addEventListener('DOMContentLoaded', function() {
+            setupPaymentButton('payMembership');
+            setupPaymentButton('payIdCard');
+            setupPaymentButton('payCertificate');
+            
+            addDebugLog('Payment buttons initialized');
         });
         
         // Initialize
@@ -723,10 +843,23 @@ main, #member-settings{ padding-top: 8px; }
         getCurrentUser().then(user => {
             if (user) {
                 addDebugLog(`User data loaded: ${user.email}`);
+                // Update UI with user data
+                const helloEl = document.getElementById('hello');
+                const emailEl = document.getElementById('email');
+                
+                if (helloEl) {
+                    const fullName = `${user.surname || ''} ${user.otherNames || ''}`.trim() || user.name || 'Member';
+                    helloEl.textContent = `Welcome, ${fullName}`;
+                }
+                
+                if (emailEl) {
+                    emailEl.textContent = user.email || 'No email';
+                }
             }
         });
     })();
 </script>
+<!-- Rest of your HTML remains the same -->
 <section class="container my-4" id="member-settings">
 <div class="row g-4">
 <div class="col-12">
@@ -864,6 +997,7 @@ main, #member-settings{ padding-top: 8px; }
 </div>
 </div>
 </section>
+
 
 <script>
 // Unified Member Dashboard Controller - Consolidated and Optimized
