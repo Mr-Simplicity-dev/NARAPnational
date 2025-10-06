@@ -452,10 +452,17 @@ function cleanupUploads() {
 // Call cleanup on page unload
 window.addEventListener('beforeunload', cleanupUploads);
 
+
 // ===== BASIC AUTHENTICATION CHECK =====
-const token = localStorage.getItem('jwt');
-if (!token) {
-  window.location.replace('/admin/login.php');
+// Only redirect if we're actually on a protected admin page
+if (window.location.pathname.includes('/admin/') && !window.location.pathname.includes('/admin/login.php')) {
+  const token = localStorage.getItem('jwt');
+  if (!token) {
+    console.log('No token found, redirecting to login');
+    window.location.replace('/admin/login.php');
+  } else {
+    console.log('Token found, staying on admin page');
+  }
 }
 
 // Define your API base URL
