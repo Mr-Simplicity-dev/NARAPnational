@@ -1,4 +1,4 @@
-# MyTime360 Backend (Express + MongoDB)
+# Narap Backend (Express + MongoDB)
 
 This backend serves your current frontend **unchanged** and adds APIs + uploads + admin auth.
 Your uploaded `index.html` is copied as-is to `public/index.html` so all classes/IDs remain intact.
