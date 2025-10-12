@@ -1265,18 +1265,34 @@ const resources = {
       const text = fd.get('text') || '';
       const c1Label = fd.get('cta1.label') || '';
       const c1Href = fd.get('cta1.href') || '';
+      const c1VideoUrl = fd.get('cta1.videoUrl') || '';
+      const c1VideoFile = document.getElementById('sliderVideoUrl')?.value || '';
       const c2Label = fd.get('cta2.label') || '';
       const c2Href = fd.get('cta2.href') || '';
       const image = document.getElementById('sliderImageUrl')?.value || '';
       const order = Number(fd.get('order') || 0) || 0;
+      
       return {
         kicker, headline, text,
-        cta1: c1Label || c1Href ? { label: c1Label, href: c1Href } : undefined,
+        cta1: c1Label || c1Href || c1VideoUrl || c1VideoFile ? { 
+          label: c1Label, 
+          href: c1Href,
+          videoUrl: c1VideoUrl,
+          videoFile: c1VideoFile
+        } : undefined,
         cta2: c2Label || c2Href ? { label: c2Label, href: c2Href } : undefined,
         image,
         order,
-        smallTitle: kicker, bigTitle: headline, paragraph: text,
-        primaryBtnText: c1Label, primaryBtnLink: c1Href, secondaryBtnText: c2Label, secondaryBtnLink: c2Href,
+        // Legacy field mappings for backward compatibility
+        smallTitle: kicker, 
+        bigTitle: headline, 
+        paragraph: text,
+        primaryBtnText: c1Label, 
+        primaryBtnLink: c1Href,
+        primaryBtnVideoUrl: c1VideoUrl,
+        primaryBtnVideoFile: c1VideoFile,
+        secondaryBtnText: c2Label, 
+        secondaryBtnLink: c2Href,
         imageUrl: image
       };
     },

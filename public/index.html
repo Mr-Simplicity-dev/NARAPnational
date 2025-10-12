@@ -1667,7 +1667,7 @@ async function loadSliders() {
     console.error('Failed to load services:', error);
     // Hardcoded services remain
   }
-}
+
 
 async function loadTeam() {
   try {
@@ -1686,13 +1686,14 @@ async function loadTeam() {
   }
 }
 
-async function loadSliders() {
   try {
     const response = await fetch('/api/sliders');
     const data = await response.json();
     const sliders = data.data || data; // Handle both response formats
     
     const carousel = document.querySelector('.header-carousel');
+    if (!carousel) return;
+    
     carousel.innerHTML = ''; // Clear existing
     
     sliders.forEach(slider => {
@@ -1714,13 +1715,30 @@ async function loadSliders() {
                     <p class="mb-5 fs-5">${slider.paragraph || slider.text || ''}</p>
                     
                     <div class="d-flex justify-content-center justify-content-md-end flex-shrink-0 mb-4">
-                      ${slider.primaryBtnText ? `<a class="btn btn-light rounded-pill py-3 px-4 px-md-5 me-2" href="${slider.primaryBtnLink || '#'}">
-                        <i class="fas fa-play-circle me-2"></i> ${slider.primaryBtnText}
+                      ${slider.primaryBtnText || slider.cta1?.label ? `<a class="btn btn-light rounded-pill py-3 px-4 px-md-5 me-2" 
+                        href="${slider.primaryBtnLink || slider.cta1?.href || '#'}"
+                        ${slider.cta1?.videoUrl ? `data-video-url="${slider.cta1.videoUrl}"` : ''}
+                        ${slider.cta1?.videoFile ? `data-video-file="${slider.cta1.videoFile}"` : ''}
+                        ${slider.primaryBtnVideoUrl ? `data-video-url="${slider.primaryBtnVideoUrl}"` : ''}
+                        ${slider.primaryBtnVideoFile ? `data-video-file="${slider.primaryBtnVideoFile}"` : ''}
+                        ${slider.video_link ? `data-video-url="${slider.video_link}"` : ''}>
+                        <i class="fas fa-play-circle me-2"></i> ${slider.primaryBtnText || slider.cta1?.label || 'Watch Video'}
                       </a>` : ''}
                       
-                      ${slider.secondaryBtnText ? `<a class="btn btn-primary rounded-pill py-3 px-4 px-md-5 ms-2" href="${slider.secondaryBtnLink || '#'}">
-                        ${slider.secondaryBtnText}
+                      ${slider.secondaryBtnText || slider.cta2?.label ? `<a class="btn btn-primary rounded-pill py-3 px-4 px-md-5 ms-2" 
+                        href="${slider.secondaryBtnLink || slider.cta2?.href || slider.link || '/#about'}">
+                        ${slider.secondaryBtnText || slider.cta2?.label || 'Learn More'}
                       </a>` : ''}
+                    </div>
+                    
+                    <div class="d-flex align-items-center justify-content-center justify-content-md-end">
+                      <h2 class="text-white me-2">Follow Us:</h2>
+                      <div class="d-flex justify-content-end ms-2">
+                        <a class="btn btn-md-square btn-light rounded-circle me-2" href="https://www.facebook.com/time360 farms"><i class="fab fa-facebook-f"></i></a>
+                        <a class="btn btn-md-square btn-light rounded-circle mx-2" href="https://twitter.com/yourpage"><i class="fab fa-twitter"></i></a>
+                        <a class="btn btn-md-square btn-light rounded-circle mx-2" href="https://instagram.com/yourpage"><i class="fab fa-instagram"></i></a>
+                        <a class="btn btn-md-square btn-light rounded-circle ms-2" href="www.linkedin.com/in/times-farms-247322380"><i class="fab fa-linkedin-in"></i></a>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1742,47 +1760,15 @@ async function loadSliders() {
       autoplayTimeout: 5000,
       items: 1,
       animateOut: 'fadeOut',
-      animateIn: 'fadeIn'
+      animateIn: 'fadeIn',
+      navText: ["<i class='fas fa-chevron-left'></i>","<i class='fas fa-chevron-right'></i>"]
     });
     
   } catch (error) {
     console.error('Failed to load sliders:', error);
+    // Fallback to existing static content if API fails
   }
-}
-  const carousel = document.querySelector('.header-carousel');
-  if (!carousel) return;
-  
-  // Clear existing slides
-  carousel.innerHTML = '';
-  
-  // Add new slides from admin data
-  sliders.forEach(slide => {
-    const slideHTML = `
-      <div class="header-carousel-item">
-        <img src="${slide.image}" class="img-fluid w-100" alt="Slide">
-        <div class="carousel-caption">
-          <div class="container">
-            <div class="row gy-0 gx-5">
-              <div class="col-lg-0 col-xl-5"></div>
-              <div class="col-xl-7 animated fadeInLeft">
-                <div class="text-sm-center text-md-end">
-                  <h4 class="text-primary text-uppercase fw-bold mb-4">${slide.kicker || ''}</h4>
-                  <h1 class="display-4 text-uppercase text-white mb-4">${slide.headline || ''}</h1>
-                  <p class="mb-5 fs-5">${slide.text || ''}</p>
-                  <div class="d-flex justify-content-center justify-content-md-end flex-shrink-0 mb-4">
-                    ${slide.video_link ? `<a class="btn btn-light rounded-pill py-3 px-4 px-md-5 me-2" href="${slide.video_link}"><i class="fas fa-play-circle me-2"></i> Watch Video</a>` : ''}
-                    <a class="btn btn-primary rounded-pill py-3 px-4 px-md-5 ms-2" href="${slide.link || '/#about'}">Learn More</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    `;
-    carousel.insertAdjacentHTML('beforeend', slideHTML);
-  });
-}
+
 
 async function loadServices() {
   try {
@@ -1850,5 +1836,96 @@ function updateTeam(team) {
 // Load content when page loads
 document.addEventListener('DOMContentLoaded', loadDynamicContent);
 </script>
+
+<!-- ADD VIDEO MODAL CODE HERE -->
+        <!-- Video Modal -->
+        <div class="modal fade" id="videoModal" tabindex="-1" aria-labelledby="videoModalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="videoModalLabel">Watch Video</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body p-0">
+                <div id="videoContainer" class="ratio ratio-16x9">
+                  <!-- Video content will be inserted here -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <script>
+        // Video modal functionality
+        function playVideo(videoUrl, videoFile) {
+          const videoContainer = document.getElementById('videoContainer');
+          const modal = new bootstrap.Modal(document.getElementById('videoModal'));
+          
+          let videoHTML = '';
+          
+          if (videoFile) {
+            // Local video file
+            videoHTML = `
+              <video controls autoplay class="w-100 h-100">
+                <source src="${videoFile}" type="video/mp4">
+                Your browser does not support the video tag.
+              </video>
+            `;
+          } else if (videoUrl) {
+            // YouTube/Vimeo URL
+            if (videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be')) {
+              const videoId = extractYouTubeId(videoUrl);
+              videoHTML = `<iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1" frameborder="0" allowfullscreen class="w-100 h-100"></iframe>`;
+            } else if (videoUrl.includes('vimeo.com')) {
+              const videoId = extractVimeoId(videoUrl);
+              videoHTML = `<iframe src="https://player.vimeo.com/video/${videoId}?autoplay=1" frameborder="0" allowfullscreen class="w-100 h-100"></iframe>`;
+            } else {
+              // Direct video URL
+              videoHTML = `
+                <video controls autoplay class="w-100 h-100">
+                  <source src="${videoUrl}" type="video/mp4">
+                  Your browser does not support the video tag.
+                </video>
+              `;
+            }
+          }
+          
+          videoContainer.innerHTML = videoHTML;
+          modal.show();
+          
+          // Clear video when modal is closed
+          document.getElementById('videoModal').addEventListener('hidden.bs.modal', function() {
+            videoContainer.innerHTML = '';
+          });
+        }
+
+        // Extract YouTube video ID
+        function extractYouTubeId(url) {
+          const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+          const match = url.match(regExp);
+          return (match && match[2].length === 11) ? match[2] : null;
+        }
+
+        // Extract Vimeo video ID
+        function extractVimeoId(url) {
+          const regExp = /vimeo.com\/(\d+)/;
+          const match = url.match(regExp);
+          return match ? match[1] : null;
+        }
+
+        // Handle watch video button clicks
+        document.addEventListener('click', function(e) {
+          if (e.target.closest('[data-video-url], [data-video-file]')) {
+            e.preventDefault();
+            const button = e.target.closest('[data-video-url], [data-video-file]');
+            const videoUrl = button.getAttribute('data-video-url');
+            const videoFile = button.getAttribute('data-video-file');
+            
+            if (videoUrl || videoFile) {
+              playVideo(videoUrl, videoFile);
+            }
+          }
+        });
+        </script>
 </body>
 </html>
