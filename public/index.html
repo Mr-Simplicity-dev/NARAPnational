@@ -1487,7 +1487,30 @@ async function loadDynamicContent() {
   // Clear existing slides
   carousel.innerHTML = '';
   
- 
+  // Add new slides from admin data
+  sliders.forEach(slide => {
+    const slideHTML = `
+      <div class="header-carousel-item">
+        <img src="${slide.image}" class="img-fluid w-100" alt="Slide">
+        <div class="carousel-caption">
+          <div class="container">
+            <div class="row g-5">
+              <div class="col-lg-7 animated fadeInLeft">
+                <div class="text-sm-center text-md-start">
+                  <h4 class="text-white text-uppercase fw-bold mb-4">${slide.kicker || ''}</h4>
+                  <h1 class="display-1 text-white mb-4">${slide.headline}</h1>
+                  <p class="mb-5 fs-5">${slide.text || ''}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+    carousel.insertAdjacentHTML('beforeend', slideHTML);
+  });
+
+
 
 function updateServices(services) {
   const servicesContainer = document.querySelector('.services-container');
@@ -1662,6 +1685,8 @@ async function loadTeam() {
   }
 }
 
+// ✅ ADD THIS MISSING FUNCTION DECLARATION:
+async function loadSliders() {
   try {
     const response = await fetch('/api/sliders');
     const data = await response.json();
@@ -1744,6 +1769,7 @@ async function loadTeam() {
     console.error('Failed to load sliders:', error);
     // Fallback to existing static content if API fails
   }
+}
 
 
 async function loadServices() {
