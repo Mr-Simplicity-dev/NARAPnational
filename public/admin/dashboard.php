@@ -172,59 +172,108 @@
     </div>
 
     <!-- SLIDERS -->
-    <div class="tab-pane fade" id="pane-sliders" role="tabpanel">
-      <div class="card mb-4"><div class="card-body">
-        <h5 class="mb-3">Add / Edit Slider</h5>
-        <form id="form-slider" class="row g-3">
-          <input type="hidden" name="_id">
-          <div class="col-md-4"><label class="form-label req">Kicker</label><input name="kicker" class="form-control" placeholder="Providing Comfort"></div>
-          <div class="col-md-8"><label class="form-label req">Headline</label><input name="headline" class="form-control" placeholder="Across Sectors"></div>
-          <div class="col-12"><label class="form-label">Text</label><textarea name="text" class="form-control" rows="3"></textarea></div>
-          <div class="col-md-6"><label class="form-label">CTA1 Label</label><input name="cta1.label" class="form-control" placeholder="Watch Video"></div>
-          <div class="col-md-6"><label class="form-label">CTA1 Href</label><input name="cta1.href" class="form-control" placeholder="#video"></div>
-          <div class="col-md-6"><label class="form-label">CTA2 Label</label><input name="cta2.label" class="form-control" placeholder="Contact Us"></div>
-          <div class="col-md-6"><label class="form-label">CTA2 Href</label><input name="cta2.href" class="form-control" placeholder="#contact"></div>
-          <div class="col-md-8">
-            <label class="form-label req">Slider Image</label>
-            <div class="image-upload-container" data-target="sliderImage">
-              <div class="upload-placeholder">
-                <i class="fas fa-cloud-upload-alt fa-2x mb-2"></i>
-                <p>Click to upload or drag and drop</p>
-                <p class="small">PNG, JPG, GIF up to 5MB</p>
-              </div>
-              <img class="image-preview img-fluid rounded" id="sliderImagePreview">
-              <input type="file" class="d-none" accept="image/*" id="sliderImageUpload">
-              <input type="hidden" name="image" id="sliderImageUrl">
-            </div>
-            <div class="d-flex mt-2 gap-2">
-             <!-- Choose Image buttons -->
-<button type="button" class="btn btn-outline-primary btn-sm" data-action="choose-image" data-target="sliderImage">
-  <i class="fas fa-upload me-1"></i> Choose Image
-</button>
-
-<button type="button" class="btn btn-outline-danger btn-sm" data-action="clear-image" data-target="sliderImage">
-  <i class="fas fa-times me-1"></i> Clear
-</button>
-            </div>
+<div class="tab-pane fade" id="pane-sliders" role="tabpanel">
+  <div class="card mb-4"><div class="card-body">
+    <h5 class="mb-3">Add / Edit Slider</h5>
+    <form id="form-slider" class="row g-3">
+      <input type="hidden" name="_id">
+      <div class="col-md-4"><label class="form-label req">Kicker</label><input name="kicker" class="form-control" placeholder="Providing Comfort"></div>
+      <div class="col-md-8"><label class="form-label req">Headline</label><input name="headline" class="form-control" placeholder="Across Sectors"></div>
+      <div class="col-12"><label class="form-label">Text</label><textarea name="text" class="form-control" rows="3"></textarea></div>
+      
+      <!-- CTA1 Fields -->
+      <div class="col-md-6"><label class="form-label">CTA1 Label</label><input name="cta1.label" class="form-control" placeholder="Watch Video"></div>
+      <div class="col-md-6"><label class="form-label">CTA1 Href</label><input name="cta1.href" class="form-control" placeholder="#video"></div>
+      
+      <!-- Video Fields -->
+      <div class="col-md-6">
+        <label class="form-label">CTA1 Video URL</label>
+        <input name="cta1.videoUrl" class="form-control" placeholder="https://youtube.com/watch?v=... or https://vimeo.com/...">
+        <div class="form-text">YouTube, Vimeo, or direct video URL</div>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Or Upload Video File</label>
+        <div class="image-upload-container" data-target="sliderVideo">
+          <div class="upload-placeholder">
+            <i class="fas fa-video fa-2x mb-2"></i>
+            <p>Click to upload video or drag and drop</p>
+            <p class="small">MP4, WEBM, OGV up to 50MB</p>
           </div>
-          <div class="col-md-4"><label class="form-label">Order</label><input name="order" type="number" class="form-control" placeholder="1"></div>
-          <div class="col-12 sticky-actions">
-            <button class="btn btn-brand" type="submit">Save Slider</button>
-            <button class="btn btn-outline-secondary" type="button" id="resetSliderForm">Reset</button>
-            <small class="ms-2 text-muted" id="sliderStatus"></small>
-          </div>
-        </form>
-      </div></div>
-      <div class="card"><div class="card-body">
-        <h5 class="mb-3">All Slides</h5>
-        <div class="table-responsive">
-          <table class="table align-middle">
-            <thead><tr><th>#</th><th>Preview</th><th>Kicker</th><th>Headline</th><th>Buttons</th><th>Order</th><th></th></tr></thead>
-            <tbody id="list-sliders"></tbody>
-          </table>
+          <video class="image-preview" id="sliderVideoPreview" controls style="display:none; max-width:200px; max-height:150px;"></video>
+          <input type="file" class="d-none" accept="video/*" id="sliderVideoUpload">
+          <input type="hidden" name="cta1.videoFile" id="sliderVideoUrl">
         </div>
-      </div></div>
+        <div class="d-flex mt-2 gap-2">
+          <button type="button" class="btn btn-outline-primary btn-sm" data-action="choose-video" data-target="sliderVideo">
+            <i class="fas fa-upload me-1"></i> Choose Video
+          </button>
+          <button type="button" class="btn btn-outline-danger btn-sm" data-action="clear-video" data-target="sliderVideo">
+            <i class="fas fa-times me-1"></i> Clear
+          </button>
+        </div>
+      </div>
+      
+      <!-- CTA2 Fields -->
+      <div class="col-md-6"><label class="form-label">CTA2 Label</label><input name="cta2.label" class="form-control" placeholder="Contact Us"></div>
+      <div class="col-md-6"><label class="form-label">CTA2 Href</label><input name="cta2.href" class="form-control" placeholder="#contact"></div>
+      
+      <!-- Slider Image -->
+      <div class="col-md-8">
+        <label class="form-label req">Slider Image</label>
+        <div class="image-upload-container" data-target="sliderImage">
+          <div class="upload-placeholder">
+            <i class="fas fa-cloud-upload-alt fa-2x mb-2"></i>
+            <p>Click to upload or drag and drop</p>
+            <p class="small">PNG, JPG, GIF up to 5MB</p>
+          </div>
+          <img class="image-preview img-fluid rounded" id="sliderImagePreview">
+          <input type="file" class="d-none" accept="image/*" id="sliderImageUpload">
+          <input type="hidden" name="image" id="sliderImageUrl">
+        </div>
+        <div class="d-flex mt-2 gap-2">
+          <button type="button" class="btn btn-outline-primary btn-sm" data-action="choose-image" data-target="sliderImage">
+            <i class="fas fa-upload me-1"></i> Choose Image
+          </button>
+          <button type="button" class="btn btn-outline-danger btn-sm" data-action="clear-image" data-target="sliderImage">
+            <i class="fas fa-times me-1"></i> Clear
+          </button>
+        </div>
+      </div>
+      
+      <!-- Order Field -->
+      <div class="col-md-4"><label class="form-label">Order</label><input name="order" type="number" class="form-control" placeholder="1"></div>
+      
+      <!-- Form Actions -->
+      <div class="col-12 sticky-actions">
+        <button class="btn btn-brand" type="submit">Save Slider</button>
+        <button class="btn btn-outline-secondary" type="button" id="resetSliderForm">Reset</button>
+        <small class="ms-2 text-muted" id="sliderStatus"></small>
+      </div>
+    </form>
+  </div></div>
+  
+  <!-- All Slides Table -->
+  <div class="card"><div class="card-body">
+    <h5 class="mb-3">All Slides</h5>
+    <div class="table-responsive">
+      <table class="table align-middle">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Preview</th>
+            <th>Kicker</th>
+            <th>Headline</th>
+            <th>Buttons</th>
+            <th>Video</th>
+            <th>Order</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="list-sliders"></tbody>
+      </table>
     </div>
+  </div></div>
+</div>
 
     <!-- SERVICES -->
     <div class="tab-pane fade" id="pane-services" role="tabpanel">

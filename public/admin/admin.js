@@ -422,6 +422,152 @@ function cleanupUploads() {
 // Call cleanup on page unload
 window.addEventListener('beforeunload', cleanupUploads);
 
+// ===== VIDEO UPLOAD FUNCTIONALITY =====
+
+// Add video upload functionality
+function initializeVideoUploads() {
+  console.log('Initializing video uploads...');
+  
+  // Setup video upload buttons
+  document.addEventListener('click', function(e) {
+    const button = e.target.closest('[data-action="choose-video"]');
+    if (button) {
+      e.preventDefault();
+      const target = button.getAttribute('data-target');
+      const fileInput = document.getElementById(`${target}Upload`);
+      if (fileInput) fileInput.click();
+    }
+
+    const clearButton = e.target.closest('[data-action="clear-video"]');
+    if (clearButton) {
+      e.preventDefault();
+      const target = clearButton.getAttribute('data-target');
+      clearVideoUpload(target);
+    }
+  });
+
+  // Setup video file input handlers
+  document.querySelectorAll('input[type="file"][accept="video/*"]').forEach(input => {
+    input.addEventListener('change', function(e) {
+      if (this.files && this.files[0]) {
+        const target = this.id.replace('Upload', '');
+        handleVideoSelection(this.files[0], target);
+      }
+    });
+  });
+}
+
+// Handle video file selection
+function handleVideoSelection(file, target) {
+  if (!file) return;
+  
+  // Validate video file
+  const validTypes = ['video/mp4', 'video/webm', 'video/ogg', 'video/avi', 'video/mov'];
+  if (!validTypes.includes(file.type)) {
+    showNotification('Please select a valid video file (MP4, WEBM, OGV, AVI, MOV)', 'error');
+    return;
+  }
+  
+  // Validate file size (50MB)
+  const maxSize = 50 * 1024 * 1024;
+  if (file.size > maxSize) {
+    showNotification(`Video must be less than 50MB (current: ${(file.size / 1024 / 1024).toFixed(2)}MB)`, 'error');
+    return;
+  }
+  
+  // Show video preview
+  showVideoPreview(file, target);
+  
+  // Upload the video
+  uploadVideo(file, target);
+}
+
+// Show video preview
+function showVideoPreview(file, target) {
+  const preview = document.getElementById(`${target}Preview`);
+  const container = document.querySelector(`[data-target="${target}"]`);
+  
+  if (!preview || !container) return;
+  
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    preview.src = e.target.result;
+    preview.style.display = 'block';
+    
+    const placeholder = container.querySelector('.upload-placeholder');
+    if (placeholder) {
+      placeholder.style.display = 'none';
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
+// Upload video file
+async function uploadVideo(file, target) {
+  try {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    // Use the same JWT token as your other requests
+    const token = localStorage.getItem('jwt');
+    if (!token) {
+      throw new Error('Not authenticated. Please log in again.');
+    }
+
+    const response = await fetch('/api/upload/video', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      },
+      body: formData
+    });
+
+    const result = await response.json();
+    
+    if (result.success) {
+      // Update hidden input with video URL
+      const urlInput = document.getElementById(`${target}Url`);
+      if (urlInput) {
+        urlInput.value = result.url;
+      }
+      
+      showNotification('Video uploaded successfully!', 'success');
+    } else {
+      throw new Error(result.error || 'Upload failed');
+    }
+  } catch (error) {
+    console.error('Video upload error:', error);
+    showNotification(`Video upload failed: ${error.message}`, 'error');
+  }
+}
+
+// Clear video upload
+function clearVideoUpload(target) {
+  const preview = document.getElementById(`${target}Preview`);
+  const urlInput = document.getElementById(`${target}Url`);
+  const fileInput = document.getElementById(`${target}Upload`);
+  const container = document.querySelector(`[data-target="${target}"]`);
+  
+  if (preview) {
+    preview.src = '';
+    preview.style.display = 'none';
+  }
+  
+  if (urlInput) {
+    urlInput.value = '';
+  }
+  
+  if (fileInput) {
+    fileInput.value = '';
+  }
+  
+  if (container) {
+    const placeholder = container.querySelector('.upload-placeholder');
+    if (placeholder) {
+      placeholder.style.display = 'block';
+    }
+  }
+}
 
 // ===== BASIC AUTHENTICATION CHECK =====
 // Only redirect if we're actually on a protected admin page
@@ -1348,6 +1494,8 @@ document.addEventListener('DOMContentLoaded', function() {
   if (logoutBtn) {
     logoutBtn.addEventListener('click', handleLogout);
   }
+   // Initialize video uploads
+  initializeVideoUploads();
 
   // Search functionality
   $('#allSearch')?.addEventListener('input', () => {
