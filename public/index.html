@@ -789,9 +789,11 @@ function filterPortfolio(category) {
             <h1 class="display-5 mb-4">Articles For Pro Traders</h1>
             <p class="mb-0">Latest tips, strategies and market insights.</p>
         </div>
+        
         <div class="row">
                         <div class="col-md-6 col-lg-4 mb-4">
                 <div class="blog-item p-4 h-100 d-flex flex-column">
+                    
                     <div class="blog-img mb-4">
                         <img src="admin/uploads/blogs/1756400179_grok_image_42tmw1.jpg" class="img-fluid w-100 rounded" alt="">
                         
@@ -1460,25 +1462,18 @@ s0.parentNode.insertBefore(s1,s0);
 
   <script>
 // Load dynamic content from admin dashboard
+// Load dynamic content from admin dashboard
 async function loadDynamicContent() {
   try {
-    const response = await fetch('/api/settings/home');
-    if (!response.ok) throw new Error('Failed to load content');
+    // Load all sections
+    await Promise.all([
+      loadSliders(),
+      loadServices(), 
+      loadTeam(),
+      loadBlogs()
+    ]);
     
-    const data = await response.json();
-    
-    // Update sliders
-    if (data.sliders && data.sliders.length > 0) {
-      updateSliders(data.sliders);
-    }
-    
-    // Update services
-    if (data.services && data.services.length > 0) {
-      updateServices(data.services);
-    }
-    
-    // Update other sections as needed
-    console.log('Dynamic content loaded successfully');
+    console.log('All dynamic content loaded successfully');
     
   } catch (error) {
     console.error('Failed to load dynamic content:', error);
@@ -1486,7 +1481,7 @@ async function loadDynamicContent() {
   }
 }
 
-function updateSliders(sliders) {
+
   const carousel = document.querySelector('.header-carousel');
   if (!carousel) return;
   
@@ -1517,6 +1512,7 @@ function updateSliders(sliders) {
   });
 }
 
+
 function updateServices(services) {
   const servicesContainer = document.querySelector('.services-container');
   if (!servicesContainer) return;
@@ -1538,6 +1534,316 @@ function updateServices(services) {
       </div>
     `;
     servicesContainer.insertAdjacentHTML('beforeend', serviceHTML);
+  });
+}
+
+// Load content when page loads
+document.addEventListener('DOMContentLoaded', loadDynamicContent);
+
+
+function updateServices(services) {
+  const servicesContainer = document.querySelector('.services-container');
+  if (!servicesContainer) return;
+  
+  servicesContainer.innerHTML = '';
+  
+  services.forEach(service => {
+    const serviceHTML = `
+      <div class="col-md-6 col-lg-4 wow fadeInUp" data-wow-delay="0.2s">
+        <div class="service-item">
+          <div class="service-img">
+            <img src="${service.image}" class="img-fluid rounded-top w-100" alt="">
+          </div>
+          <div class="rounded-bottom p-4">
+            <a href="#" class="h4 d-inline-block mb-4">${service.title}</a>
+            <p class="mb-4">${service.description}</p>
+          </div>
+        </div>
+      </div>
+    `;
+    servicesContainer.insertAdjacentHTML('beforeend', serviceHTML);
+  });
+}
+
+// Load content when page loads
+document.addEventListener('DOMContentLoaded', loadDynamicContent);
+</script>
+
+<script>
+// Load dynamic content from admin dashboard
+async function loadDynamicContent() {
+  try {
+    // Load all sections
+    await Promise.all([
+      loadSliders(),
+      loadServices(), 
+      loadTeam(),
+      loadBlogs()
+    ]);
+    
+    console.log('All dynamic content loaded successfully');
+    
+  } catch (error) {
+    console.error('Failed to load dynamic content:', error);
+    // Fallback to static content (current behavior)
+  }
+}
+
+async function loadBlogs() {
+  try {
+    const response = await fetch('/api/blogs?limit=3'); // Load only 3 for homepage
+    if (!response.ok) throw new Error('Failed to fetch blogs');
+    
+    const data = await response.json();
+    const blogs = data.data || data;
+    
+    // Only replace content if we have blogs from API
+    if (blogs && blogs.length > 0) {
+      const blogsContainer = document.querySelector('#blog .row');
+      blogsContainer.innerHTML = ''; // Clear existing
+      
+      blogs.slice(0, 3).forEach(blog => {
+        const blogHTML = `
+          <div class="col-md-6 col-lg-4 mb-4">
+            <div class="blog-item p-4 h-100 d-flex flex-column">
+              <div class="blog-img mb-4">
+                <img src="${blog.image}" class="img-fluid w-100 rounded" alt="${blog.title}">
+              </div>
+              <div class="d-flex align-items-center flex-wrap mb-2 small text-muted">
+                <span class="me-3"><i class="fas fa-user text-primary me-1"></i>${blog.author || 'Admin'}</span>
+                <span class="me-3"><i class="far fa-calendar-alt text-primary me-1"></i>${new Date(blog.createdAt).toLocaleDateString()}</span>
+                ${blog.views ? `<span class="me-3"><i class="far fa-eye text-primary me-1"></i>${blog.views} Views</span>` : ''}
+                ${blog.comments ? `<span><i class="far fa-comments text-primary me-1"></i>${blog.comments} Comments</span>` : ''}
+              </div>
+              <a href="post.php?slug=${blog.slug}" class="h5 d-inline-block mb-2">${blog.title}</a>
+              <p class="mb-3 flex-grow-1" style="display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden;">
+                ${blog.excerpt || (blog.content ? blog.content.substring(0, 200) + '...' : '')}
+              </p>
+              <a href="post.php?slug=${blog.slug}" class="btn btn-primary btn-sm mt-auto">Read Full Blog</a>
+            </div>
+          </div>
+        `;
+        blogsContainer.insertAdjacentHTML('beforeend', blogHTML);
+      });
+    }
+    // If no blogs from API, hardcoded content remains
+    
+  } catch (error) {
+    console.error('Failed to load blogs:', error);
+    // Hardcoded content remains as fallback
+  }
+}
+
+// Add the missing functions with fallback logic
+async function loadSliders() {
+  try {
+    const response = await fetch('/api/sliders');
+    if (!response.ok) throw new Error('Failed to fetch sliders');
+    
+    const data = await response.json();
+    const sliders = data.data || data;
+    
+    if (sliders && sliders.length > 0) {
+      updateSliders(sliders);
+    }
+  } catch (error) {
+    console.error('Failed to load sliders:', error);
+    // Hardcoded sliders remain
+  }
+}
+
+
+  try {
+    const response = await fetch('/api/services');
+    if (!response.ok) throw new Error('Failed to fetch services');
+    
+    const data = await response.json();
+    const services = data.data || data;
+    
+    if (services && services.length > 0) {
+      updateServices(services);
+    }
+  } catch (error) {
+    console.error('Failed to load services:', error);
+    // Hardcoded services remain
+  }
+}
+
+async function loadTeam() {
+  try {
+    const response = await fetch('/api/team');
+    if (!response.ok) throw new Error('Failed to fetch team');
+    
+    const data = await response.json();
+    const team = data.data || data;
+    
+    if (team && team.length > 0) {
+      updateTeam(team);
+    }
+  } catch (error) {
+    console.error('Failed to load team:', error);
+    // Hardcoded team remains
+  }
+}
+
+async function loadSliders() {
+  try {
+    const response = await fetch('/api/sliders');
+    const data = await response.json();
+    const sliders = data.data || data; // Handle both response formats
+    
+    const carousel = document.querySelector('.header-carousel');
+    carousel.innerHTML = ''; // Clear existing
+    
+    sliders.forEach(slider => {
+      const slideHTML = `
+        <div class="header-carousel-item">
+          <img src="${slider.imageUrl || slider.image}" class="img-fluid w-100" alt="Slide">
+          <div class="carousel-caption">
+            <div class="container">
+              <div class="row gy-0 gx-5">
+                <div class="col-lg-0 col-xl-5"></div>
+                <div class="col-xl-7 animated fadeInLeft">
+                  <div class="text-sm-center text-md-end">
+                    <h4 class="text-primary text-uppercase fw-bold mb-4">
+                      ${slider.smallTitle || slider.kicker || ''}
+                    </h4>
+                    <h1 class="display-4 text-uppercase text-white mb-4">
+                      ${slider.bigTitle || slider.headline || ''}
+                    </h1>
+                    <p class="mb-5 fs-5">${slider.paragraph || slider.text || ''}</p>
+                    
+                    <div class="d-flex justify-content-center justify-content-md-end flex-shrink-0 mb-4">
+                      ${slider.primaryBtnText ? `<a class="btn btn-light rounded-pill py-3 px-4 px-md-5 me-2" href="${slider.primaryBtnLink || '#'}">
+                        <i class="fas fa-play-circle me-2"></i> ${slider.primaryBtnText}
+                      </a>` : ''}
+                      
+                      ${slider.secondaryBtnText ? `<a class="btn btn-primary rounded-pill py-3 px-4 px-md-5 ms-2" href="${slider.secondaryBtnLink || '#'}">
+                        ${slider.secondaryBtnText}
+                      </a>` : ''}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+      carousel.insertAdjacentHTML('beforeend', slideHTML);
+    });
+    
+    // Reinitialize carousel after loading
+    $('.header-carousel').trigger('destroy.owl.carousel');
+    $('.header-carousel').owlCarousel({
+      loop: true,
+      margin: 0,
+      nav: true,
+      autoplay: true,
+      autoplayTimeout: 5000,
+      items: 1,
+      animateOut: 'fadeOut',
+      animateIn: 'fadeIn'
+    });
+    
+  } catch (error) {
+    console.error('Failed to load sliders:', error);
+  }
+}
+  const carousel = document.querySelector('.header-carousel');
+  if (!carousel) return;
+  
+  // Clear existing slides
+  carousel.innerHTML = '';
+  
+  // Add new slides from admin data
+  sliders.forEach(slide => {
+    const slideHTML = `
+      <div class="header-carousel-item">
+        <img src="${slide.image}" class="img-fluid w-100" alt="Slide">
+        <div class="carousel-caption">
+          <div class="container">
+            <div class="row gy-0 gx-5">
+              <div class="col-lg-0 col-xl-5"></div>
+              <div class="col-xl-7 animated fadeInLeft">
+                <div class="text-sm-center text-md-end">
+                  <h4 class="text-primary text-uppercase fw-bold mb-4">${slide.kicker || ''}</h4>
+                  <h1 class="display-4 text-uppercase text-white mb-4">${slide.headline || ''}</h1>
+                  <p class="mb-5 fs-5">${slide.text || ''}</p>
+                  <div class="d-flex justify-content-center justify-content-md-end flex-shrink-0 mb-4">
+                    ${slide.video_link ? `<a class="btn btn-light rounded-pill py-3 px-4 px-md-5 me-2" href="${slide.video_link}"><i class="fas fa-play-circle me-2"></i> Watch Video</a>` : ''}
+                    <a class="btn btn-primary rounded-pill py-3 px-4 px-md-5 ms-2" href="${slide.link || '/#about'}">Learn More</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+    carousel.insertAdjacentHTML('beforeend', slideHTML);
+  });
+}
+
+async function loadServices() {
+  try {
+    const response = await fetch('/api/services');
+    const data = await response.json();
+    const services = data.data || data;
+    
+    const servicesContainer = document.querySelector('#what-we-do .row.g-4');
+    servicesContainer.innerHTML = ''; // Clear existing
+    
+    services.forEach((service, index) => {
+      const delay = (index + 1) * 0.2;
+      const serviceHTML = `
+        <div class="col-md-6 col-lg-4 wow fadeInUp" data-wow-delay="${delay}s">
+          <div class="service-item">
+            <div class="service-img">
+              <img src="${service.image}" class="img-fluid rounded-top w-100" alt="${service.title}">
+            </div>
+            <div class="rounded-bottom p-4">
+              <a href="${service.link || '/#what-we-do'}" class="h4 d-inline-block mb-4">${service.title}</a>
+              <p class="mb-4">${service.description}</p>
+              <a class="btn btn-primary rounded-pill py-2 px-4" href="${service.link || '/#what-we-do'}">Learn More</a>
+            </div>
+          </div>
+        </div>
+      `;
+      servicesContainer.insertAdjacentHTML('beforeend', serviceHTML);
+    });
+    
+  } catch (error) {
+    console.error('Failed to load services:', error);
+  }
+}
+function updateTeam(team) {
+  const teamContainer = document.querySelector('#team .row');
+  if (!teamContainer) return;
+  
+  teamContainer.innerHTML = '';
+  
+  team.forEach((member, index) => {
+    const delay = (index * 0.2) + 0.2;
+    const teamHTML = `
+      <div class="col-md-6 col-lg-6 col-xl-3 wow fadeInUp" data-wow-delay="${delay}s">
+        <div class="team-item">
+          <div class="team-img">
+            <img src="${member.image}" class="img-fluid" alt="${member.name}">
+          </div>
+          <div class="team-title">
+            <h4 class="mb-0">${member.name}</h4>
+            <p class="mb-0">${member.position}</p>
+          </div>
+          <div class="team-icon">
+            ${member.facebook ? `<a class="btn btn-primary btn-sm-square rounded-circle me-3" href="${member.facebook}"><i class="fab fa-facebook-f"></i></a>` : ''}
+            ${member.twitter ? `<a class="btn btn-primary btn-sm-square rounded-circle me-3" href="${member.twitter}"><i class="fab fa-twitter"></i></a>` : ''}
+            ${member.linkedin ? `<a class="btn btn-primary btn-sm-square rounded-circle me-3" href="${member.linkedin}"><i class="fab fa-linkedin-in"></i></a>` : ''}
+            ${member.instagram ? `<a class="btn btn-primary btn-sm-square rounded-circle me-0" href="${member.instagram}"><i class="fab fa-instagram"></i></a>` : ''}
+          </div>
+        </div>
+      </div>
+    `;
+    teamContainer.insertAdjacentHTML('beforeend', teamHTML);
   });
 }
 
