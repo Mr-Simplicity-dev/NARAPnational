@@ -1297,25 +1297,30 @@ const resources = {
       };
     },
     renderRow: (item, i) => {
-      const img = item.image || item.imageUrl || '';
-      const kick = item.kicker || item.smallTitle || '';
-      const head = item.headline || item.bigTitle || '';
-      const c1 = (item.cta1 && item.cta1.label) || item.primaryBtnText || '';
-      const c2 = (item.cta2 && item.cta2.label) || item.secondaryBtnText || '';
-      const ord = (item.order ?? '') + '';
-      return `<tr>
-        <td>${i + 1}</td>
-        <td>${img ? `<img class="img-thumb" src="${img}">` : ''}</td>
-        <td>${kick}</td>
-        <td>${head}</td>
-        <td>${[c1, c2].filter(Boolean).join(' / ')}</td>
-        <td>${ord}</td>
-        <td class="text-end">
-          <button class="btn btn-sm btn-outline-primary" data-edit="sliders" data-id="${item._id}">Edit</button>
-          <button class="btn btn-sm btn-outline-danger" data-del="sliders" data-id="${item._id}">Delete</button>
-        </td>
-      </tr>`;
-    }
+  const img = item.image || item.imageUrl || '';
+  const kick = item.kicker || item.smallTitle || '';
+  const head = item.headline || item.bigTitle || '';
+  const c1 = (item.cta1 && item.cta1.label) || item.primaryBtnText || '';
+  const c2 = (item.cta2 && item.cta2.label) || item.secondaryBtnText || '';
+  const ord = (item.order ?? '') + '';
+  
+  // Check if video is configured
+  const hasVideo = (item.cta1?.videoUrl || item.cta1?.videoFile || item.primaryBtnVideoUrl || item.primaryBtnVideoFile) ? '✅ Video' : '❌ No Video';
+  
+  return `<tr>
+    <td>${i + 1}</td>
+    <td>${img ? `<img class="img-thumb" src="${img}">` : ''}</td>
+    <td>${kick}</td>
+    <td>${head}</td>
+    <td>${[c1, c2].filter(Boolean).join(' / ')}</td>
+    <td>${hasVideo}</td>
+    <td>${ord}</td>
+    <td class="text-end">
+      <button class="btn btn-sm btn-outline-primary" data-edit="sliders" data-id="${item._id}">Edit</button>
+      <button class="btn btn-sm btn-outline-danger" data-del="sliders" data-id="${item._id}">Delete</button>
+    </td>
+  </tr>`;
+}
   },
   services: {
     endpoint: '/services', listEl: '#list-services', form: '#form-service', status: '#serviceStatus',
