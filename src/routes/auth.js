@@ -5,10 +5,63 @@ import fs from 'fs';
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
 import { requireAuth } from '../middleware/auth.js';
-
+import passport from 'passport';
+import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 const router = express.Router();
 
 
+
+// Google OAuth Strategy
+passport.use(new GoogleStrategy({
+  clientID: process.env.GOOGLE_CLIENT_ID,
+  clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+  callbackURL: "/api/auth/google/callback"
+}, async (accessToken, refreshToken, profile, done) => {
+  try {
+    // Check if user exists
+    let user = await User.findOne({ email: profile.emails[0].value });
+    
+    if (user) {
+      return done(null, user);
+    } else {
+      // Create new user
+      user = await User.create({
+        name: profile.displayName,
+        email: profile.emails[0].value,
+        role: 'member',
+        // Set a default password or handle passwordless accounts
+        password: 'google-oauth-' + Date.now()
+      });
+      return done(null, user);
+    }
+  } catch (error) {
+    return done(error, null);
+  }
+}));
+
+passport.serializeUser((user, done) => done(null, user._id));
+passport.deserializeUser(async (id, done) => {
+  try {
+    const user = await User.findById(id);
+    done(null, user);
+  } catch (error) {
+    done(error, null);
+  }
+});
+
+// Google OAuth routes
+router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+
+router.get('/google/callback', 
+  passport.authenticate('google', { failureRedirect: '/register.php' }),
+  async (req, res) => {
+    // Generate JWT token
+    const token = jwt.sign({ id: req.user._id }, process.env.JWT_SECRET || 'secret', { expiresIn: '7d' });
+    
+    // Redirect to frontend with token
+    res.redirect(`/member/profile-setup.php?token=${token}`);
+  }
+);
 
 /* --------------------------------- uploads -------------------------------- */
 const memberPassportDir = path.join(process.cwd(), 'public', 'admin', 'uploads', 'passports');

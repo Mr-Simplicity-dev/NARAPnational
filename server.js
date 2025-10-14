@@ -7,6 +7,9 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import fs from 'fs';
+import session from 'express-session';
+import passport from 'passport';
+
 
 import authRoutes from './src/routes/auth.js';
 import blogRoutes from './src/routes/blogs.js';
@@ -139,6 +142,15 @@ app.use(helmet({
     }
   }
 }));
+// Add after other middleware (around line 145)
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'your-session-secret',
+  resave: false,
+  saveUninitialized: false
+}));
+
+app.use(passport.initialize());
+app.use(passport.session());
 app.use(cors({ origin: process.env.CORS_ORIGIN?.split(',') || '*'}));
 app.use(express.json({ limit: '2mb' }));
 app.use(express.urlencoded({ extended: true }));

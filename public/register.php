@@ -61,8 +61,7 @@
       </div>
     </aside>
 
-        <!-- RIGHT: Signup Form -->
-<main class="right-pane">
+       <main class="right-pane">
   <div class="card-auth">
     <h2>Create your account</h2>
     <div class="subtitle">Use a valid email you can access. You'll complete your full profile next.</div>
