@@ -430,15 +430,30 @@
   <script>
   // Authentication and user data loading
   (function(){
-    const token = localStorage.getItem('jwt');
+  // Check for token in URL parameters first (from Google OAuth)
+  const urlParams = new URLSearchParams(window.location.search);
+  const urlToken = urlParams.get('token');
+  
+  let token = localStorage.getItem('jwt');
+  
+  // If token is in URL, save it to localStorage and clean URL
+  if (urlToken) {
+    localStorage.setItem('jwt', urlToken);
+    token = urlToken;
+    console.log('Token received from Google OAuth, saved to localStorage');
     
-    if (!token) {
-      console.log('No JWT token found, redirecting to login...');
-      setTimeout(() => { 
-        window.location.replace('/member/login.php'); 
-      }, 400);
-      return;
-    }
+    // Clean the URL (remove token parameter)
+    const newUrl = window.location.pathname;
+    window.history.replaceState({}, document.title, newUrl);
+  }
+  
+  if (!token) {
+    console.log('No JWT token found, redirecting to login...');
+    setTimeout(() => { 
+      window.location.replace('/member/login.php'); 
+    }, 400);
+    return;
+  }
     
     console.log('JWT token found, fetching user data...');
     
