@@ -559,11 +559,54 @@
     <div class="tab-pane fade" id="pane-members-all" role="tabpanel">
       <div class="card mb-3"><div class="card-body">
         <div class="row g-3 align-items-end">
-          <div class="col-md-6">
+          <div class="col-md-4">
             <label class="form-label">Search (name/email/member ID/state)</label>
             <input id="allSearch" class="form-control" placeholder="Search…">
           </div>
-          <div class="col-md-6 text-md-end">
+          <div class="col-md-4">
+            <label class="form-label">Filter by State:</label>
+            <select id="stateFilter" class="form-select">
+              <option value="">All States</option>
+              <option value="Abia">Abia</option>
+              <option value="Adamawa">Adamawa</option>
+              <option value="Akwa Ibom">Akwa Ibom</option>
+              <option value="Anambra">Anambra</option>
+              <option value="Bauchi">Bauchi</option>
+              <option value="Bayelsa">Bayelsa</option>
+              <option value="Benue">Benue</option>
+              <option value="Borno">Borno</option>
+              <option value="Cross River">Cross River</option>
+              <option value="Delta">Delta</option>
+              <option value="Ebonyi">Ebonyi</option>
+              <option value="Edo">Edo</option>
+              <option value="Ekiti">Ekiti</option>
+              <option value="Enugu">Enugu</option>
+              <option value="FCT">FCT</option>
+              <option value="Gombe">Gombe</option>
+              <option value="Imo">Imo</option>
+              <option value="Jigawa">Jigawa</option>
+              <option value="Kaduna">Kaduna</option>
+              <option value="Kano">Kano</option>
+              <option value="Katsina">Katsina</option>
+              <option value="Kebbi">Kebbi</option>
+              <option value="Kogi">Kogi</option>
+              <option value="Kwara">Kwara</option>
+              <option value="Lagos">Lagos</option>
+              <option value="Nasarawa">Nasarawa</option>
+              <option value="Niger">Niger</option>
+              <option value="Ogun">Ogun</option>
+              <option value="Ondo">Ondo</option>
+              <option value="Osun">Osun</option>
+              <option value="Oyo">Oyo</option>
+              <option value="Plateau">Plateau</option>
+              <option value="Rivers">Rivers</option>
+              <option value="Sokoto">Sokoto</option>
+              <option value="Taraba">Taraba</option>
+              <option value="Yobe">Yobe</option>
+              <option value="Zamfara">Zamfara</option>
+            </select>
+          </div>
+          <div class="col-md-4 text-md-end">
             <button class="btn btn-brand" id="btnReloadAll">Reload</button>
             <button class="btn btn-outline-secondary" id="btnExportAll">Export CSV</button>
           </div>
@@ -574,7 +617,7 @@
         <div class="table-responsive">
           <table class="table align-middle">
             <thead>
-              <tr><th>#</th><th>Name</th><th>Email</th><th>Member ID</th><th>State</th><th>Created</th></tr>
+              <tr><th>S/N</th><th>Name</th><th>Email</th><th>Member ID</th><th>State</th><th>Created</th></tr>
             </thead>
             <tbody id="list-members-all"></tbody>
           </table>
@@ -589,15 +632,59 @@
       </div></div>
     </div>
 
+
     <!-- PAID MEMBERS -->
     <div class="tab-pane fade" id="pane-members-paid" role="tabpanel">
       <div class="card mb-3"><div class="card-body">
         <div class="row g-3 align-items-end">
-          <div class="col-md-4">
+          <div class="col-md-3">
             <label class="form-label">Search (name/email/member ID/state)</label>
             <input id="paidSearch" class="form-control" placeholder="Search…">
           </div>
-          <div class="col-md-5">
+          <div class="col-md-3">
+            <label class="form-label">Filter by State:</label>
+            <select id="stateFilterPaid" class="form-select">
+              <option value="">All States</option>
+              <option value="Abia">Abia</option>
+              <option value="Adamawa">Adamawa</option>
+              <option value="Akwa Ibom">Akwa Ibom</option>
+              <option value="Anambra">Anambra</option>
+              <option value="Bauchi">Bauchi</option>
+              <option value="Bayelsa">Bayelsa</option>
+              <option value="Benue">Benue</option>
+              <option value="Borno">Borno</option>
+              <option value="Cross River">Cross River</option>
+              <option value="Delta">Delta</option>
+              <option value="Ebonyi">Ebonyi</option>
+              <option value="Edo">Edo</option>
+              <option value="Ekiti">Ekiti</option>
+              <option value="Enugu">Enugu</option>
+              <option value="FCT">FCT</option>
+              <option value="Gombe">Gombe</option>
+              <option value="Imo">Imo</option>
+              <option value="Jigawa">Jigawa</option>
+              <option value="Kaduna">Kaduna</option>
+              <option value="Kano">Kano</option>
+              <option value="Katsina">Katsina</option>
+              <option value="Kebbi">Kebbi</option>
+              <option value="Kogi">Kogi</option>
+              <option value="Kwara">Kwara</option>
+              <option value="Lagos">Lagos</option>
+              <option value="Nasarawa">Nasarawa</option>
+              <option value="Niger">Niger</option>
+              <option value="Ogun">Ogun</option>
+              <option value="Ondo">Ondo</option>
+              <option value="Osun">Osun</option>
+              <option value="Oyo">Oyo</option>
+              <option value="Plateau">Plateau</option>
+              <option value="Rivers">Rivers</option>
+              <option value="Sokoto">Sokoto</option>
+              <option value="Taraba">Taraba</option>
+              <option value="Yobe">Yobe</option>
+              <option value="Zamfara">Zamfara</option>
+            </select>
+          </div>
+          <div class="col-md-4">
             <label class="form-label">Count as "Paid" if…</label>
             <div class="d-flex gap-3 flex-wrap">
               <div class="form-check"><input class="form-check-input" type="checkbox" id="paidFeeMembership" checked><label class="form-check-label" for="paidFeeMembership">Membership fee</label></div>
@@ -609,7 +696,7 @@
               <label class="form-check-label" for="paidLogicAll">Require <strong>all selected</strong> fees (unchecked = any one)</label>
             </div>
           </div>
-          <div class="col-md-3 text-md-end">
+          <div class="col-md-2 text-md-end">
             <button class="btn btn-brand" id="btnReloadPaid">Reload</button>
             <button class="btn btn-outline-secondary" id="btnExportPaid">Export CSV</button>
           </div>
@@ -618,7 +705,7 @@
       <div class="card"><div class="card-body">
         <div class="table-responsive">
           <table class="table align-middle">
-            <thead><tr><th>#</th><th>Name</th><th>Email</th><th>Member ID</th><th>State</th><th>Paid</th></tr></thead>
+            <thead><tr><th>S/N</th><th>Name</th><th>Email</th><th>Member ID</th><th>State</th><th>Paid</th></tr></thead>
             <tbody id="list-members-paid"></tbody>
           </table>
         </div>
@@ -632,15 +719,59 @@
       </div></div>
     </div>
 
+
     <!-- UNPAID MEMBERS -->
     <div class="tab-pane fade" id="pane-members-unpaid" role="tabpanel">
       <div class="card mb-3"><div class="card-body">
         <div class="row g-3 align-items-end">
-          <div class="col-md-6">
+          <div class="col-md-4">
             <label class="form-label">Search (name/email/member ID/state)</label>
             <input id="unpaidSearch" class="form-control" placeholder="Search…">
           </div>
-          <div class="col-md-6 text-md-end">
+          <div class="col-md-4">
+            <label class="form-label">Filter by State:</label>
+            <select id="stateFilterUnpaid" class="form-select">
+              <option value="">All States</option>
+              <option value="Abia">Abia</option>
+              <option value="Adamawa">Adamawa</option>
+              <option value="Akwa Ibom">Akwa Ibom</option>
+              <option value="Anambra">Anambra</option>
+              <option value="Bauchi">Bauchi</option>
+              <option value="Bayelsa">Bayelsa</option>
+              <option value="Benue">Benue</option>
+              <option value="Borno">Borno</option>
+              <option value="Cross River">Cross River</option>
+              <option value="Delta">Delta</option>
+              <option value="Ebonyi">Ebonyi</option>
+              <option value="Edo">Edo</option>
+              <option value="Ekiti">Ekiti</option>
+              <option value="Enugu">Enugu</option>
+              <option value="FCT">FCT</option>
+              <option value="Gombe">Gombe</option>
+              <option value="Imo">Imo</option>
+              <option value="Jigawa">Jigawa</option>
+              <option value="Kaduna">Kaduna</option>
+              <option value="Kano">Kano</option>
+              <option value="Katsina">Katsina</option>
+              <option value="Kebbi">Kebbi</option>
+              <option value="Kogi">Kogi</option>
+              <option value="Kwara">Kwara</option>
+              <option value="Lagos">Lagos</option>
+              <option value="Nasarawa">Nasarawa</option>
+              <option value="Niger">Niger</option>
+              <option value="Ogun">Ogun</option>
+              <option value="Ondo">Ondo</option>
+              <option value="Osun">Osun</option>
+              <option value="Oyo">Oyo</option>
+              <option value="Plateau">Plateau</option>
+              <option value="Rivers">Rivers</option>
+              <option value="Sokoto">Sokoto</option>
+              <option value="Taraba">Taraba</option>
+              <option value="Yobe">Yobe</option>
+              <option value="Zamfara">Zamfara</option>
+            </select>
+          </div>
+          <div class="col-md-4 text-md-end">
             <button class="btn btn-brand" id="btnReloadUnpaid">Reload</button>
             <button class="btn btn-outline-secondary" id="btnExportUnpaid">Export CSV</button>
           </div>
@@ -650,7 +781,7 @@
       <div class="card"><div class="card-body">
         <div class="table-responsive">
           <table class="table align-middle">
-            <thead><tr><th>#</th><th>Name</th><th>Email</th><th>Member ID</th><th>State</th><th>Unpaid Fees</th></tr></thead>
+            <thead><tr><th>S/N</th><th>Name</th><th>Email</th><th>Member ID</th><th>State</th><th>Unpaid Fees</th></tr></thead>
             <tbody id="list-members-unpaid"></tbody>
           </table>
         </div>
@@ -663,6 +794,7 @@
         </div>
       </div></div>
     </div>
+
 
   </div>
 </div>

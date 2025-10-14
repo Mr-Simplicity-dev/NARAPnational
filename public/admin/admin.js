@@ -899,6 +899,16 @@ function filterPaidMembers(data, requireAll) {
   });
 }
 
+// ===== STATE FILTERING FUNCTION =====
+function filterMembersByState(data, selectedState) {
+  if (!selectedState) return data;
+  
+  return data.filter(item => {
+    const memberState = (item?.state || '').toLowerCase();
+    return memberState === selectedState.toLowerCase();
+  });
+}
+
 // ===== MEMBERS LOADING =====
 async function loadMembersSimple(type) {
   try {
@@ -956,6 +966,9 @@ function renderFilteredMembers(type) {
   let filteredData = [];
   let currentPage = 1;
   
+  // Get selected state
+  const selectedState = $('#stateFilter')?.value || '';
+  
   switch(type) {
     case 'all':
       data = currentAllData;
@@ -982,6 +995,12 @@ function renderFilteredMembers(type) {
       break;
   }
   
+  // Apply state filter
+  if (selectedState) {
+    filteredData = filterMembersByState(filteredData, selectedState);
+  }
+  
+  // Rest of your existing renderFilteredMembers code...
   const tbody = document.getElementById(`list-members-${type}`);
   const countEl = document.getElementById(`${type}Count`);
   
@@ -1170,25 +1189,41 @@ function setupPaginationHandlers() {
 }
 
 // ===== EXPORT HANDLERS =====
+// ===== ENHANCED EXPORT HANDLERS =====
 async function handleExport(type) {
   try {
     const button = $(`#btnExport${type.charAt(0).toUpperCase() + type.slice(1)}`);
     showButtonLoading(button, 'Exporting...');
     
+    // Get selected state filter
+    const selectedState = $('#stateFilter')?.value || '';
+    
     // Get current filtered data for export (all data, not just current page)
     let dataToExport = [];
     switch(type) {
-      case 'all': dataToExport = filterMembers(currentAllData, $('#allSearch')?.value || '', 'all'); break;
+      case 'all': 
+        dataToExport = filterMembers(currentAllData, $('#allSearch')?.value || '', 'all');
+        break;
       case 'paid': 
         let paidData = filterMembers(currentPaidData, $('#paidSearch')?.value || '', 'paid');
         const requireAll = $('#paidLogicAll')?.checked || false;
         dataToExport = filterPaidMembers(paidData, requireAll);
         break;
-      case 'unpaid': dataToExport = filterMembers(currentUnpaidData, $('#unpaidSearch')?.value || '', 'unpaid'); break;
+      case 'unpaid': 
+        dataToExport = filterMembers(currentUnpaidData, $('#unpaidSearch')?.value || '', 'unpaid');
+        break;
+    }
+    
+    // Apply state filter to the data
+    if (selectedState) {
+      dataToExport = filterMembersByState(dataToExport, selectedState);
     }
     
     const csv = convertToCSV(dataToExport, type);
-    const filename = `${type}-members-${new Date().toISOString().split('T')[0]}.csv`;
+    
+    // Include state in filename if filtered
+    const stateLabel = selectedState ? `-${selectedState.replace(/\s+/g, '-')}` : '';
+    const filename = `${type}-members${stateLabel}-${new Date().toISOString().split('T')[0]}.csv`;
     
     downloadCSV(csv, filename);
     
@@ -1555,6 +1590,19 @@ document.addEventListener('DOMContentLoaded', function() {
   $('#btnExportAll')?.addEventListener('click', () => handleExport('all'));
   $('#btnExportPaid')?.addEventListener('click', () => handleExport('paid'));
   $('#btnExportUnpaid')?.addEventListener('click', () => handleExport('unpaid'));
+
+  // State filter change handler
+$('#stateFilter')?.addEventListener('change', () => {
+  // Reset pagination when state filter changes
+  allPage = 1;
+  paidPage = 1;
+  unpaidPage = 1;
+  
+  // Re-render all member lists with new filter
+  renderFilteredMembers('all');
+  renderFilteredMembers('paid');
+  renderFilteredMembers('unpaid');
+});
   
   // Reload buttons with loading states
   $('#btnReloadAll')?.addEventListener('click', async () => {
