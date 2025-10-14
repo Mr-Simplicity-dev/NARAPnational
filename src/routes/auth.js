@@ -9,15 +9,15 @@ import passport from 'passport';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 const router = express.Router();
 
-
-
-// Google OAuth Strategy
+// Configure Google OAuth Strategy
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
   callbackURL: "/api/auth/google/callback"
 }, async (accessToken, refreshToken, profile, done) => {
   try {
+    console.log('Google profile:', profile);
+    
     // Check if user exists
     let user = await User.findOne({ email: profile.emails[0].value });
     
@@ -29,16 +29,17 @@ passport.use(new GoogleStrategy({
         name: profile.displayName,
         email: profile.emails[0].value,
         role: 'member',
-        // Set a default password or handle passwordless accounts
-        password: 'google-oauth-' + Date.now()
+        password: 'google-oauth-' + Date.now() // Temporary password for OAuth users
       });
       return done(null, user);
     }
   } catch (error) {
+    console.error('Google OAuth error:', error);
     return done(error, null);
   }
 }));
 
+// Passport serialization
 passport.serializeUser((user, done) => done(null, user._id));
 passport.deserializeUser(async (id, done) => {
   try {
@@ -50,18 +51,26 @@ passport.deserializeUser(async (id, done) => {
 });
 
 // Google OAuth routes
-router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+router.get('/google', passport.authenticate('google', { 
+  scope: ['profile', 'email'] 
+}));
 
 router.get('/google/callback', 
-  passport.authenticate('google', { failureRedirect: '/register.php' }),
+  passport.authenticate('google', { failureRedirect: '/register.php?error=google_auth_failed' }),
   async (req, res) => {
-    // Generate JWT token
-    const token = jwt.sign({ id: req.user._id }, process.env.JWT_SECRET || 'secret', { expiresIn: '7d' });
-    
-    // Redirect to frontend with token
-    res.redirect(`/member/profile-setup.php?token=${token}`);
+    try {
+      // Generate JWT token
+      const token = jwt.sign({ id: req.user._id }, process.env.JWT_SECRET || 'secret', { expiresIn: '7d' });
+      
+      // Redirect to frontend with token
+      res.redirect(`/member/profile-setup.php?token=${token}&google_auth=success`);
+    } catch (error) {
+      console.error('Token generation error:', error);
+      res.redirect('/register.php?error=token_generation_failed');
+    }
   }
 );
+
 
 /* --------------------------------- uploads -------------------------------- */
 const memberPassportDir = path.join(process.cwd(), 'public', 'admin', 'uploads', 'passports');
