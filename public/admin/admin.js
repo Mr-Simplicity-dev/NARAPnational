@@ -1492,7 +1492,8 @@ async function createOrUpdate(e, key) {
     if (res.ok) { resetForm(cfg.form); loadList(key); }
   } catch (err) {
     console.error(`createOrUpdate ${key} error:`, err);
-    document.querySelector(resources[key]?.status)?.textContent = 'Failed.';
+   const statusElement = resources[key] && resources[key].status ? document.querySelector(resources[key].status) : null;
+if (statusElement) statusElement.textContent = 'Failed.';
   }
 }
 
