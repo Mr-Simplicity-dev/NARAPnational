@@ -967,7 +967,9 @@ function renderFilteredMembers(type) {
   let currentPage = 1;
   
   // Get selected state
-  const selectedState = $('#stateFilter')?.value || '';
+ const selectedState = type === 'paid' ? ($('#stateFilterPaid')?.value || '') :
+                     type === 'unpaid' ? ($('#stateFilterUnpaid')?.value || '') :
+                     ($('#stateFilter')?.value || '');
   
   switch(type) {
     case 'all':
@@ -1188,7 +1190,7 @@ function setupPaginationHandlers() {
   });
 }
 
-// ===== EXPORT HANDLERS =====
+
 // ===== ENHANCED EXPORT HANDLERS =====
 async function handleExport(type) {
   try {
@@ -1604,14 +1606,22 @@ $('#stateFilter')?.addEventListener('change', () => {
   renderFilteredMembers('unpaid');
 });
 
-// Add these after line 1609 in admin.js
+
+// State filter change handler for paid members
 $('#stateFilterPaid')?.addEventListener('change', () => {
+  // Reset pagination when state filter changes
   paidPage = 1;
+  
+  // Re-render paid member list with new filter
   renderFilteredMembers('paid');
 });
 
+// State filter change handler for unpaid members  
 $('#stateFilterUnpaid')?.addEventListener('change', () => {
+  // Reset pagination when state filter changes
   unpaidPage = 1;
+  
+  // Re-render unpaid member list with new filter
   renderFilteredMembers('unpaid');
 });
   
