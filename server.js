@@ -34,6 +34,24 @@ import membersRoutes from './src/routes/members.js'; // plural - admin member ma
 import paidRoutes from './src/routes/paid.js';
 import unpaidRoutes from './src/routes/unpaid.js';
 
+
+const uploadDirs = [
+  'public/admin/uploads/services',
+  'public/admin/uploads/portfolio', 
+  'public/admin/uploads/blogs',
+  'public/admin/uploads/sections',
+  'public/admin/uploads/team',
+  'public/admin/uploads/partners',
+  'public/admin/uploads/passports'
+];
+
+uploadDirs.forEach(dir => {
+  try {
+    fs.mkdirSync(dir, { recursive: true });
+  } catch (e) {
+    console.log(`Directory ${dir} already exists or couldn't be created`);
+  }
+});
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -67,6 +85,8 @@ app.use(helmet({
   "https://ajax.googleapis.com",
   "https://accounts.google.com",
   "https://apis.google.com",
+  "https://www.gstatic.com",           // ⚠️ ADD THIS
+  "https://ssl.gstatic.com",           // ⚠️ ADD THIS
   "https://cdnjs.cloudflare.com",
   "https://cdn.jsdelivr.net",
   "https://static.whatsapp.net",

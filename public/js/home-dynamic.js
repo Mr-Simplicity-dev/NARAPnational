@@ -71,9 +71,11 @@
     } catch { return []; }
   };
 
-  // SLIDERS (accept dual schema)
-  const sliders = (await safeFetch('/api/sliders'))
-    .map(s => ({
+ 
+ // SLIDERS (accept dual schema)
+const slidersData = await safeFetch('/api/sliders');
+const sliders = (Array.isArray(slidersData) ? slidersData : [])
+  .map(s => ({
       kicker:   s.kicker ?? s.smallTitle ?? '',
       headline: s.headline ?? s.bigTitle ?? '',
       text:     s.text ?? s.paragraph ?? '',
