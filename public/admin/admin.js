@@ -1198,7 +1198,9 @@ async function handleExport(type) {
     showButtonLoading(button, 'Exporting...');
     
     // Get selected state filter
-    const selectedState = $('#stateFilter')?.value || '';
+   const selectedState = type === 'paid' ? ($('#stateFilterPaid')?.value || '') :
+                     type === 'unpaid' ? ($('#stateFilterUnpaid')?.value || '') :
+                     ($('#stateFilter')?.value || '');
     
     // Get current filtered data for export (all data, not just current page)
     let dataToExport = [];
