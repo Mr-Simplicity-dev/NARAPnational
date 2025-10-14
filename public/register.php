@@ -61,65 +61,93 @@
       </div>
     </aside>
 
-    <!-- RIGHT: Signup Form -->
-    <main class="right-pane">
-      <div class="card-auth">
-        <h2>Create your account</h2>
-        <div class="subtitle">Use a valid email you can access. You'll complete your full profile next.</div>
+        <!-- RIGHT: Signup Form -->
+<main class="right-pane">
+  <div class="card-auth">
+    <h2>Create your account</h2>
+    <div class="subtitle">Use a valid email you can access. You'll complete your full profile next.</div>
 
-        <div class="alert alert-guidelines" role="alert">
-          <div class="fw-bold mb-1">Before you start</div>
-          <ul class="mb-0 ps-3">
-            <li>Use your personal email (avoid shared inboxes).</li>
-            <li>Choose a strong password (8+ chars, mix of letters &amp; numbers).</li>
-            <li>You can fill your full details after creating this account.</li>
-          </ul>
-        </div>
-
-        <form id="signupForm" class="needs-validation" novalidate>
-          <!-- Hidden name that we derive from the email (local-part) -->
-          <input type="hidden" id="name" name="name" />
-
-          <div class="mb-3">
-            <label for="email" class="form-label">Email address</label>
-            <input type="email" class="form-control" id="email" name="email" placeholder="you@example.com" required>
-            <div class="invalid-feedback">Please enter a valid email.</div>
-          </div>
-
-          <div class="mb-3">
-            <label for="password" class="form-label">Password</label>
-            <div class="input-group">
-              <input type="password" class="form-control" id="password" name="password" minlength="8" placeholder="••••••••" required>
-              <button class="btn btn-outline-secondary pw-toggle" type="button" id="togglePassword" aria-label="Show password">Show</button>
-            </div>
-            <div class="hint mt-1" id="pwHint">Use at least 8 characters.</div>
-            <div class="invalid-feedback">Please choose a password (min 8 characters).</div>
-          </div>
-
-          <div class="mb-3">
-            <label for="confirm" class="form-label">Confirm password</label>
-            <div class="input-group">
-              <input type="password" class="form-control" id="confirm" name="confirm_password" minlength="8" placeholder="Repeat password" required>
-              <button class="btn btn-outline-secondary pw-toggle" type="button" id="toggleConfirm" aria-label="Show password">Show</button>
-            </div>
-            <div class="invalid-feedback" id="confirmFeedback">Passwords must match.</div>
-          </div>
-
-          <div class="mb-3 form-check">
-            <input class="form-check-input" type="checkbox" value="1" id="agree" required>
-            <label class="form-check-label" for="agree">I agree to the NARAP Terms &amp; Privacy Policy</label>
-            <div class="invalid-feedback">You must accept before continuing.</div>
-          </div>
-
-          <button type="submit" class="btn btn-brand w-100" id="submitBtn" disabled>Create Account</button>
-        </form>
-
-        <div class="divider"></div>
-        <div class="text-center hint">Already have an account? <a href="/member/login.php" class="link-success">Sign in</a></div>
-
-        <div id="signupMsg" class="mt-3"></div>
+    <!-- Google Sign-In Section -->
+    <div class="google-signin-section">
+      <h6 class="mb-3">Quick signup with Google</h6>
+      
+      <!-- Google One Tap (hidden, auto-loads) -->
+      <div id="g_id_onload"
+           data-client_id="963092048723-a6bvo7dt81c8a0tk2tl50rapsjrfchpa.apps.googleusercontent.com"
+           data-callback="handleGoogleCredential"
+           data-auto_prompt="false"
+           data-cancel_on_tap_outside="false">
       </div>
-    </main>
+      
+      <!-- Custom Google Button -->
+      <button class="google-btn" id="googleSignInBtn" onclick="initiateGoogleSignIn()">
+        <svg class="google-icon" viewBox="0 0 24 24">
+          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+        </svg>
+        Continue with Google
+      </button>
+    </div>
+
+    <div class="divider-or">
+      <span>OR</span>
+    </div>
+
+    <div class="alert alert-guidelines" role="alert">
+      <div class="fw-bold mb-1">Before you start</div>
+      <ul class="mb-0 ps-3">
+        <li>Use your personal email (avoid shared inboxes).</li>
+        <li>Choose a strong password (8+ chars, mix of letters &amp; numbers).</li>
+        <li>You can fill your full details after creating this account.</li>
+      </ul>
+    </div>
+
+    <form id="signupForm" class="needs-validation" novalidate>
+      <!-- Hidden name that we derive from the email (local-part) -->
+      <input type="hidden" id="name" name="name" />
+
+      <div class="mb-3">
+        <label for="email" class="form-label">Email address</label>
+        <input type="email" class="form-control" id="email" name="email" placeholder="you@example.com" required>
+        <div class="invalid-feedback">Please enter a valid email.</div>
+      </div>
+
+      <div class="mb-3">
+        <label for="password" class="form-label">Password</label>
+        <div class="input-group">
+          <input type="password" class="form-control" id="password" name="password" minlength="8" placeholder="••••••••" required>
+          <button class="btn btn-outline-secondary pw-toggle" type="button" id="togglePassword" aria-label="Show password">Show</button>
+        </div>
+        <div class="hint mt-1" id="pwHint">Use at least 8 characters.</div>
+        <div class="invalid-feedback">Please choose a password (min 8 characters).</div>
+      </div>
+
+      <div class="mb-3">
+        <label for="confirm" class="form-label">Confirm password</label>
+        <div class="input-group">
+          <input type="password" class="form-control" id="confirm" name="confirm_password" minlength="8" placeholder="Repeat password" required>
+          <button class="btn btn-outline-secondary pw-toggle" type="button" id="toggleConfirm" aria-label="Show password">Show</button>
+        </div>
+        <div class="invalid-feedback" id="confirmFeedback">Passwords must match.</div>
+      </div>
+
+      <div class="mb-3 form-check">
+        <input class="form-check-input" type="checkbox" value="1" id="agree" required>
+        <label class="form-check-label" for="agree">I agree to the NARAP Terms &amp; Privacy Policy</label>
+        <div class="invalid-feedback">You must accept before continuing.</div>
+      </div>
+
+      <button type="submit" class="btn btn-brand w-100" id="submitBtn" disabled>Create Account</button>
+    </form>
+
+    <div class="divider"></div>
+    <div class="text-center hint">Already have an account? <a href="/member/login.php" class="link-success">Sign in</a></div>
+
+    <div id="signupMsg" class="mt-3"></div>
+  </div>
+</main>
   </div>
 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
