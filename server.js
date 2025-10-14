@@ -171,7 +171,7 @@ app.use(helmet({
 // Add after other middleware (around line 145)
 // Session configuration for Passport
 app.use(session({
-  secret: process.env.SESSION_SECRET || 'your-session-secret-change-this',
+  secret: process.env.SESSION_SECRET || '507d337f93fe5e3663bcf9917a2355e4a66bc71a55430c6ae1822ccb35fa607761f99af13ce5f990c67481bb8735381e61a9a00aefd570942c3add407f0fa928',
   resave: false,
   saveUninitialized: false,
   cookie: { secure: false } // Set to true in production with HTTPS
