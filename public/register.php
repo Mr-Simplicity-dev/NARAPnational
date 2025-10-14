@@ -196,6 +196,49 @@
   </div>
 </main>
   </div>
+  <!-- Google Identity Services -->
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+
+<script>
+// Google Sign-In Functions
+function initiateGoogleSignIn() {
+  // Redirect to your backend Google OAuth route
+  window.location.href = '/api/auth/google';
+}
+
+function handleGoogleCredential(response) {
+  console.log('Google credential received:', response);
+  
+  // Send the credential to your backend for verification
+  fetch('/api/auth/google/verify', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      credential: response.credential
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success && data.token) {
+      localStorage.setItem('jwt', data.token);
+      document.getElementById('signupMsg').innerHTML = 
+        '<div class="alert alert-success">Google sign-in successful! Redirecting...</div>';
+      setTimeout(() => {
+        window.location.href = '/member/profile-setup.php';
+      }, 1500);
+    } else {
+      throw new Error(data.message || 'Google sign-in failed');
+    }
+  })
+  .catch(err => {
+    console.error('Google sign-in error:', err);
+    document.getElementById('signupMsg').innerHTML = 
+      '<div class="alert alert-danger">Google sign-in failed: ' + err.message + '</div>';
+  });
+}
+</script>
 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
