@@ -1603,6 +1603,17 @@ $('#stateFilter')?.addEventListener('change', () => {
   renderFilteredMembers('paid');
   renderFilteredMembers('unpaid');
 });
+
+// Add these after line 1609 in admin.js
+$('#stateFilterPaid')?.addEventListener('change', () => {
+  paidPage = 1;
+  renderFilteredMembers('paid');
+});
+
+$('#stateFilterUnpaid')?.addEventListener('change', () => {
+  unpaidPage = 1;
+  renderFilteredMembers('unpaid');
+});
   
   // Reload buttons with loading states
   $('#btnReloadAll')?.addEventListener('click', async () => {
