@@ -48,6 +48,54 @@
 
     @media (max-width: 992px){ .page{ grid-template-columns:1fr; padding:20px } .left-pane{ display:none } .right-pane{ border-radius:16px } }
     @media (max-width: 576px){ .card-auth{ width:100%; padding:24px 16px } .card-auth h2{ font-size:1.3rem } }
+
+    /* Google Sign-In Styles */
+.google-signin-section { margin-bottom: 20px; }
+.google-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid #dadce0;
+  border-radius: 12px;
+  background: #fff;
+  color: #3c4043;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+}
+.google-btn:hover {
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  border-color: #c1c7cd;
+}
+.google-icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 12px;
+}
+.divider-or {
+  text-align: center;
+  margin: 20px 0;
+  position: relative;
+}
+.divider-or::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: #e5e7eb;
+}
+.divider-or span {
+  background: #fff;
+  padding: 0 16px;
+  color: #6b7280;
+  font-size: 14px;
+}
   </style>
 </head>
 <body>
