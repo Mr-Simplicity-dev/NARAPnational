@@ -131,17 +131,20 @@ app.use(helmet({
         "https://googleads.g.doubleclick.net",
         "https://js.paystack.co"],
       "connect-src": [
-        "'self'",
-        "https://tawk.to",
-        "https://embed.tawk.to",
-        "https://cdn.tawk.to",
-        "https://va.tawk.to",
-        "https://*.tawk.to",
-        "wss://*.tawk.to",
-        "https://ep1.adtrafficquality.google",
-        "https://api.paystack.co",
-        "https://cdn.jsdelivr.net"
-      ]
+  "'self'",
+  "https://tawk.to",
+  "https://embed.tawk.to",
+  "https://cdn.tawk.to",
+  "https://va.tawk.to",
+  "https://*.tawk.to",
+  "wss://*.tawk.to",
+  "https://ep1.adtrafficquality.google",
+  "https://accounts.google.com",
+  "https://apis.google.com",
+  "https://www.googleapis.com",
+  "https://api.paystack.co",
+  "https://cdn.jsdelivr.net"
+]
     }
   }
 }));
