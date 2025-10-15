@@ -677,6 +677,8 @@ if (typeof PaystackPop === 'undefined') {
 <body>
 <header>
 <div class="title">
+  <!-- Added logo image here -->
+  <img src="/uploads/slider/Narap.png" alt="NARAP Logo" style="height: 32px; margin-right: 12px; vertical-align: middle;">
   <span>Member Dashboard</span>
   <div class="menu" id="mdMenu">
     <button class="menu-toggle" id="mdMenuToggle" aria-haspopup="true" aria-expanded="false">Account Settings ▾</button>
@@ -736,16 +738,19 @@ if (typeof PaystackPop === 'undefined') {
 <div style="font-weight: 600; margin-bottom: 8px;">Select Payment Method:</div>
 <div class="payment-methods">
 <div class="payment-method active" data-method="card">
-<h4>Card</h4>
-<p>Debit/Credit Card</p>
+  <div style="font-size: 24px; margin-bottom: 8px;">💳</div>
+  <h4>Card</h4>
+  <p>Debit/Credit Card</p>
 </div>
 <div class="payment-method" data-method="bank">
-<h4>Bank Transfer</h4>
-<p>Direct Bank Transfer</p>
+  <div style="font-size: 24px; margin-bottom: 8px;">🏦</div>
+  <h4>Bank Transfer</h4>
+  <p>Direct Bank Transfer</p>
 </div>
 <div class="payment-method" data-method="ussd">
-<h4>USSD</h4>
-<p>USSD Code</p>
+  <div style="font-size: 24px; margin-bottom: 8px;">📱</div>
+  <h4>USSD</h4>
+  <p>USSD Code</p>
 </div>
 </div>
 </div>
