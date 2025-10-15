@@ -1,794 +1,706 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
-   <link rel="icon" type="image/png" href="/uploads/slider/Narap.png"/>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<meta http-equiv="Content-Security-Policy" content="
+  <link rel="icon" type="image/png" href="/uploads/slider/Narap.png"/>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <meta http-equiv="Content-Security-Policy" content="
     default-src 'self'; 
-    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://d2mpatx37cqexb.cloudfront.net https://use.fontawesome.com https://embed.tawk.to https://cdn.tawk.to https://*.tawk.to https://paystack.com https://*.paystack.com; 
-    font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com https://use.fontawesome.com; 
-    script-src 'self' 'unsafe-inline' https://js.paystack.co https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://api.paystack.com; 
+    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; 
+    font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; 
+    script-src 'self' 'unsafe-inline' https://js.paystack.co https://cdnjs.cloudflare.com; 
     connect-src 'self' https://api.paystack.co https://checkout.paystack.com; 
-    frame-src 'self' https://js.paystack.co https://*.paystack.com https://checkout.paystack.com;
-    child-src 'self' https://js.paystack.co https://*.paystack.com https://checkout.paystack.com;
-">
-<title>Member Dashboard · Payments</title>
-<<style>
+    frame-src 'self' https://js.paystack.co https://*.paystack.com;
+  ">
+  <title>NARAP Member Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  
+  <style>
     :root {
-  --brand: #0a7f41;
-  --brand-50: #eaf7f0;
-  --brand-100: #d1efdd;
-  --brand-600: #0a7f41;
-  --brand-700: #086d37;
-  --brand-800: #065a2d;
-  --ink: #0b1220;
-  --muted: #6b7280;
-  --surface: #ffffff;
-  --bg: #f8fafc;
-  --border: #e2e8f0;
-  --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  --gradient: linear-gradient(135deg, var(--brand-600), var(--brand-700));
-  --ok: #16a34a; 
-  --warn: #f59e0b; 
-  --err: #ef4444;
-}
+      --brand: #0a7f41;
+      --brand-50: #eaf7f0;
+      --brand-100: #d1efdd;
+      --brand-600: #0a7f41;
+      --brand-700: #086d37;
+      --brand-800: #065a2d;
+      --ink: #0b1220;
+      --muted: #6b7280;
+      --surface: #ffffff;
+      --bg: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+      --border: #e2e8f0;
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+      --gradient: linear-gradient(135deg, var(--brand-600) 0%, var(--brand-700) 50%, var(--brand-800) 100%);
+      --ok: #10b981; 
+      --warn: #f59e0b; 
+      --err: #ef4444;
+    }
 
-* { 
-  box-sizing: border-box; 
-  margin: 0; 
-  padding: 0; 
-}
+    * { 
+      box-sizing: border-box; 
+      margin: 0; 
+      padding: 0; 
+    }
 
-body {
-  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
-  background: var(--bg); 
-  color: var(--ink); 
-  line-height: 1.6;
-}
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--ink); 
+      line-height: 1.6;
+      min-height: 100vh;
+    }
 
-/* Header */
-header {
-  display: flex; 
-  align-items: center; 
-  justify-content: space-between;
-  background: var(--gradient); 
-  color: #fff; 
-  padding: 16px 24px;
-  position: sticky; 
-  top: 0; 
-  z-index: 100;
-  box-shadow: var(--shadow-lg);
-}
+    /* Dashboard Layout */
+    .dashboard-container {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
 
-header .title { 
-  font-weight: 700; 
-  font-size: 1.25rem;
-}
+    /* Modern Header */
+    .dashboard-header {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 20px 0;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    }
 
-header .title span {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
+    .dashboard-header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--gradient);
+      opacity: 0.95;
+      z-index: -1;
+    }
 
-/* Header Menu */
-.menu {
-  position: relative;
-}
+    .header-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
 
-.menu-toggle {
-  background: rgba(255, 255, 255, 0.1);
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .header-logo {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.2);
+      padding: 8px;
+    }
+
+    .header-title {
+      color: white;
+      font-size: 1.5rem;
+      font-weight: 800;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .header-user {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .user-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      object-fit: cover;
+    }
+
+    .user-info h4 {
+      color: white;
+      font-size: 1rem;
+      font-weight: 600;
+      margin: 0;
+    }
+
+    .user-info p {
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 0.85rem;
+      margin: 0;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 12px;
+    }
+
+    .btn-header {
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 12px;
+      padding: 10px 20px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+
+    .btn-header:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: translateY(-2px);
+    }
+
+    /* Main Content */
+    .dashboard-main {
+      flex: 1;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 32px 24px;
+      width: 100%;
+    }
+
+    /* Welcome Section */
+    .welcome-hero {
+      background: var(--gradient);
+      border-radius: 24px;
+      padding: 40px;
+      margin-bottom: 32px;
+      color: white;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .welcome-hero::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -20%;
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+
+    .welcome-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .welcome-title {
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin-bottom: 12px;
+    }
+
+    .welcome-subtitle {
+      font-size: 1.2rem;
+      opacity: 0.9;
+      margin-bottom: 32px;
+    }
+
+    .welcome-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 24px;
+    }
+
+    .stat-card {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
+      padding: 24px;
+      text-align: center;
+    }
+
+    .stat-icon {
+      font-size: 2rem;
+      margin-bottom: 12px;
+    }
+
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+
+    .stat-label {
+      font-size: 0.9rem;
+      opacity: 0.8;
+    }
+
+    /* Dashboard Grid */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 32px;
+      margin-bottom: 32px;
+    }
+
+    /* Modern Cards */
+    .dashboard-card {
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 20px;
+      padding: 32px;
+      transition: all 0.4s ease;
+    }
+
+    .dashboard-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 2px solid var(--brand-50);
+    }
+
+    .card-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--ink);
+    }
+
+    .card-icon {
+      font-size: 1.5rem;
+      color: var(--brand);
+    }
+
+    /* Profile Section */
+    .profile-section {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      margin-bottom: 32px;
+    }
+
+    .profile-avatar {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      border: 4px solid var(--brand-100);
+      object-fit: cover;
+    }
+
+    .profile-info h3 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: var(--brand);
+    }
+
+    .profile-email {
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+
+    .profile-badge {
+      background: var(--gradient);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    /* Payment Methods */
+    .payment-methods {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin: 24px 0;
+    }
+
+    .payment-method {
+      background: rgba(255, 255, 255, 0.6);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 16px;
+      padding: 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .payment-method:hover {
+      transform: translateY(-4px);
+      border-color: var(--brand);
+    }
+
+    .payment-method.active {
+      border-color: var(--brand);
+      background: var(--brand-50);
+    }
+
+    .payment-icon {
+      font-size: 2rem;
+      color: var(--brand);
+      margin-bottom: 12px;
+    }
+
+    /* Modern Buttons */
+    .btn-modern {
+      background: var(--gradient);
+      color: white;
+      border: none;
+      border-radius: 16px;
+      padding: 16px 32px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+    }
+
+    .btn-modern:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(10, 127, 65, 0.3);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .payment-methods {
+        grid-template-columns: 1fr;
+      }
+      
+      .welcome-title {
+        font-size: 2rem;
+      }
+      
+      .header-user {
+        display: none;
+      }
+    }
+    .welcome-hero {
+  background: var(--gradient);
+  border-radius: 24px;
+  padding: 40px;
+  margin-bottom: 32px;
   color: white;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 8px;
-  padding: 8px 16px;
+  position: relative;
+  overflow: hidden;
+}
+
+.welcome-hero::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -20%;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+  border-radius: 50%;
+}
+
+.welcome-content {
+  position: relative;
+  z-index: 1;
+  text-align: center; /* This centers only the text */
+  max-width: 100%; /* Remove the max-width constraint */
+}
+
+.welcome-title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin-bottom: 12px;
+}
+
+.welcome-subtitle {
+  font-size: 1.2rem;
+  opacity: 0.9;
+  margin-bottom: 32px;
+}
+
+.welcome-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 24px;
+  text-align: left; /* Keep stats text aligned left */
+}
+
+/* Account Settings Toggle Styles */
+#member-settings {
+  display: none; /* Hidden by default */
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+#member-settings.active {
+  display: block;
+}
+
+.settings-panel {
+  display: none;
+}
+
+.settings-panel.active {
+  display: block;
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideDown {
+  from { 
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Settings Toggle Button */
+.settings-toggle-btn {
+  background: var(--gradient);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 24px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.settings-toggle-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(10, 127, 65, 0.3);
+}
+
+/* Settings Navigation */
+.settings-nav {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.settings-nav-btn {
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 20px;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.menu-toggle:hover {
-  background: rgba(255, 255, 255, 0.2);
-}
-
-.menu-list {
-  position: absolute;
-  top: 100%;
-  right: 0;
-  background: white;
-  border-radius: 8px;
-  box-shadow: var(--shadow-lg);
-  min-width: 180px;
-  padding: 8px 0;
-  margin-top: 8px;
-  display: none;
-  z-index: 1000;
-}
-
-.menu-list.show {
-  display: block;
-}
-
-.menu-list a {
-  display: block;
-  padding: 12px 16px;
+  transition: all 0.3s ease;
   color: var(--ink);
   text-decoration: none;
-  transition: background 0.2s ease;
 }
 
-.menu-list a:hover {
-  background: var(--brand-50);
-  color: var(--brand-700);
-}
-
-/* Header Actions */
-.actions {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-}
-
-header a.btn, header button {
-  background: rgba(255, 255, 255, 0.9); 
-  color: var(--brand); 
-  border: 0; 
-  border-radius: 8px;
-  padding: 10px 16px; 
-  font-weight: 600; 
-  text-decoration: none; 
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-size: 0.9rem;
-}
-
-header a.btn:hover, header button:hover {
-  background: white;
-  transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-/* Container */
-.container { 
-  max-width: 1200px; 
-  margin: 24px auto; 
-  padding: 0 20px; 
-}
-
-/* Grid */
-.grid { 
-  display: grid; 
-  grid-template-columns: 1fr; 
-  gap: 24px; 
-}
-
-@media (min-width: 900px) { 
-  .grid { 
-    grid-template-columns: 2fr 1fr; 
-  } 
-}
-
-/* Panels */
-.panel {
-  background: var(--surface); 
-  border-radius: 16px;
-  box-shadow: var(--shadow); 
-  padding: 24px;
-  border: 1px solid var(--border);
-  transition: all 0.3s ease;
-}
-
-.panel:hover {
-  box-shadow: var(--shadow-lg);
-  transform: translateY(-2px);
-}
-
-/* Profile Section */
-.profile {
-  display: flex; 
-  gap: 16px; 
-  align-items: center;
-  padding-bottom: 20px; 
-  border-bottom: 2px solid var(--brand-50);
-  margin-bottom: 20px;
-}
-
-.profile img {
-  width: 80px; 
-  height: 80px; 
-  border-radius: 50%;
-  object-fit: cover; 
-  border: 3px solid var(--brand-100); 
-  background: #fff;
-  transition: all 0.3s ease;
-}
-
-.profile img:hover {
-  border-color: var(--brand);
-  transform: scale(1.05);
-}
-
-/* Typography */
-.muted { 
-  color: var(--muted); 
-  font-size: 14px; 
-}
-
-.list { 
-  display: flex; 
-  flex-direction: column; 
-  gap: 12px; 
-  margin-top: 20px; 
-}
-
-.item {
-  display: flex; 
-  justify-content: space-between; 
-  gap: 12px;
-  padding: 12px 0; 
-  border-bottom: 1px solid var(--border);
-  transition: all 0.2s ease;
-}
-
-.item:hover {
-  padding-left: 8px;
-  border-left: 3px solid var(--brand);
-}
-
-/* Pills/Badges */
-.pill {
-  display: inline-flex;
-  align-items: center;
-  background: var(--brand-50); 
-  color: var(--brand-700);
-  padding: 4px 12px; 
-  border-radius: 20px; 
-  font-size: 12px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-/* Payment Cards */
-.pay-card {
-  display: flex; 
-  flex-direction: column; 
-  gap: 8px;
-  border: 2px solid var(--brand-100); 
-  border-radius: 16px; 
-  padding: 20px;
-  margin-bottom: 20px;
-  background: linear-gradient(135deg, var(--brand-50), white);
-  transition: all 0.3s ease;
-}
-
-.pay-card:hover {
-  border-color: var(--brand);
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-lg);
-}
-
-.pay-card .h { 
-  font-weight: 700; 
-  font-size: 1.1rem;
-  color: var(--brand-700);
-}
-
-.pay-card .a { 
-  font-size: 14px; 
-  color: var(--muted); 
-}
-
-.pay-card .price { 
-  font-size: 28px; 
-  font-weight: 900; 
-  color: var(--brand);
-  margin-top: 8px;
-}
-
-/* Buttons */
-.btn {
-  padding: 12px 20px; 
-  border: 0; 
-  border-radius: 10px;
-  background: var(--brand); 
-  color: #fff; 
-  font-weight: 600;
-  cursor: pointer; 
-  transition: all 0.3s ease; 
-  margin-top: 12px;
-  font-size: 0.95rem;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  text-decoration: none;
-}
-
-.btn:hover { 
-  background: var(--brand-700);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(10, 127, 65, 0.3);
-}
-
-.btn:disabled { 
-  background: #94a3b8; 
-  cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
-}
-
-.btn.secondary {
-  background: transparent;
-  color: var(--brand);
-  border: 2px solid var(--brand);
-}
-
-.btn.secondary:hover {
+.settings-nav-btn:hover,
+.settings-nav-btn.active {
   background: var(--brand);
   color: white;
+  border-color: var(--brand);
 }
 
-/* Status Colors */
-.ok { color: var(--ok); } 
-.warn { color: var(--warn); } 
-.err { color: var(--err); }
-
-/* Status Panel */
-.status-panel {
-  display: flex; 
-  justify-content: space-between; 
-  flex-wrap: wrap;
-  background: var(--brand-50); 
-  padding: 16px 20px; 
-  border-radius: 12px;
-  margin-bottom: 24px;
-  border: 1px solid var(--brand-100);
-}
-
-.status {
-  display: flex; 
-  align-items: center; 
-  gap: 10px;
-  margin: 6px 0;
-  font-weight: 500;
-}
-
-.status-dot {
-  width: 12px; 
-  height: 12px; 
-  border-radius: 50%;
-  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.8);
-}
-
-.connected { background: var(--ok); }
-.disconnected { background: var(--err); }
-.warning { background: var(--warn); }
-
-/* Notification System */
-.notification {
-  position: fixed; 
-  top: 24px; 
-  right: 24px; 
-  padding: 16px 24px;
-  border-radius: 12px; 
-  color: white; 
+.settings-close-btn {
   background: var(--err);
-  box-shadow: var(--shadow-lg); 
-  z-index: 1000;
-  transform: translateX(100%); 
-  transition: transform 0.3s ease;
-  max-width: 380px;
-  font-weight: 500;
-}
-
-.notification.show { 
-  transform: translateX(0); 
-}
-
-.notification.success { 
-  background: var(--ok); 
-}
-
-/* Payment Methods */
-.payment-methods {
-  display: grid; 
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px; 
-  margin: 20px 0;
-}
-
-.payment-method {
-  border: 2px solid var(--border); 
+  color: white;
+  border: none;
   border-radius: 12px;
-  padding: 16px; 
-  text-align: center; 
+  padding: 10px 20px;
+  font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
-  background: white;
 }
 
-.payment-method:hover {
-  border-color: var(--brand); 
-  transform: translateY(-3px);
-  box-shadow: var(--shadow-lg);
+.settings-close-btn:hover {
+  background: #dc2626;
+  transform: translateY(-2px);
 }
-
-.payment-method.active {
-  border-color: var(--brand); 
-  background: var(--brand-50);
-}
-
-.payment-method h4 {
-  margin: 8px 0; 
-  font-size: 15px;
-  color: var(--ink);
-  font-weight: 600;
-}
-
-.payment-method p {
-  margin: 0; 
-  font-size: 13px; 
-  color: var(--muted);
-}
-
-/* Debug Panel */
-.debug-panel {
-  background: #f8f9fa; 
-  border: 1px solid var(--border);
-  border-radius: 12px; 
-  padding: 20px; 
-  margin-top: 24px;
-  font-family: 'Monaco', 'Menlo', monospace; 
-  font-size: 13px;
-  max-height: 250px; 
-  overflow-y: auto;
-}
-
-.debug-title {
-  font-weight: 700; 
-  margin-bottom: 12px; 
-  color: var(--brand);
-  font-size: 14px;
-}
-
-.debug-log { 
-  margin: 6px 0; 
-  padding: 6px; 
-  border-bottom: 1px solid #eee; 
-}
-
-.debug-error { color: var(--err); }
-.debug-success { color: var(--ok); }
-
-/* Loading Indicator */
-.loading {
-  display: inline-block; 
-  width: 20px; 
-  height: 20px;
-  border: 3px solid rgba(255,255,255,.3); 
-  border-radius: 50%;
-  border-top-color: #fff; 
-  animation: spin 1s ease-in-out infinite;
-}
-
-@keyframes spin { 
-  to { transform: rotate(360deg); } 
-}
-
-/* Modal */
-.modal {
-  position: fixed; 
-  top: 0; 
-  left: 0; 
-  right: 0; 
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.6); 
-  display: flex;
-  align-items: center; 
-  justify-content: center; 
-  z-index: 2000;
-  opacity: 0; 
-  visibility: hidden; 
-  transition: all 0.3s ease;
-}
-
-.modal.show { 
-  opacity: 1; 
-  visibility: visible; 
-}
-
-.modal-content {
-  background: white; 
-  border-radius: 16px; 
-  padding: 32px;
-  width: 90%; 
-  max-width: 420px; 
-  box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-}
-
-.modal-title {
-  font-size: 22px; 
-  font-weight: 700; 
-  margin-bottom: 16px;
-  color: var(--err);
-}
-
-.modal-message { 
-  margin-bottom: 28px; 
-  color: var(--muted);
-  line-height: 1.6;
-}
-
-.modal-actions {
-  display: flex; 
-  gap: 12px; 
-  justify-content: flex-end;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-  .container {
-    padding: 0 16px;
-    margin: 16px auto;
-  }
-  
-  header {
-    padding: 12px 16px;
-  }
-  
-  .panel {
-    padding: 20px;
-  }
-  
-  .profile {
-    flex-direction: column;
-    text-align: center;
-    gap: 12px;
-  }
-  
-  .payment-methods {
-    grid-template-columns: 1fr;
-  }
-  
-  .actions {
-    flex-direction: column;
-    gap: 8px;
-  }
-  
-  header a.btn, header button {
-    padding: 8px 12px;
-    font-size: 0.85rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .pay-card .price {
-    font-size: 24px;
-  }
-  
-  .modal-content {
-    padding: 24px;
-    margin: 20px;
-  }
-  
-  .modal-actions {
-    flex-direction: column;
-  }
-}
-    
-/* --- Header dropdown for Account Settings --- */
-header .title { display:flex; align-items:center; gap:12px; position:relative; }
-header .title .menu { position:relative; }
-header .title .menu-toggle{
-  background: rgba(255,255,255,0.2); color:#fff; border:0; border-radius:10px;
-  padding:6px 10px; font-weight:700; cursor:pointer;
-}
-header .title .menu-toggle:focus{ outline: 2px solid rgba(255,255,255,.6); outline-offset:2px; }
-header .title .menu-list{
-  position:absolute; top:110%; left:0; min-width: 200px;
-  background:#fff; color: var(--ink); border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0,0,0,.15);
-  padding:8px; display:none; z-index: 200;
-}
-header .title .menu-list a{
-  display:block; padding:10px 12px; border-radius:8px; text-decoration:none;
-  color: var(--ink); font-weight:600;
-}
-header .title .menu-list a:hover{ background:#f1f5f9; }
-header .title .menu.open .menu-list{ display:block; }
-@media (max-width: 480px){
-  header .title .menu-toggle{ padding:6px 8px; font-size: 12px; }
-}
-
-/* --- Hide Account Settings section by default; reveal via header dropdown --- */
-#member-settings{ display:none; }
-#member-settings .settings-panel{ display:none; }
-#member-settings .settings-panel.active{ display:block; }
-</style>
-<style>
-#member-settings .icon-eye, #member-settings .icon-eye-slash { width: 1.1em; height: 1.1em; pointer-events: none; vertical-align: -2px; }
-#member-settings [hidden] { display: none !important; }
-#member-settings .card { border-radius: .75rem; }
-</style>
-<style>
-:root{
-  --narap-green: #198754;
-  --narap-green-dark: #146c43;
-  --narap-green-25: rgba(25,135,84,.25);
-}
-/* Section look */
-#member-settings .section-kicker{
-  font-size:.8rem; letter-spacing:.08em; color:var(--narap-green);
-  text-transform:uppercase; font-weight:700;
-}
-#member-settings h2.h4{ color: var(--narap-green); font-weight:700; }
-#member-settings .divider{ border-top: 2px solid var(--narap-green-25); }
-/* Cards */
-#member-settings .card{ border:1px solid var(--narap-green-25); border-radius:1rem; box-shadow:0 2px 8px rgba(0,0,0,.04); }
-#member-settings .card .h5{ color:#0f5132; font-weight:700; }
-/* Inputs & focus */
-#member-settings .form-label{ font-weight:600; }
-#member-settings .form-control:focus, #member-settings .form-select:focus{
-  border-color: var(--narap-green);
-  box-shadow: 0 0 0 .25rem var(--narap-green-25);
-}
-/* Buttons */
-#member-settings .btn-success{
-  background-color: var(--narap-green);
-  border-color: var(--narap-green);
-}
-#member-settings .btn-success:hover{
-  background-color: var(--narap-green-dark);
-  border-color: var(--narap-green-dark);
-}
-/* Password eye icon */
-#member-settings .icon-eye, #member-settings .icon-eye-slash {
-  width: 1.1em; height: 1.1em; pointer-events: none; vertical-align: -2px;
-}
-#member-settings [hidden]{ display:none !important; }
-#member-settings .passport-preview{ max-height:120px; width:auto; border:1px solid var(--narap-green-25); }
-
-/* --- Lightweight grid to mimic Bootstrap cols on the member settings section --- */
-#member-settings .row{ display:flex; flex-wrap:wrap; gap:1.5rem; }
-#member-settings .col-12{ flex:0 0 100%; max-width:100%; }
-#member-settings .col-lg-7, #member-settings .col-lg-5{ flex:0 0 100%; max-width:100%; }
-@media (min-width: 992px){
-  #member-settings .col-lg-7{ flex:0 0 58.3333%; max-width:58.3333%; }
-  #member-settings .col-lg-5{ flex:0 0 41.6667%; max-width:41.6667%; }
-}
-/* Ensure cards don't overlap and keep stacking context sane */
-#member-settings .card{ position:relative; z-index:1; }
-/* Avoid header overlap with sticky header */
-main, #member-settings{ padding-top: 8px; }
-</style>
-<script src="https://js.paystack.co/v1/inline.js"></script>
-<script>
-// Check if Paystack loaded properly
-if (typeof PaystackPop === 'undefined') {
-    console.error('Paystack script failed to load!');
-} else {
-    console.log('Paystack script loaded successfully');
-}
-</script>
+  </style>
 </head>
+
 <body>
-<header>
-<div class="title">
-  <!-- Added logo image here -->
-  <img src="/uploads/slider/Narap.png" alt="NARAP Logo" style="height: 32px; margin-right: 12px; vertical-align: middle;">
-  <span>Member Dashboard</span>
-  <div class="menu" id="mdMenu">
-    <button class="menu-toggle" id="mdMenuToggle" aria-haspopup="true" aria-expanded="false">Account Settings ▾</button>
-    <div class="menu-list" role="menu" aria-labelledby="mdMenuToggle">
-      <a href="#" role="menuitem" id="linkEditProfile">Edit Profile</a>
-      <a href="#" role="menuitem" id="linkChangePassword">Change Password</a>
-      <a href="#" role="menuitem" id="linkShowAll">Show All</a>
-      <a href="#" role="menuitem" id="linkHide">Hide Settings</a>
+  <div class="dashboard-container">
+    <!-- Header -->
+    <header class="dashboard-header">
+      <div class="header-content">
+        <div class="header-brand">
+          <img src="/uploads/slider/Narap.png" alt="NARAP" class="header-logo">
+          <h1 class="header-title">NARAP Dashboard</h1>
+        </div>
+        
+        <div class="header-user">
+          <img src="/uploads/slider/Narap.png" alt="User" class="user-avatar" id="headerAvatar">
+          <div class="user-info">
+            <h4 id="headerName">Welcome</h4>
+            <p id="headerEmail">Loading...</p>
+          </div>
+        </div>
+        
+        <div class="header-actions">
+          <a href="/" class="btn-header">
+            <i class="fas fa-home"></i> Back to Site
+          </a>
+          <button class="btn-header" id="logoutBtn">
+            <i class="fas fa-sign-out-alt"></i> Logout
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="dashboard-main">
+      <!-- Welcome Hero -->
+      <section class="welcome-hero">
+        <div class="welcome-content">
+          <h2 class="welcome-title" id="welcomeTitle">Welcome to NARAP</h2>
+          <p class="welcome-subtitle">Manage your membership, payments, and profile all in one place.</p>
+          
+          <div class="welcome-stats">
+            <div class="stat-card">
+              <div class="stat-icon">👤</div>
+              <div class="stat-value" id="membershipStatus">Active</div>
+              <div class="stat-label">Membership Status</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">💳</div>
+              <div class="stat-value" id="paymentStatus">Unpaid</div>
+              <div class="stat-label">Payment Status</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">📅</div>
+              <div class="stat-value" id="joinDate">2024</div>
+              <div class="stat-label">Member Since</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Add Settings Toggle Button -->
+  <div style="text-align: center; margin-bottom: 32px;">
+    <button class="settings-toggle-btn" id="settingsToggleBtn">
+      <i class="fas fa-cog"></i>
+      Account Settings
+    </button>
+  </div>
+
+      <!-- Dashboard Grid -->
+      <div class="dashboard-grid">
+        <!-- Profile Card -->
+        <div class="dashboard-card">
+          <div class="card-header">
+            <i class="fas fa-user card-icon"></i>
+            <h3 class="card-title">Profile Information</h3>
+          </div>
+          
+          <div class="profile-section">
+            <img src="/uploads/slider/Narap.png" alt="Profile" class="profile-avatar" id="profileAvatar">
+            <div class="profile-info">
+              <h3 id="profileName">Loading...</h3>
+              <p class="profile-email" id="profileEmail">Loading...</p>
+              <span class="profile-badge">
+                <i class="fas fa-star"></i>
+                MEMBER
+              </span>
+            </div>
+          </div>
+          
+          <div id="profileDetails">
+            <!-- Profile details will be loaded here -->
+          </div>
+        </div>
+
+        <!-- Payment Card -->
+<div class="dashboard-card">
+  <div class="card-header">
+    <i class="fas fa-credit-card card-icon"></i>
+    <h3 class="card-title">Payments</h3>
+  </div>
+  
+  <!-- Payment Methods -->
+  <div class="payment-methods">
+    <div class="payment-method active" data-method="card">
+      <div class="payment-icon">💳</div>
+      <h4>Card</h4>
+      <p>Debit/Credit</p>
+    </div>
+    <div class="payment-method" data-method="bank">
+      <div class="payment-icon">🏦</div>
+      <h4>Bank</h4>
+      <p>Transfer</p>
+    </div>
+    <div class="payment-method" data-method="ussd">
+      <div class="payment-icon">📱</div>
+      <h4>USSD</h4>
+      <p>Code</p>
+    </div>
+  </div>
+  
+  <!-- Payment Options -->
+  <div style="margin-top: 24px;">
+    <div style="background: var(--gradient); color: white; padding: 24px; border-radius: 16px; margin-bottom: 16px;">
+      <h4 style="margin-bottom: 8px;">Membership Fee</h4>
+      <p style="opacity: 0.9; margin-bottom: 16px;">Access member benefits and dashboard tools.</p>
+      <div style="font-size: 2rem; font-weight: 800;">₦5,000</div>
+      <button class="btn-modern" id="payMembership" data-amount-kobo="500000" data-purpose="membership">
+        <i class="fas fa-credit-card"></i>
+        <span id="payMembershipText">Pay Membership</span>
+        <span class="loading" id="payMembershipLoader" style="display: none;"></span>
+      </button>
+    </div>
+    
+    <div style="background: var(--gradient); color: white; padding: 24px; border-radius: 16px; margin-bottom: 16px;">
+      <h4 style="margin-bottom: 8px;">ID Card Fee</h4>
+      <p style="opacity: 0.9; margin-bottom: 16px;">Get your official member ID card.</p>
+      <div style="font-size: 2rem; font-weight: 800;">₦3,000</div>
+      <button class="btn-modern" id="payIdCard" data-amount-kobo="300000" data-purpose="idcard">
+        <i class="fas fa-credit-card"></i>
+        <span id="payIdCardText">Pay ID Card</span>
+        <span class="loading" id="payIdCardLoader" style="display: none;"></span>
+      </button>
+    </div>
+    
+    <div style="background: var(--gradient); color: white; padding: 24px; border-radius: 16px; margin-bottom: 16px;">
+      <h4 style="margin-bottom: 8px;">Certificate Fee</h4>
+      <p style="opacity: 0.9; margin-bottom: 16px;">Generate and download membership certificate.</p>
+      <div style="font-size: 2rem; font-weight: 800;">₦10,000</div>
+      <button class="btn-modern" id="payCertificate" data-amount-kobo="1000000" data-purpose="certificate">
+        <i class="fas fa-credit-card"></i>
+        <span id="payCertificateText">Pay Certificate</span>
+        <span class="loading" id="payCertificateLoader" style="display: none;"></span>
+      </button>
     </div>
   </div>
 </div>
-<div class="actions">
-<a class="btn" href="/">Back to Site</a>
-<button class="btn" id="logoutBtn">Logout</button>
-</div>
-</header>
-<div class="notification" id="notification">
-<span id="notification-text"></span>
-</div>
-<!-- Token Expiration Modal -->
-<div class="modal" id="tokenExpiredModal">
-<div class="modal-content">
-<div class="modal-title">Session Expired</div>
-<div class="modal-message">
-                Your session has expired. Please log in again to continue.
-            </div>
-<div class="modal-actions">
-<button class="btn secondary" id="modalCancel">Cancel</button>
-<button class="btn" id="modalLogin">Log In</button>
-</div>
-</div>
-</div>
-<div class="container">
-
-<div class="grid">
-<div class="panel">
-<div class="profile">
-<img alt="passport" id="avatar" src="/uploads/slider/Narap.png" data-fallback="/uploads/slider/Narap.png"/>
-<div>
-
-
-<div id="hello" style="font-weight:800">Welcome</div>
-<div class="muted"><span id="email"></span> · <span class="pill" id="rolePill">MEMBER</span></div>
-</div>
-</div>
-<div style="margin-top:16px">
-<div style="font-weight:800;margin-bottom:8px">Member Details</div>
-<div class="list" id="recentList">
-<div class="muted">No recent activity yet.</div>
-</div>
-</div>
-</div>
-<div class="panel">
-<div style="font-weight:800;margin-bottom:8px">Payments</div>
-<!-- Payment Method Selection -->
-<div style="margin-bottom: 20px;">
-<div style="font-weight: 600; margin-bottom: 8px;">Select Payment Method:</div>
-<div class="payment-methods">
-<div class="payment-method active" data-method="card">
-  <div style="font-size: 24px; margin-bottom: 8px;">💳</div>
-  <h4>Card</h4>
-  <p>Debit/Credit Card</p>
-</div>
-<div class="payment-method" data-method="bank">
-  <div style="font-size: 24px; margin-bottom: 8px;">🏦</div>
-  <h4>Bank Transfer</h4>
-  <p>Direct Bank Transfer</p>
-</div>
-<div class="payment-method" data-method="ussd">
-  <div style="font-size: 24px; margin-bottom: 8px;">📱</div>
-  <h4>USSD</h4>
-  <p>USSD Code</p>
-</div>
-</div>
-</div>
-<div class="pay-card">
-<div class="h">Membership Fee</div>
-<div class="a">Access member benefits and dashboard tools.</div>
-<div class="price">₦5,000</div>
-<button class="btn" data-amount-kobo="500000" data-purpose="membership" id="payMembership">
-<span id="payMembershipText">Pay Membership</span>
-<span class="loading" id="payMembershipLoader" style="display: none;"></span>
-</button>
-</div>
-<div class="pay-card">
-<div class="h">ID Card Fee</div>
-<div class="a">Get your official member ID card.</div>
-<div class="price">₦3,000</div>
-<button class="btn" data-amount-kobo="300000" data-purpose="idcard" id="payIdCard">
-<span id="payIdCardText">Pay ID Card</span>
-<span class="loading" id="payIdCardLoader" style="display: none;"></span>
-</button>
-</div>
-<div class="pay-card">
-<div class="h">Certificate Fee</div>
-<div class="a">Generate and download membership certificate.</div>
-<div class="price">₦10,000</div>
-<button class="btn" data-amount-kobo="1000000" data-purpose="certificate" id="payCertificate">
-<span id="payCertificateText">Pay Certificate</span>
-<span class="loading" id="payCertificateLoader" style="display: none;"></span>
-</button>
-</div>
-<!-- Debug Panel -->
-<div class="debug-panel">
-  <div class="debug-title">Payment Debug Log</div>
-  <div id="debugLogs">
-    <div class="debug-log">Dashboard initialized. Payment system ready...</div>
+      </div>
+    </main>
   </div>
-</div>
 
+  <!-- Scripts -->
+  <script src="https://js.paystack.co/v1/inline.js"></script>
+  
 
 <script>
     (function(){
@@ -1464,106 +1376,118 @@ function verifyPaystackLoaded() {
   }
   
   // Centralized user data loading
-  async function loadUserData(forceRefresh = false) {
-    if (userData && !forceRefresh) return userData;
+//   async function loadUserData(forceRefresh = false) {
+//     if (userData && !forceRefresh) return userData;
     
-    const token = getToken();
-    if (!token) {
-      window.location.href = '/member/login.php';
-      return;
-    }
+//     const token = getToken();
+//     if (!token) {
+//       window.location.href = '/member/login.php';
+//       return;
+//     }
     
-    try {
-      const response = await fetch(`${API_BASE}/member/profile`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
+//     try {
+//       const response = await fetch(`${API_BASE}/member/profile`, {
+//         headers: {
+//           'Authorization': `Bearer ${token}`,
+//           'Content-Type': 'application/json'
+//         }
+//       });
       
-      if (!response.ok) {
-        if (response.status === 401) {
-          clearAuth();
-          window.location.href = '/member/login.php';
-          return;
-        }
-        throw new Error(`HTTP ${response.status}: Failed to load profile`);
-      }
+//       if (!response.ok) {
+//         if (response.status === 401) {
+//           clearAuth();
+//           window.location.href = '/member/login.php';
+//           return;
+//         }
+//         throw new Error(`HTTP ${response.status}: Failed to load profile`);
+//       }
       
-      userData = await response.json();
-      return userData;
+//       userData = await response.json();
+//       return userData;
       
-    } catch (error) {
-      console.error('Error loading user data:', error);
-      showNotification('Failed to load member data. Please refresh the page.');
-      throw error;
-    }
-  }
+//     } catch (error) {
+//       console.error('Error loading user data:', error);
+//       showNotification('Failed to load member data. Please refresh the page.');
+//       throw error;
+//     }
+//   }
   
   // Update dashboard with user data
-  function updateDashboard(user) {
-    if (!user) return;
-    
-    // Update welcome message
-    const fullName = `${user.surname || ''} ${user.otherNames || ''}`.trim() || 
-                     user.name || 'Member';
-    const helloEl = document.getElementById('hello');
-    if (helloEl) helloEl.textContent = `Welcome, ${fullName}`;
-    
-    // Update email
-    const emailEl = document.getElementById('email');
-    if (emailEl) emailEl.textContent = user.email || 'No email';
-    
-    // Update avatar
-    const avatar = document.getElementById('avatar');
-    if (avatar && user.passportUrl) {
-      const testImage = new Image();
-      testImage.onload = () => avatar.src = user.passportUrl;
-      testImage.onerror = () => avatar.src = avatar.getAttribute('data-fallback') || '/uploads/slider/Narap.png';
-      testImage.src = user.passportUrl;
-    }
-    
-    // Update member details
-    const recentList = document.getElementById('recentList');
-    if (recentList) {
-      recentList.innerHTML = `
-        <div class="item">
-          <span>Full Name</span>
-          <span style="font-weight: 600">${fullName}</span>
-        </div>
-        <div class="item">
-          <span>Phone</span>
-          <span style="font-weight: 600">${user.phone || 'Not provided'}</span>
-        </div>
-        <div class="item">
-          <span>State</span>
-          <span style="font-weight: 600">${user.state || 'Not provided'}</span>
-        </div>
-        <div class="item">
-          <span>Zone</span>
-          <span style="font-weight: 600">${user.zone || 'Not provided'}</span>
-        </div>
-        <div class="item">
-          <span>Date of Birth</span>
-          <span style="font-weight: 600">${user.dob ? new Date(user.dob).toLocaleDateString() : 'Not provided'}</span>
-        </div>
-        <div class="item">
-          <span>Guarantor</span>
-          <span style="font-weight: 600">${user.guarantor || 'Not provided'}</span>
-        </div>
-        <div class="item">
-          <span>Member Since</span>
-          <span style="font-weight: 600">${user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'Unknown'}</span>
-        </div>
-        <div class="item">
-          <span>Membership Status</span>
-          <span class="pill" style="background: ${user.hasPaidMembership ? 'var(--ok)' : 'var(--warn)'}; color: white;">
-            ${user.hasPaidMembership ? 'ACTIVE' : 'PENDING'}
-          </span>
-        </div>
-      `;
-    }
+function updateDashboard(user) {
+  if (!user) return;
+  
+  // Update welcome message
+  const fullName = `${user.surname || ''} ${user.otherNames || ''}`.trim() || 
+                   user.name || 'Member';
+  const helloEl = document.getElementById('hello');
+  if (helloEl) helloEl.textContent = `Welcome, ${fullName}`;
+  
+  // Update email
+  const emailEl = document.getElementById('email');
+  if (emailEl) emailEl.textContent = user.email || 'No email';
+  
+  // Update payment status in welcome stats
+  const paymentStatusEl = document.getElementById('paymentStatus');
+  if (paymentStatusEl) {
+    paymentStatusEl.textContent = user.hasPaidMembership ? 'Paid' : 'Unpaid';
   }
+  
+  // Update membership status in welcome stats
+  const membershipStatusEl = document.getElementById('membershipStatus');
+  if (membershipStatusEl) {
+    membershipStatusEl.textContent = user.hasPaidMembership ? 'Active' : 'Pending';
+  }
+  
+  // Update avatar
+  const avatar = document.getElementById('avatar');
+  if (avatar && user.passportUrl) {
+    const testImage = new Image();
+    testImage.onload = () => avatar.src = user.passportUrl;
+    testImage.onerror = () => avatar.src = avatar.getAttribute('data-fallback') || '/uploads/slider/Narap.png';
+    testImage.src = user.passportUrl;
+  }
+  
+  // Update member details
+  const recentList = document.getElementById('recentList');
+  if (recentList) {
+    recentList.innerHTML = `
+      <div class="item">
+        <span>Full Name</span>
+        <span style="font-weight: 600">${fullName}</span>
+      </div>
+      <div class="item">
+        <span>Phone</span>
+        <span style="font-weight: 600">${user.phone || 'Not provided'}</span>
+      </div>
+      <div class="item">
+        <span>State</span>
+        <span style="font-weight: 600">${user.state || 'Not provided'}</span>
+      </div>
+      <div class="item">
+        <span>Zone</span>
+        <span style="font-weight: 600">${user.zone || 'Not provided'}</span>
+      </div>
+      <div class="item">
+        <span>Date of Birth</span>
+        <span style="font-weight: 600">${user.dob ? new Date(user.dob).toLocaleDateString() : 'Not provided'}</span>
+      </div>
+      <div class="item">
+        <span>Guarantor</span>
+        <span style="font-weight: 600">${user.guarantor || 'Not provided'}</span>
+      </div>
+      <div class="item">
+        <span>Member Since</span>
+        <span style="font-weight: 600">${user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'Unknown'}</span>
+      </div>
+      <div class="item">
+        <span>Membership Status</span>
+        <span class="pill" style="background: ${user.hasPaidMembership ? 'var(--ok)' : 'var(--warn)'}; color: white;">
+          ${user.hasPaidMembership ? 'ACTIVE' : 'PENDING'}
+        </span>
+      </div>
+    `;
+  }
+}
   
   // DOB selects initialization
   function initDOB() {
@@ -1900,9 +1824,59 @@ function verifyPaystackLoaded() {
     init();
   }
 })();
+
+// Add this JavaScript to handle the toggle functionality
+document.addEventListener('DOMContentLoaded', function() {
+  const settingsSection = document.getElementById('member-settings');
+  const settingsToggleBtn = document.getElementById('settingsToggleBtn');
+  const settingsCloseBtn = document.getElementById('settingsCloseBtn');
+  const settingsNavBtns = document.querySelectorAll('.settings-nav-btn');
+  const settingsPanels = document.querySelectorAll('.settings-panel');
+
+  // Toggle settings section
+  settingsToggleBtn.addEventListener('click', function() {
+    settingsSection.classList.add('active');
+    // Scroll to settings section
+    settingsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+
+  // Close settings section
+  settingsCloseBtn.addEventListener('click', function() {
+    settingsSection.classList.remove('active');
+    // Scroll back to top
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  // Handle settings navigation
+  settingsNavBtns.forEach(btn => {
+    btn.addEventListener('click', function() {
+      const targetPanel = this.getAttribute('data-panel');
+      
+      // Update active nav button
+      settingsNavBtns.forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+      
+      // Show target panel, hide others
+      settingsPanels.forEach(panel => {
+        if (panel.getAttribute('data-panel') === targetPanel) {
+          panel.classList.add('active');
+        } else {
+          panel.classList.remove('active');
+        }
+      });
+    });
+  });
+
+  // Close settings when clicking outside (optional)
+  document.addEventListener('click', function(event) {
+    if (settingsSection.classList.contains('active') && 
+        !settingsSection.contains(event.target) && 
+        event.target !== settingsToggleBtn) {
+      settingsSection.classList.remove('active');
+    }
+  });
+});
+
 </script>
-
-
-
 </body>
 </html>
