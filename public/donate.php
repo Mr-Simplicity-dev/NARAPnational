@@ -424,17 +424,32 @@
         Make a Donation
       </h2>
 
-<!-- Add before the donation amounts section -->
+<!-- Donor Information -->
 <div class="donor-info">
-  <h3>Donor Information</h3>
-  <input type="text" id="donorName" placeholder="Full Name or Organization" required>
-  <input type="email" id="donorEmail" placeholder="Email Address" required>
-  <input type="tel" id="donorPhone" placeholder="Phone Number (optional)">
-  <select id="donorType">
-    <option value="individual">Individual</option>
-    <option value="organization">Organization/Institution</option>
-  </select>
-  <textarea id="donationMessage" placeholder="Message (optional)"></textarea>
+  <h3><i class="fas fa-user"></i> Donor Information</h3>
+  
+  <div class="form-group">
+    <input type="text" id="donorName" class="form-input" placeholder="Full Name or Organization Name" required>
+  </div>
+  
+  <div class="form-group">
+    <input type="email" id="donorEmail" class="form-input" placeholder="Email Address" required>
+  </div>
+  
+  <div class="form-group">
+    <input type="tel" id="donorPhone" class="form-input" placeholder="Phone Number (optional)">
+  </div>
+  
+  <div class="form-group">
+    <select id="donorType" class="form-select">
+      <option value="individual">Individual Donor</option>
+      <option value="organization">Organization/Institution</option>
+    </select>
+  </div>
+  
+  <div class="form-group">
+    <textarea id="donationMessage" class="form-textarea" placeholder="Message or purpose of donation (optional)"></textarea>
+  </div>
 </div>
 
       <!-- Preset Amounts -->
