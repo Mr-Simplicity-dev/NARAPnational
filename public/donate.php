@@ -569,35 +569,58 @@
     }
 
     // Handle donation
-    donateBtn.addEventListener('click', () => {
-      if (selectedAmount < 1000) {
-        alert('Please select or enter an amount of at least ₦1,000');
-        return;
-      }
+donateBtn.addEventListener('click', () => {
+  if (selectedAmount < 1000) {
+    alert('Please select or enter an amount of at least ₦1,000');
+    return;
+  }
 
-      // Initialize Paystack payment
-      const handler = PaystackPop.setup({
-        key: 'pk_test_your_paystack_public_key_here', // Replace with your Paystack public key
-        email: 'donor@example.com', // You can ask for email or use a default
-        amount: selectedAmount * 100, // Amount in kobo
-        currency: 'NGN',
-        ref: 'donation_' + Math.floor((Math.random() * 1000000000) + 1),
-        metadata: {
-          purpose: 'donation',
-          donor_type: 'individual'
-        },
-        callback: function(response) {
-          alert('Donation successful! Thank you for supporting NARAP. Reference: ' + response.reference);
-          // You can redirect to a thank you page or send data to your backend
-          window.location.href = '/?donation=success';
-        },
-        onClose: function() {
-          alert('Donation cancelled');
-        }
-      });
-      
-      handler.openIframe();
-    });
+  // Get donor information
+  const donorName = document.getElementById('donorName').value.trim();
+  const donorEmail = document.getElementById('donorEmail').value.trim();
+  const donorPhone = document.getElementById('donorPhone').value.trim();
+  const donorType = document.getElementById('donorType').value;
+  const donationMessage = document.getElementById('donationMessage').value.trim();
+
+  // Validate required fields
+  if (!donorName) {
+    alert('Please enter your name or organization name');
+    document.getElementById('donorName').focus();
+    return;
+  }
+  
+  if (!donorEmail) {
+    alert('Please enter your email address');
+    document.getElementById('donorEmail').focus();
+    return;
+  }
+
+  // Initialize Paystack payment with donor information
+  const handler = PaystackPop.setup({
+    key: 'pk_test_your_paystack_public_key_here', // Replace with your Paystack public key
+    email: donorEmail, // Use actual donor email
+    amount: selectedAmount * 100, // Amount in kobo
+    currency: 'NGN',
+    ref: 'donation_' + Math.floor((Math.random() * 1000000000) + 1),
+    metadata: {
+      purpose: 'donation',
+      donor_type: donorType,
+      donor_name: donorName,
+      donor_phone: donorPhone,
+      donation_message: donationMessage
+    },
+    callback: function(response) {
+      alert('Donation successful! Thank you for supporting NARAP. Reference: ' + response.reference);
+      // You can redirect to a thank you page or send data to your backend
+      window.location.href = '/?donation=success';
+    },
+    onClose: function() {
+      alert('Donation cancelled');
+    }
+  });
+  
+  handler.openIframe();
+});
 
     // Check if Paystack loaded
     if (typeof PaystackPop === 'undefined') {
