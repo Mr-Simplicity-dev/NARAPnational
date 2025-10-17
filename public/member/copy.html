@@ -1469,41 +1469,41 @@ function showTokenExpiredModal() {
 // }
 
   // Centralized user data loading
-//   async function loadUserData(forceRefresh = false) {
-//     if (userData && !forceRefresh) return userData;
+  async function loadUserData(forceRefresh = false) {
+    if (userData && !forceRefresh) return userData;
     
-//     const token = getToken();
-//     if (!token) {
-//       window.location.href = '/member/login.php';
-//       return;
-//     }
+    const token = getToken();
+    if (!token) {
+      window.location.href = '/member/login.php';
+      return;
+    }
     
-//     try {
-//       const response = await fetch(`${API_BASE}/member/profile`, {
-//         headers: {
-//           'Authorization': `Bearer ${token}`,
-//           'Content-Type': 'application/json'
-//         }
-//       });
+    try {
+      const response = await fetch(`${API_BASE}/member/profile`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
       
-//       if (!response.ok) {
-//         if (response.status === 401) {
-//           clearAuth();
-//           window.location.href = '/member/login.php';
-//           return;
-//         }
-//         throw new Error(`HTTP ${response.status}: Failed to load profile`);
-//       }
+      if (!response.ok) {
+        if (response.status === 401) {
+          clearAuth();
+          window.location.href = '/member/login.php';
+          return;
+        }
+        throw new Error(`HTTP ${response.status}: Failed to load profile`);
+      }
       
-//       userData = await response.json();
-//       return userData;
+      userData = await response.json();
+      return userData;
       
-//     } catch (error) {
-//       console.error('Error loading user data:', error);
-//       showNotification('Failed to load member data. Please refresh the page.');
-//       throw error;
-//     }
-//   }
+    } catch (error) {
+      console.error('Error loading user data:', error);
+      showNotification('Failed to load member data. Please refresh the page.');
+      throw error;
+    }
+  }
   
   // Update dashboard with user data
 function updateDashboard(user) {
