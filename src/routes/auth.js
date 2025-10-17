@@ -62,8 +62,36 @@ router.get('/google/callback',
       // Generate JWT token
       const token = jwt.sign({ id: req.user._id }, process.env.JWT_SECRET || 'secret', { expiresIn: '7d' });
       
-      // Redirect to frontend with token
-      res.redirect(`/member/profile-setup.php?token=${token}&google_auth=success`);
+      // Check if profile is complete
+      const user = req.user;
+      const isProfileComplete = 
+        (user.surname || user.lastName) &&
+        (user.otherNames || user.firstName) &&
+        user.phone && 
+        user.state && 
+        user.passportUrl && 
+        user.signatureUrl &&
+        user.profileCompleted === true;
+
+      console.log('Google user profile completeness:', {
+        surname: !!user.surname,
+        lastName: !!user.lastName,
+        otherNames: !!user.otherNames,
+        firstName: !!user.firstName,
+        phone: !!user.phone,
+        state: !!user.state,
+        passportUrl: !!user.passportUrl,
+        signatureUrl: !!user.signatureUrl,
+        profileCompleted: user.profileCompleted,
+        isComplete: isProfileComplete
+      });
+
+      // Redirect based on profile completeness
+      if (isProfileComplete) {
+        res.redirect(`/member/dashboard.php?token=${token}&google_auth=success`);
+      } else {
+        res.redirect(`/member/profile-setup.php?token=${token}&google_auth=success`);
+      }
     } catch (error) {
       console.error('Token generation error:', error);
       res.redirect('/register.php?error=token_generation_failed');
@@ -223,10 +251,27 @@ router.post('/login', async (req, res) => {
   try {
     const { email = '', password = '' } = req.body || {};
     const user = await User.findOne({ email: email.toLowerCase().trim() }).select('+password');
+    
     if (!user) return res.status(400).json({ 
       success: false, 
       message: 'Invalid credentials' 
     });
+    
+    // Check if this is a Google user (no password set)
+    if (user.googleId && !user.password) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'This account was created with Google. Please use "Continue with Google" to sign in.' 
+      });
+    }
+    
+    // For regular users, check password
+    if (!user.password) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Invalid credentials' 
+      });
+    }
     
     const ok = await user.comparePassword(password);
     if (!ok) return res.status(400).json({ 
