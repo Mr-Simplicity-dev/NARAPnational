@@ -10,27 +10,42 @@ import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 const router = express.Router();
 
 // Configure Google OAuth Strategy
+// Configure Google OAuth Strategy
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
   callbackURL: "/api/auth/google/callback"
 }, async (accessToken, refreshToken, profile, done) => {
   try {
-    console.log('Google profile:', profile);
+    console.log('Google profile received:', {
+      id: profile.id,
+      email: profile.emails[0].value,
+      name: profile.displayName
+    });
     
     // Check if user exists
     let user = await User.findOne({ email: profile.emails[0].value });
     
     if (user) {
+      console.log('Existing user found:', user._id);
+      // Update Google ID if not set
+      if (!user.googleId) {
+        user.googleId = profile.id;
+        await user.save();
+      }
       return done(null, user);
     } else {
+      console.log('Creating new user from Google');
       // Create new user
       user = await User.create({
         name: profile.displayName,
         email: profile.emails[0].value,
+        googleId: profile.id,
         role: 'member',
-        password: 'google-oauth-' + Date.now() // Temporary password for OAuth users
+        // Don't set a password for Google users
+        password: undefined
       });
+      console.log('New user created:', user._id);
       return done(null, user);
     }
   } catch (error) {
@@ -59,11 +74,23 @@ router.get('/google/callback',
   passport.authenticate('google', { failureRedirect: '/register.php?error=google_auth_failed' }),
   async (req, res) => {
     try {
-      // Generate JWT token
-      const token = jwt.sign({ id: req.user._id }, process.env.JWT_SECRET || 'secret', { expiresIn: '7d' });
-      
-      // Check if profile is complete
       const user = req.user;
+      const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET || 'secret', { expiresIn: '7d' });
+      
+      // Check where the request came from (registration or login)
+      const referer = req.get('Referer') || '';
+      const isFromLogin = referer.includes('/member/login.php');
+      const isFromRegister = referer.includes('/register.php');
+      
+      console.log('Google OAuth callback:', {
+        userId: user._id,
+        email: user.email,
+        isFromLogin,
+        isFromRegister,
+        referer
+      });
+
+      // Check if profile is complete
       const isProfileComplete = 
         (user.surname || user.lastName) &&
         (user.otherNames || user.firstName) &&
@@ -73,11 +100,9 @@ router.get('/google/callback',
         user.signatureUrl &&
         user.profileCompleted === true;
 
-      console.log('Google user profile completeness:', {
-        surname: !!user.surname,
-        lastName: !!user.lastName,
-        otherNames: !!user.otherNames,
-        firstName: !!user.firstName,
+      console.log('Profile completeness:', {
+        surname: !!(user.surname || user.lastName),
+        otherNames: !!(user.otherNames || user.firstName),
         phone: !!user.phone,
         state: !!user.state,
         passportUrl: !!user.passportUrl,
@@ -86,12 +111,22 @@ router.get('/google/callback',
         isComplete: isProfileComplete
       });
 
-      // Redirect based on profile completeness
-      if (isProfileComplete) {
-        res.redirect(`/member/dashboard.php?token=${token}&google_auth=success`);
+      // Handle different flows
+      if (isFromLogin) {
+        // LOGIN FLOW: User clicked Google from login page
+        if (isProfileComplete) {
+          console.log('Login: Complete profile → Dashboard');
+          res.redirect(`/member/dashboard.php?token=${token}&google_auth=success`);
+        } else {
+          console.log('Login: Incomplete profile → Profile setup');
+          res.redirect(`/member/profile-setup.php?token=${token}&google_auth=success`);
+        }
       } else {
-        res.redirect(`/member/profile-setup.php?token=${token}&google_auth=success`);
+        // REGISTRATION FLOW: User clicked Google from registration page
+        console.log('Registration: → Profile setup');
+        res.redirect(`/member/profile-setup.php?token=${token}&google_auth=success&new_user=true`);
       }
+      
     } catch (error) {
       console.error('Token generation error:', error);
       res.redirect('/register.php?error=token_generation_failed');
