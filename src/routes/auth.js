@@ -9,7 +9,7 @@ import passport from 'passport';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 const router = express.Router();
 
-// Configure Google OAuth Strategy
+
 // Configure Google OAuth Strategy
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
@@ -121,6 +121,51 @@ router.get('/google/callback',
     }
   }
 );
+
+// Temporary debug route - add this after your Google callback
+router.get('/debug-user/:email', async (req, res) => {
+  try {
+    const user = await User.findOne({ email: req.params.email });
+    if (!user) {
+      return res.json({ error: 'User not found' });
+    }
+    
+    const isProfileComplete = 
+      (user.surname || user.lastName) &&
+      (user.otherNames || user.firstName) &&
+      user.phone && 
+      user.state && 
+      user.passportUrl && 
+      user.signatureUrl &&
+      user.profileCompleted === true;
+
+    res.json({
+      email: user.email,
+      profileCompleted: user.profileCompleted,
+      isComplete: isProfileComplete,
+      fields: {
+        surname: user.surname || null,
+        lastName: user.lastName || null,
+        otherNames: user.otherNames || null,
+        firstName: user.firstName || null,
+        phone: user.phone || null,
+        state: user.state || null,
+        passportUrl: user.passportUrl || null,
+        signatureUrl: user.signatureUrl || null
+      },
+      missing: {
+        name: !(user.surname || user.lastName),
+        otherNames: !(user.otherNames || user.firstName),
+        phone: !user.phone,
+        state: !user.state,
+        passportUrl: !user.passportUrl,
+        signatureUrl: !user.signatureUrl,
+        profileCompleted: user.profileCompleted !== true
+      }
+    });
+  } catch (error) {
+    res.json({ error: error.message });
+  }
 
 /* --------------------------------- uploads -------------------------------- */
 const memberPassportDir = path.join(process.cwd(), 'public', 'admin', 'uploads', 'passports');
