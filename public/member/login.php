@@ -113,9 +113,9 @@ function initiateGoogleSignIn() {
   btn.disabled = true;
   btn.textContent = 'Redirecting to Google...';
   
-  // Small delay to prevent request conflicts
+  // Add source parameter
   setTimeout(() => {
-    window.location.href = '/api/auth/google';
+    window.location.href = '/api/auth/google?source=login';
   }, 100);
 }
 

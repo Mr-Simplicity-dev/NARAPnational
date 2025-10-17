@@ -68,6 +68,10 @@ passport.deserializeUser(async (id, done) => {
 // Google OAuth routes with forced account selection
 router.get('/google', (req, res, next) => {
   console.log('🔵 Google OAuth initiated from:', req.get('Referer'));
+  console.log('🔵 Source parameter:', req.query.source);
+  
+  // Store source in session
+  req.session.googleAuthSource = req.query.source || 'unknown';
   
   passport.authenticate('google', {
     scope: ['profile', 'email'],
@@ -84,9 +88,9 @@ router.get('/google/callback',
       const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET || 'secret', { expiresIn: '7d' });
       
       // Check where the request came from (registration or login)
-      const referer = req.get('Referer') || '';
-      const isFromLogin = referer.includes('/member/login.php');
-      const isFromRegister = referer.includes('/register.php');
+const source = req.session.googleAuthSource || 'unknown';
+const isFromLogin = source === 'login';
+const isFromRegister = source === 'register';
       
       console.log('Google OAuth callback:', {
         userId: user._id,
@@ -117,20 +121,20 @@ router.get('/google/callback',
         isComplete: isProfileComplete
       });
 
-      // Handle different flows
-      if (isFromLogin) {
-        // LOGIN FLOW: User clicked Google from login page
-        if (isProfileComplete) {
-          console.log('Login: Complete profile → Dashboard');
-          res.redirect(`/member/dashboard.php?token=${token}&google_auth=success`);
-        } else {
-          console.log('Login: Incomplete profile → Profile setup');
-          res.redirect(`/member/profile-setup.php?token=${token}&google_auth=success`);
-        }
+      // IMPROVED LOGIC: Check profile completeness first, then flow
+      if (isProfileComplete) {
+        // User has complete profile - always go to dashboard
+        console.log('Complete profile → Dashboard');
+        res.redirect(`/member/dashboard.php?token=${token}&google_auth=success`);
       } else {
-        // REGISTRATION FLOW: User clicked Google from registration page
-        console.log('Registration: → Profile setup');
-        res.redirect(`/member/profile-setup.php?token=${token}&google_auth=success&new_user=true`);
+        // User has incomplete profile - go to profile setup
+        if (isFromLogin) {
+          console.log('Login with incomplete profile → Profile setup');
+          res.redirect(`/member/profile-setup.php?token=${token}&google_auth=success`);
+        } else {
+          console.log('Registration → Profile setup');
+          res.redirect(`/member/profile-setup.php?token=${token}&google_auth=success&new_user=true`);
+        }
       }
       
     } catch (error) {
@@ -139,7 +143,6 @@ router.get('/google/callback',
     }
   }
 );
-
 
 /* --------------------------------- uploads -------------------------------- */
 const memberPassportDir = path.join(process.cwd(), 'public', 'admin', 'uploads', 'passports');

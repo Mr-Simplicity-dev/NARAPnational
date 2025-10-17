@@ -202,8 +202,8 @@
 <script>
 // Google Sign-In Functions
 function initiateGoogleSignIn() {
-  // Redirect to your backend Google OAuth route
-  window.location.href = '/api/auth/google';
+  // Add source parameter
+  window.location.href = '/api/auth/google?source=register';
 }
 
 function handleGoogleCredential(response) {
