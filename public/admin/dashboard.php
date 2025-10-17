@@ -70,6 +70,7 @@
     <li class="nav-item" role="presentation"><button class="nav-link" id="tab-members-all" data-bs-toggle="pill" data-bs-target="#pane-members-all" type="button" role="tab">Registrations</button></li>
     <li class="nav-item" role="presentation"><button class="nav-link" id="tab-members-paid" data-bs-toggle="pill" data-bs-target="#pane-members-paid" type="button" role="tab">Paid Members</button></li>
     <li class="nav-item" role="presentation"><button class="nav-link" id="tab-members-unpaid" data-bs-toggle="pill" data-bs-target="#pane-members-unpaid" type="button" role="tab">Unpaid Members</button></li>
+    <li class="nav-item" role="presentation"><button class="nav-link" id="tab-donations" data-bs-toggle="pill" data-bs-target="#pane-donations" type="button" role="tab">Donations</button></li>
   </ul>
 
   <div class="tab-content" id="pills-tabContent">
@@ -795,6 +796,89 @@
       </div></div>
     </div>
 
+
+  </div>
+</div>
+
+<!-- DONATIONS TAB -->
+    <div class="tab-pane fade" id="pane-donations" role="tabpanel">
+      <div class="card shadow-sm-soft">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <h5 class="mb-0">Donation Management</h5>
+            <div>
+              <button class="btn btn-outline-brand btn-sm" id="exportDonations">
+                <i class="fas fa-download"></i> Export
+              </button>
+              <button class="btn btn-brand btn-sm" id="refreshDonations">
+                <i class="fas fa-sync-alt"></i> Refresh
+              </button>
+            </div>
+          </div>
+
+          <!-- Donation Statistics -->
+          <div class="row mb-4">
+            <div class="col-md-3">
+              <div class="card bg-success text-white">
+                <div class="card-body text-center">
+                  <h4 id="totalDonations">₦0</h4>
+                  <small>Total Raised</small>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="card bg-info text-white">
+                <div class="card-body text-center">
+                  <h4 id="totalDonors">0</h4>
+                  <small>Total Donors</small>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="card bg-warning text-white">
+                <div class="card-body text-center">
+                  <h4 id="avgDonation">₦0</h4>
+                  <small>Average Donation</small>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="card bg-primary text-white">
+                <div class="card-body text-center">
+                  <h4 id="monthlyDonations">₦0</h4>
+                  <small>This Month</small>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Donations Table -->
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Donor Name</th>
+                  <th>Email</th>
+                  <th>Type</th>
+                  <th>Amount</th>
+                  <th>Reference</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="donationsTableBody">
+                <tr>
+                  <td colspan="8" class="text-center text-muted">
+                    <i class="fas fa-spinner fa-spin"></i> Loading donations...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
 
   </div>
 </div>

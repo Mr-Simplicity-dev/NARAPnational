@@ -610,10 +610,19 @@ donateBtn.addEventListener('click', () => {
       donation_message: donationMessage
     },
     callback: function(response) {
-      alert('Donation successful! Thank you for supporting NARAP. Reference: ' + response.reference);
-      // You can redirect to a thank you page or send data to your backend
-      window.location.href = '/?donation=success';
-    },
+  // Save donation to database
+  saveDonationToDatabase(response, {
+    donor_name: donorName,
+    email: donorEmail,
+    phone: donorPhone,
+    donor_type: donorType,
+    amount: selectedAmount,
+    message: donationMessage
+  });
+  
+  alert('Donation successful! Thank you for supporting NARAP. Reference: ' + response.reference);
+  window.location.href = '/?donation=success';
+}
     onClose: function() {
       alert('Donation cancelled');
     }
@@ -629,6 +638,36 @@ donateBtn.addEventListener('click', () => {
         alert('Payment system is currently unavailable. Please try again later.');
       });
     }
+
+// Add this function to save donation data
+async function saveDonationToDatabase(paystackResponse, donorData) {
+  try {
+    const response = await fetch('/api/donations', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        donor_name: donorData.donor_name,
+        email: donorData.email,
+        phone: donorData.phone,
+        donor_type: donorData.donor_type,
+        amount: donorData.amount,
+        reference: paystackResponse.reference,
+        status: 'success', // Paystack callback means payment was successful
+        message: donorData.message,
+        paystack_reference: paystackResponse.reference
+      })
+    });
+
+    if (!response.ok) {
+      console.error('Failed to save donation to database');
+    }
+  } catch (error) {
+    console.error('Error saving donation:', error);
+  }
+}
+
   </script>
 </body>
 </html>

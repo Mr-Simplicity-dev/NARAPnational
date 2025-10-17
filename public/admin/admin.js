@@ -1729,6 +1729,11 @@ $('#stateFilterUnpaid')?.addEventListener('change', () => {
       deleteItem(key, id);
     }
   });
+
+  // Initialize donations tab if it's the active tab
+  if (document.getElementById('tab-donations')?.classList.contains('active')) {
+    loadDonations();
+  }
 });
 
 
@@ -1760,3 +1765,243 @@ console.log('🟡 Loading members on page load...');
 loadAllMembers();
 loadPaidMembers(); 
 loadUnpaidMembers();
+
+
+// Donations Management
+let donationsData = [];
+let donationsCurrentPage = 1;
+const donationsPerPage = 20;
+
+// Initialize donations tab when it's clicked
+document.getElementById('tab-donations')?.addEventListener('click', function() {
+  loadDonations();
+});
+
+// Load donations data
+async function loadDonations() {
+  try {
+    showDonationsLoading();
+    
+    const token = localStorage.getItem('jwt');
+    const response = await fetch('/api/donations', {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: Failed to load donations`);
+    }
+
+    donationsData = await response.json();
+    updateDonationsStats();
+    renderDonationsTable();
+    
+  } catch (error) {
+    console.error('Error loading donations:', error);
+    showDonationsError('Failed to load donations data');
+  }
+}
+
+// Update donation statistics
+function updateDonationsStats() {
+  const total = donationsData.reduce((sum, donation) => sum + donation.amount, 0);
+  const totalDonors = new Set(donationsData.map(d => d.email)).size;
+  const avgDonation = totalDonors > 0 ? total / totalDonors : 0;
+  
+  // This month's donations
+  const currentMonth = new Date().getMonth();
+  const currentYear = new Date().getFullYear();
+  const monthlyTotal = donationsData
+    .filter(d => {
+      const donationDate = new Date(d.created_at);
+      return donationDate.getMonth() === currentMonth && donationDate.getFullYear() === currentYear;
+    })
+    .reduce((sum, donation) => sum + donation.amount, 0);
+
+  // Update UI
+  document.getElementById('totalDonations').textContent = `₦${total.toLocaleString()}`;
+  document.getElementById('totalDonors').textContent = totalDonors.toString();
+  document.getElementById('avgDonation').textContent = `₦${Math.round(avgDonation).toLocaleString()}`;
+  document.getElementById('monthlyDonations').textContent = `₦${monthlyTotal.toLocaleString()}`;
+}
+
+// Render donations table
+function renderDonationsTable() {
+  const tbody = document.getElementById('donationsTableBody');
+  if (!tbody) return;
+
+  if (donationsData.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="8" class="text-center text-muted">
+          <i class="fas fa-info-circle"></i> No donations found
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  // Sort by date (newest first)
+  const sortedDonations = [...donationsData].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+  
+  // Pagination
+  const startIndex = (donationsCurrentPage - 1) * donationsPerPage;
+  const endIndex = startIndex + donationsPerPage;
+  const paginatedDonations = sortedDonations.slice(startIndex, endIndex);
+
+  tbody.innerHTML = paginatedDonations.map((donation, index) => {
+    const date = new Date(donation.created_at).toLocaleDateString();
+    const statusBadge = getStatusBadge(donation.status);
+    
+    return `
+      <tr>
+        <td>${date}</td>
+        <td>${donation.donor_name || 'Anonymous'}</td>
+        <td>${donation.email}</td>
+        <td>
+          <span class="badge bg-secondary">${donation.donor_type}</span>
+        </td>
+        <td><strong>₦${donation.amount.toLocaleString()}</strong></td>
+        <td><code>${donation.reference}</code></td>
+        <td>${statusBadge}</td>
+        <td>
+          <button class="btn btn-sm btn-outline-primary" onclick="viewDonationDetails('${donation.id}')">
+            <i class="fas fa-eye"></i>
+          </button>
+          <button class="btn btn-sm btn-outline-success" onclick="sendThankYou('${donation.email}', '${donation.donor_name}')">
+            <i class="fas fa-envelope"></i>
+          </button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+// Get status badge HTML
+function getStatusBadge(status) {
+  switch (status?.toLowerCase()) {
+    case 'success':
+    case 'completed':
+      return '<span class="badge bg-success">Success</span>';
+    case 'pending':
+      return '<span class="badge bg-warning">Pending</span>';
+    case 'failed':
+      return '<span class="badge bg-danger">Failed</span>';
+    default:
+      return '<span class="badge bg-secondary">Unknown</span>';
+  }
+}
+
+// Show loading state
+function showDonationsLoading() {
+  const tbody = document.getElementById('donationsTableBody');
+  if (tbody) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="8" class="text-center text-muted">
+          <i class="fas fa-spinner fa-spin"></i> Loading donations...
+        </td>
+      </tr>
+    `;
+  }
+}
+
+// Show error state
+function showDonationsError(message) {
+  const tbody = document.getElementById('donationsTableBody');
+  if (tbody) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="8" class="text-center text-danger">
+          <i class="fas fa-exclamation-triangle"></i> ${message}
+        </td>
+      </tr>
+    `;
+  }
+}
+
+// View donation details
+function viewDonationDetails(donationId) {
+  const donation = donationsData.find(d => d.id === donationId);
+  if (!donation) return;
+
+  const details = `
+    <strong>Donation Details:</strong><br>
+    Date: ${new Date(donation.created_at).toLocaleString()}<br>
+    Donor: ${donation.donor_name || 'Anonymous'}<br>
+    Email: ${donation.email}<br>
+    Phone: ${donation.phone || 'Not provided'}<br>
+    Type: ${donation.donor_type}<br>
+    Amount: ₦${donation.amount.toLocaleString()}<br>
+    Reference: ${donation.reference}<br>
+    Message: ${donation.message || 'No message'}<br>
+    Status: ${donation.status}
+  `;
+
+  alert(details); // You can replace this with a proper modal
+}
+
+// Send thank you email
+async function sendThankYou(email, donorName) {
+  if (!confirm(`Send thank you email to ${donorName} (${email})?`)) return;
+
+  try {
+    const token = localStorage.getItem('jwt');
+    const response = await fetch('/api/donations/thank-you', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ email, donorName })
+    });
+
+    if (response.ok) {
+      alert('Thank you email sent successfully!');
+    } else {
+      throw new Error('Failed to send email');
+    }
+  } catch (error) {
+    console.error('Error sending thank you email:', error);
+    alert('Failed to send thank you email');
+  }
+}
+
+// Export donations
+function exportDonations() {
+  if (donationsData.length === 0) {
+    alert('No donations to export');
+    return;
+  }
+
+  const csvContent = [
+    ['Date', 'Donor Name', 'Email', 'Phone', 'Type', 'Amount', 'Reference', 'Status', 'Message'],
+    ...donationsData.map(d => [
+      new Date(d.created_at).toLocaleDateString(),
+      d.donor_name || '',
+      d.email,
+      d.phone || '',
+      d.donor_type,
+      d.amount,
+      d.reference,
+      d.status,
+      d.message || ''
+    ])
+  ].map(row => row.map(field => `"${field}"`).join(',')).join('\n');
+
+  const blob = new Blob([csvContent], { type: 'text/csv' });
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `donations_${new Date().toISOString().split('T')[0]}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  window.URL.revokeObjectURL(url);
+}
+
+// Event listeners for donations tab
+document.getElementById('refreshDonations')?.addEventListener('click', loadDonations);
+document.getElementById('exportDonations')?.addEventListener('click', exportDonations);

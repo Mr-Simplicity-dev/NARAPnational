@@ -33,6 +33,7 @@ import memberRoutes from './src/routes/member.js'; // singular - individual memb
 import membersRoutes from './src/routes/members.js'; // plural - admin member management
 import paidRoutes from './src/routes/paid.js';
 import unpaidRoutes from './src/routes/unpaid.js';
+import donationsRoutes from './src/routes/donations.js';
 
 
 const uploadDirs = [
@@ -238,6 +239,7 @@ app.use('/api/member', memberRoutes); // This handles /api/member/profile
 app.use('/api/members', requireAuth, requireAdmin, membersRoutes); // Admin member management
 app.use('/api/members/paid', requireAuth, requireAdmin, paidRoutes);
 app.use('/api/members/unpaid', requireAuth, requireAdmin, unpaidRoutes);
+app.use('/api/donations', requireAuth, requireAdmin, donationsRoutes);
 
 // Health check
 app.get('/healthz', (_req, res) => res.json({ ok: true }));
