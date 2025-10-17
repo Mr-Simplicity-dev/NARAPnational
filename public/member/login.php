@@ -37,6 +37,11 @@
       background: #f8f9fa;
     }
     
+    .google-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    
     .google-icon {
       width: 18px;
       height: 18px;
@@ -68,14 +73,6 @@
   <div class="wrap">
     <h1>Member Login</h1>
     
-    <!-- Google One Tap (hidden, auto-loads) -->
-    <div id="g_id_onload"
-         data-client_id="963092048723-a6bvo7dt81c8a0tk2tl50rapsjrfchpa.apps.googleusercontent.com"
-         data-callback="handleGoogleCredential"
-         data-auto_prompt="false"
-         data-cancel_on_tap_outside="false">
-    </div>
-    
     <!-- Custom Google Button -->
     <button class="google-btn" id="googleSignInBtn">
       <svg class="google-icon" viewBox="0 0 24 24">
@@ -103,55 +100,29 @@
     <a class="small" href="/admin/login.php">Are you an admin? Go to Admin Login</a>
   </div>
 
-<!-- Google Identity Services -->
-<script src="https://accounts.google.com/gsi/client" async defer></script>
-
 <script>
+// Prevent multiple simultaneous requests
+let isProcessing = false;
+
 // Google Sign-In Functions
 function initiateGoogleSignIn() {
-  // Redirect to your backend Google OAuth route
-  window.location.href = '/api/auth/google';
-}
-
-// Handle Google One Tap credential
-function handleGoogleCredential(response) {
-  console.log('Google credential received:', response);
+  if (isProcessing) return;
   
-  // Send the credential to your backend
-  fetch('/api/auth/google/verify', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      credential: response.credential
-    })
-  })
-  .then(res => res.json())
-  .then(data => {
-    if (data.success) {
-      // Store token and redirect
-      localStorage.setItem('jwt', data.token);
-      if (data.user) {
-        localStorage.setItem('user', JSON.stringify(data.user));
-      }
-      
-      // Check profile completeness and redirect
-      checkProfileAndRedirect(data.token);
-    } else {
-      document.getElementById('msg').textContent = data.message || 'Google sign-in failed';
-      document.getElementById('msg').style.color = 'red';
-    }
-  })
-  .catch(error => {
-    console.error('Google sign-in error:', error);
-    document.getElementById('msg').textContent = 'Google sign-in failed';
-    document.getElementById('msg').style.color = 'red';
-  });
+  isProcessing = true;
+  const btn = document.getElementById('googleSignInBtn');
+  btn.disabled = true;
+  btn.textContent = 'Redirecting to Google...';
+  
+  // Small delay to prevent request conflicts
+  setTimeout(() => {
+    window.location.href = '/api/auth/google';
+  }, 100);
 }
 
 // Check profile completeness and redirect
 async function checkProfileAndRedirect(token) {
+  if (isProcessing) return;
+  
   try {
     const profileRes = await fetch('/api/member/profile', {
       headers: {
@@ -163,8 +134,6 @@ async function checkProfileAndRedirect(token) {
     if (profileRes.ok) {
       const profile = await profileRes.json();
       
-      console.log('Profile data received:', profile); // Debug log
-      
       const isProfileComplete = 
         (profile.surname || profile.lastName || profile.name) &&
         (profile.otherNames || profile.firstName || profile.name) &&
@@ -174,27 +143,12 @@ async function checkProfileAndRedirect(token) {
         profile.signatureUrl &&
         profile.profileCompleted === true;
 
-      console.log('Profile completeness check:', {
-        surname: !!(profile.surname || profile.lastName),
-        otherNames: !!(profile.otherNames || profile.firstName),
-        name: !!profile.name,
-        phone: !!profile.phone,
-        state: !!profile.state,
-        passportUrl: !!profile.passportUrl,
-        signatureUrl: !!profile.signatureUrl,
-        profileCompleted: profile.profileCompleted,
-        isComplete: isProfileComplete
-      });
-
       if (isProfileComplete) {
-        console.log('Profile complete - redirecting to dashboard');
         window.location.href = '/member/dashboard.php';
       } else {
-        console.log('Profile incomplete - redirecting to profile setup');
         window.location.href = '/member/profile-setup.php';
       }
     } else {
-      console.log('Profile fetch failed - redirecting to profile setup');
       window.location.href = '/member/profile-setup.php';
     }
   } catch (error) {
@@ -205,6 +159,18 @@ async function checkProfileAndRedirect(token) {
 
 // Add event listener for Google button
 document.addEventListener('DOMContentLoaded', function() {
+  // Check for token in URL (from Google callback)
+  const urlParams = new URLSearchParams(window.location.search);
+  const token = urlParams.get('token');
+  const googleAuth = urlParams.get('google_auth');
+  
+  if (token && googleAuth === 'success') {
+    // Store token and check profile
+    localStorage.setItem('jwt', token);
+    checkProfileAndRedirect(token);
+    return;
+  }
+  
   const googleBtn = document.getElementById('googleSignInBtn');
   if (googleBtn) {
     googleBtn.addEventListener('click', initiateGoogleSignIn);
@@ -214,15 +180,20 @@ document.addEventListener('DOMContentLoaded', function() {
 // Traditional login form
 document.getElementById('loginForm').addEventListener('submit', async (e)=>{
   e.preventDefault();
+  
+  if (isProcessing) return;
+  isProcessing = true;
+  
   const email = document.getElementById('email').value.trim();
   const password = document.getElementById('password').value.trim();
   const msg = document.getElementById('msg');
+  const submitBtn = e.target.querySelector('button[type="submit"]');
   
   msg.textContent = 'Signing in...';
   msg.style.color = 'blue';
+  submitBtn.disabled = true;
 
   try{
-    // Step 1: Login
     const res = await fetch('/api/auth/login', {
       method:'POST',
       headers:{'Content-Type':'application/json'},
@@ -246,10 +217,12 @@ document.getElementById('loginForm').addEventListener('submit', async (e)=>{
       msg.textContent = 'Login successful! Checking profile...';
       
       // Check profile completeness and redirect
-      checkProfileAndRedirect(data.token);
+      await checkProfileAndRedirect(data.token);
     } else {
       msg.textContent = 'This account is not a member. Use Admin Login.';
       msg.style.color = 'red';
+      isProcessing = false;
+      submitBtn.disabled = false;
     }
   } catch(err) {
     // Check if it's a Google user trying to login with password
@@ -261,6 +234,8 @@ document.getElementById('loginForm').addEventListener('submit', async (e)=>{
       msg.style.color = 'red';
     }
     console.error('Login error:', err);
+    isProcessing = false;
+    submitBtn.disabled = false;
   }
 });
 </script>
