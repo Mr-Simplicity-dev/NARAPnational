@@ -113,7 +113,9 @@ function initiateGoogleSignIn() {
   btn.disabled = true;
   btn.textContent = 'Redirecting to Google...';
   
-  // Add source parameter
+  console.log('🔵 Initiating Google Sign-In from LOGIN page'); // Debug log
+  
+  // Add source parameter for login
   setTimeout(() => {
     window.location.href = '/api/auth/google?source=login';
   }, 100);

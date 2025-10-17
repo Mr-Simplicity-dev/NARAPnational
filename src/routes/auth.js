@@ -72,6 +72,7 @@ router.get('/google', (req, res, next) => {
   
   // Store source in session
   req.session.googleAuthSource = req.query.source || 'unknown';
+  console.log('🔵 Stored in session:', req.session.googleAuthSource);
   
   passport.authenticate('google', {
     scope: ['profile', 'email'],
@@ -87,20 +88,7 @@ router.get('/google/callback',
       const user = req.user;
       const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET || 'secret', { expiresIn: '7d' });
       
-      // Check where the request came from (registration or login)
-const source = req.session.googleAuthSource || 'unknown';
-const isFromLogin = source === 'login';
-const isFromRegister = source === 'register';
-      
-     console.log('Google OAuth callback:', {
-  userId: user._id,
-  email: user.email,
-  source,        // ← Change to source
-  isFromLogin,
-  isFromRegister
-});
-
-      // Check if profile is complete
+      // Check if profile is complete FIRST
       const isProfileComplete = 
         (user.surname || user.lastName) &&
         (user.otherNames || user.firstName) &&
@@ -110,32 +98,22 @@ const isFromRegister = source === 'register';
         user.signatureUrl &&
         user.profileCompleted === true;
 
-      console.log('Profile completeness:', {
-        surname: !!(user.surname || user.lastName),
-        otherNames: !!(user.otherNames || user.firstName),
-        phone: !!user.phone,
-        state: !!user.state,
-        passportUrl: !!user.passportUrl,
-        signatureUrl: !!user.signatureUrl,
-        profileCompleted: user.profileCompleted,
-        isComplete: isProfileComplete
+      console.log('Google OAuth callback:', {
+        userId: user._id,
+        email: user.email,
+        isProfileComplete
       });
 
-      // IMPROVED LOGIC: Check profile completeness first, then flow
+      // PRIORITY 1: If profile is complete, always go to dashboard
       if (isProfileComplete) {
-        // User has complete profile - always go to dashboard
-        console.log('Complete profile → Dashboard');
+        console.log('✅ Complete profile detected → Dashboard');
         res.redirect(`/member/dashboard.php?token=${token}&google_auth=success`);
-      } else {
-        // User has incomplete profile - go to profile setup
-        if (isFromLogin) {
-          console.log('Login with incomplete profile → Profile setup');
-          res.redirect(`/member/profile-setup.php?token=${token}&google_auth=success`);
-        } else {
-          console.log('Registration → Profile setup');
-          res.redirect(`/member/profile-setup.php?token=${token}&google_auth=success&new_user=true`);
-        }
+        return;
       }
+
+      // PRIORITY 2: If profile is incomplete, go to profile setup
+      console.log('🔧 Incomplete profile → Profile setup');
+      res.redirect(`/member/profile-setup.php?token=${token}&google_auth=success`);
       
     } catch (error) {
       console.error('Token generation error:', error);

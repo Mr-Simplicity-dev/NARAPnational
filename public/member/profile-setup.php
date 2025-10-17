@@ -507,6 +507,28 @@
   })();
   </script>
 
+<script>
+  // After user data is loaded, add this check:
+if (userData && userData.profileCompleted === true) {
+  console.log('✅ Profile already completed, redirecting to dashboard...');
+  
+  // Show a brief message and redirect
+  const notice = document.getElementById('notice');
+  if (notice) {
+    notice.style.display = 'block';
+    notice.style.color = 'green';
+    notice.textContent = 'Profile already completed! Redirecting to dashboard...';
+  }
+  
+  // Redirect to dashboard after 1 second
+  setTimeout(() => {
+    window.location.href = '/member/dashboard.php';
+  }, 1000);
+  
+  return; // Stop further execution
+}
+</script>
+
   <script>
   // ===== Utilities & Draft Autosave =====
   (function(){
