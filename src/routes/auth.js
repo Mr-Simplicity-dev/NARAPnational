@@ -92,13 +92,13 @@ const source = req.session.googleAuthSource || 'unknown';
 const isFromLogin = source === 'login';
 const isFromRegister = source === 'register';
       
-      console.log('Google OAuth callback:', {
-        userId: user._id,
-        email: user.email,
-        isFromLogin,
-        isFromRegister,
-        referer
-      });
+     console.log('Google OAuth callback:', {
+  userId: user._id,
+  email: user.email,
+  source,        // ← Change to source
+  isFromLogin,
+  isFromRegister
+});
 
       // Check if profile is complete
       const isProfileComplete = 
