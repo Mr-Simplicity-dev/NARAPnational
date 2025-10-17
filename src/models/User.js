@@ -18,9 +18,10 @@ const UserSchema = new mongoose.Schema({
   surname: { type: String, trim: true },
   otherNames: { type: String, trim: true },
   email: { type: String, required: true, unique: true, lowercase: true, trim: true },
-  phone: { type: String, trim: true },
-  password: { type: String, required: true },
+  phone: { type: String, trim: true }, 
+  password: { type: String, required: function() { return !this.googleId; } },
   role: { type: String, enum: ['admin', 'member'], default: 'member' },
+  googleId: { type: String, sparse: true },
   
   // Additional member fields from profile form
   state: { type: String, trim: true },
