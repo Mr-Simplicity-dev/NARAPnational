@@ -2060,12 +2060,14 @@ document.addEventListener('DOMContentLoaded', function() {
   const settingsNavBtns = document.querySelectorAll('.settings-nav-btn');
   const settingsPanels = document.querySelectorAll('.settings-panel');
 
-  // Toggle settings section
-  settingsToggleBtn.addEventListener('click', function() {
-    settingsSection.classList.add('active');
-    // Scroll to settings section
-    settingsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  });
+    // Toggle settings dropdown (if button exists)
+  if (settingsToggleBtn) {
+    settingsToggleBtn.addEventListener('click', function() {
+      settingsSection.classList.add('active');
+      // Scroll to settings section
+      settingsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  }
 
   // Close settings section
   settingsCloseBtn.addEventListener('click', function() {

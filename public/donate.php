@@ -312,6 +312,77 @@
         font-size: 2rem;
       }
     }
+
+    /* Donor Information Styles */
+.donor-info {
+  margin: 2rem 0;
+  padding: 2rem;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.donor-info h3 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--brand);
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-input {
+  width: 100%;
+  padding: 1rem 1.5rem;
+  border: 2px solid var(--brand-100);
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px rgba(10, 127, 65, 0.1);
+}
+
+.form-select {
+  width: 100%;
+  padding: 1rem 1.5rem;
+  border: 2px solid var(--brand-100);
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 500;
+  background: rgba(255, 255, 255, 0.8);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.form-textarea {
+  width: 100%;
+  padding: 1rem 1.5rem;
+  border: 2px solid var(--brand-100);
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 500;
+  min-height: 100px;
+  resize: vertical;
+  background: rgba(255, 255, 255, 0.8);
+  transition: all 0.3s ease;
+}
+
+.form-textarea:focus {
+  outline: none;
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px rgba(10, 127, 65, 0.1);
+}
   </style>
 </head>
 
@@ -352,6 +423,19 @@
         <i class="fas fa-gift card-icon"></i>
         Make a Donation
       </h2>
+
+<!-- Add before the donation amounts section -->
+<div class="donor-info">
+  <h3>Donor Information</h3>
+  <input type="text" id="donorName" placeholder="Full Name or Organization" required>
+  <input type="email" id="donorEmail" placeholder="Email Address" required>
+  <input type="tel" id="donorPhone" placeholder="Phone Number (optional)">
+  <select id="donorType">
+    <option value="individual">Individual</option>
+    <option value="organization">Organization/Institution</option>
+  </select>
+  <textarea id="donationMessage" placeholder="Message (optional)"></textarea>
+</div>
 
       <!-- Preset Amounts -->
       <div class="donation-amounts">
