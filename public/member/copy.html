@@ -538,6 +538,50 @@
   background: #dc2626;
   transform: translateY(-2px);
 }
+
+/* Member Details List Styling */
+.list { 
+  display: flex; 
+  flex-direction: column; 
+  gap: 12px; 
+  margin-top: 20px; 
+}
+
+.item {
+  display: flex; 
+  justify-content: space-between; 
+  gap: 12px;
+  padding: 12px 0; 
+  border-bottom: 1px solid var(--border);
+  transition: all 0.2s ease;
+}
+
+.item:hover {
+  padding-left: 8px;
+  border-left: 3px solid var(--brand);
+}
+
+.item span:first-child {
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.item span:last-child {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+/* Pills/Badges for status */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  background: var(--brand-50); 
+  color: var(--brand-700);
+  padding: 4px 12px; 
+  border-radius: 20px; 
+  font-size: 12px;
+  font-weight: 600;
+}
   </style>
 </head>
 
@@ -575,7 +619,7 @@
       <!-- Welcome Hero -->
       <section class="welcome-hero">
         <div class="welcome-content">
-          <h2 class="welcome-title" id="welcomeTitle">Welcome to NARAP</h2>
+          <h2 class="welcome-title" id="hello">Welcome to NARAP</h2>
           <p class="welcome-subtitle">Manage your membership, payments, and profile all in one place.</p>
           
           <div class="welcome-stats">
@@ -616,10 +660,10 @@
           </div>
           
           <div class="profile-section">
-            <img src="/uploads/slider/Narap.png" alt="Profile" class="profile-avatar" id="profileAvatar">
+            <img src="/uploads/slider/Narap.png" alt="Profile" class="profile-avatar" id="avatar" data-fallback="/uploads/slider/Narap.png">
             <div class="profile-info">
               <h3 id="profileName">Loading...</h3>
-              <p class="profile-email" id="profileEmail">Loading...</p>
+              <p class="profile-email" id="email">Loading...</p>
               <span class="profile-badge">
                 <i class="fas fa-star"></i>
                 MEMBER
@@ -627,7 +671,7 @@
             </div>
           </div>
           
-          <div id="profileDetails">
+          <div id="recentList">
             <!-- Profile details will be loaded here -->
           </div>
         </div>
