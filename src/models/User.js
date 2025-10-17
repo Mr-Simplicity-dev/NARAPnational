@@ -22,7 +22,7 @@ const UserSchema = new mongoose.Schema({
   password: { type: String, required: function() { return !this.googleId; } },
   role: { type: String, enum: ['admin', 'member'], default: 'member' },
   googleId: { type: String, sparse: true },
-  
+
   // Additional member fields from profile form
   state: { type: String, trim: true },
   zone: { type: String, trim: true },
@@ -56,13 +56,18 @@ UserSchema.pre('validate', function(next){
 });
 
 UserSchema.pre('save', async function(next){
-  if (!this.isModified('password')) return next();
+  // Skip password hashing if password is not set (Google users) or not modified
+  if (!this.password || !this.isModified('password')) return next();
+  
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
   next();
 });
 
 UserSchema.methods.comparePassword = function(candidate){
+  // If user has no password (Google user), return false
+  if (!this.password) return Promise.resolve(false);
+  
   return bcrypt.compare(candidate, this.password);
 };
 
