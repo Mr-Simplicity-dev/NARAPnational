@@ -626,6 +626,67 @@
   font-size: 12px;
   font-weight: 600;
 }
+
+/* Settings Button Dropdown - Current Position */
+.menu {
+  position: relative;
+}
+
+.menu-list {
+  position: absolute;
+  top: 100%;
+  background: white;
+  border-radius: 12px;
+  box-shadow: var(--shadow-lg);
+  min-width: 220px;
+  padding: 8px 0;
+  margin-top: 8px;
+  display: none;
+  z-index: 1000;
+  border: 1px solid var(--border);
+}
+
+.menu.open .menu-list {
+  display: block;
+}
+
+.menu-list a {
+  display: block;
+  padding: 12px 16px;
+  color: var(--ink);
+  text-decoration: none;
+  transition: background 0.2s ease;
+  font-weight: 500;
+}
+
+.menu-list a:hover {
+  background: var(--brand-50);
+  color: var(--brand);
+}
+
+.menu-list a i {
+  margin-right: 8px;
+  width: 16px;
+}
+
+.settings-toggle-btn {
+  background: var(--gradient);
+  color: white;
+  border: none;
+  border-radius: 16px;
+  padding: 16px 32px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.settings-toggle-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(10, 127, 65, 0.3);
+}
   </style>
 </head>
 
@@ -687,11 +748,28 @@
       </section>
 
       <!-- Add Settings Toggle Button -->
+     <!-- Account Settings Dropdown -->
   <div style="text-align: center; margin-bottom: 32px;">
-    <button class="settings-toggle-btn" id="settingsToggleBtn">
-      <i class="fas fa-cog"></i>
-      Account Settings
-    </button>
+    <div class="menu" id="mdMenu" style="display: inline-block; position: relative;">
+      <button class="settings-toggle-btn" id="mdMenuToggle" aria-haspopup="true" aria-expanded="false">
+        <i class="fas fa-cog"></i>
+        Account Settings ▾
+      </button>
+      <div class="menu-list" role="menu" aria-labelledby="mdMenuToggle" style="left: 50%; transform: translateX(-50%);">
+        <a href="#" role="menuitem" id="linkEditProfile">
+          <i class="fas fa-user"></i> Edit Profile
+        </a>
+        <a href="#" role="menuitem" id="linkChangePassword">
+          <i class="fas fa-lock"></i> Change Password
+        </a>
+        <a href="#" role="menuitem" id="linkShowAll">
+          <i class="fas fa-eye"></i> Show All Settings
+        </a>
+        <a href="#" role="menuitem" id="linkHide">
+          <i class="fas fa-eye-slash"></i> Hide Settings
+        </a>
+      </div>
+    </div>
   </div>
 
       <!-- Dashboard Grid -->
