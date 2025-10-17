@@ -65,10 +65,16 @@ passport.deserializeUser(async (id, done) => {
   }
 });
 
-// Google OAuth routes
-router.get('/google', passport.authenticate('google', { 
-  scope: ['profile', 'email'] 
-}));
+// Google OAuth routes with forced account selection
+router.get('/google', (req, res, next) => {
+  console.log('🔵 Google OAuth initiated from:', req.get('Referer'));
+  
+  passport.authenticate('google', {
+    scope: ['profile', 'email'],
+    prompt: 'select_account',
+    accessType: 'offline'
+  })(req, res, next);
+});
 
 router.get('/google/callback', 
   passport.authenticate('google', { failureRedirect: '/register.php?error=google_auth_failed' }),
