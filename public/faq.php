@@ -359,3 +359,49 @@
             <div class="col-md-3">
                 <div class="stat-item">
                     <div class="stat-number">1000+</div>
+
+<script>
+async function loadFAQs() {
+  try {
+    const response = await fetch('/api/faqs');
+    const faqs = await response.json();
+    
+    const accordion = document.getElementById('faqAccordion');
+    accordion.innerHTML = faqs.map((faq, index) => `
+      <div class="accordion-item" data-keywords="${faq.question.toLowerCase()}">
+        <h2 class="accordion-header" id="heading${index}">
+          <button class="accordion-button collapsed" type="button" 
+                  data-bs-toggle="collapse" data-bs-target="#collapse${index}">
+            ${faq.question}
+          </button>
+        </h2>
+        <div id="collapse${index}" class="accordion-collapse collapse">
+          <div class="accordion-body">${faq.answer}</div>
+        </div>
+      </div>
+    `).join('');
+  } catch (error) {
+    console.error('Failed to load FAQs:', error);
+  }
+}
+
+function searchFAQs() {
+  const searchTerm = document.getElementById('faqSearch').value.toLowerCase();
+  const faqItems = document.querySelectorAll('.accordion-item');
+  
+  faqItems.forEach(item => {
+    const keywords = item.dataset.keywords || '';
+    const question = item.querySelector('.accordion-button').textContent.toLowerCase();
+    const answer = item.querySelector('.accordion-body').textContent.toLowerCase();
+    
+    const matches = keywords.includes(searchTerm) || 
+                   question.includes(searchTerm) || 
+                   answer.includes(searchTerm);
+    
+    item.style.display = matches ? 'block' : 'none';
+  });
+}
+
+// Load FAQs when page loads
+document.addEventListener('DOMContentLoaded', loadFAQs);
+</script>
