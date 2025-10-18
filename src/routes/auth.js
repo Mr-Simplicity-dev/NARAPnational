@@ -64,6 +64,80 @@ passport.deserializeUser(async (id, done) => {
   }
 });
 
+
+// Google credential verification endpoint (for One Tap)
+router.post('/google/verify', async (req, res) => {
+  try {
+    const { credential } = req.body;
+    if (!credential) {
+      return res.status(400).json({ message: 'Google credential required' });
+    }
+
+    // Verify the credential with Google
+    const { OAuth2Client } = require('google-auth-library');
+    const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+    
+    const ticket = await client.verifyIdToken({
+      idToken: credential,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+    
+    const payload = ticket.getPayload();
+    const { sub: googleId, email, name } = payload;
+
+    // Check if user exists
+    let user = await User.findOne({ email });
+    
+    if (user) {
+      // Update Google ID if not set
+      if (!user.googleId) {
+        user.googleId = googleId;
+        await user.save();
+      }
+    } else {
+      // Create new user
+      user = await User.create({
+        name,
+        email,
+        googleId,
+        role: 'member',
+        password: undefined
+      });
+    }
+
+    // Generate JWT token
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET || 'secret', { expiresIn: '7d' });
+    
+    // Check if profile is complete
+    const isProfileComplete = 
+      (user.surname || user.lastName) &&
+      (user.otherNames || user.firstName) &&
+      user.phone && 
+      user.state && 
+      user.passportUrl && 
+      user.signatureUrl &&
+      user.profileCompleted === true;
+
+    res.json({
+      success: true,
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        profileComplete: isProfileComplete
+      }
+    });
+  } catch (error) {
+    console.error('Google verify error:', error);
+    res.status(400).json({ 
+      success: false, 
+      message: 'Google authentication failed' 
+    });
+  }
+});
+
 // Google OAuth routes with forced account selection
 router.get('/google', (req, res, next) => {
   console.log('🔵 Google OAuth initiated from:', req.get('Referer'));
