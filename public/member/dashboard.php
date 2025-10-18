@@ -1529,6 +1529,24 @@ function verifyPaystackLoaded() {
 
 
 <script>
+ 
+// QUICK FIX: Handle Google OAuth token from URL
+(function() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const token = urlParams.get('token');
+  const googleAuth = urlParams.get('google_auth');
+  
+  if (token && googleAuth === 'success') {
+    console.log('🔑 Saving Google OAuth token to localStorage');
+    localStorage.setItem('jwt', token);
+    
+    // Clean URL for security
+    const newUrl = window.location.pathname;
+    window.history.replaceState({}, document.title, newUrl);
+  }
+})();
+
+
 // Unified Member Dashboard Controller - Consolidated and Optimized
 (function() {
   const API_BASE = '/api';
