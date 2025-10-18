@@ -245,6 +245,7 @@ document.getElementById('loginForm').addEventListener('submit', async (e)=>{
     submitBtn.disabled = false;
   }
 });
+
 </script>
 </body>
 </html>
