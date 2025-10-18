@@ -161,26 +161,42 @@ router.get('/google/callback',
       const user = req.user;
       const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET || 'secret', { expiresIn: '7d' });
       
-      // Check if profile is complete
+      // FIXED: More lenient profile completion check that matches your actual data
       const isProfileComplete = 
-        (user.surname || user.lastName) &&
-        (user.otherNames || user.firstName) &&
+        (user.surname || user.lastName || user.name) &&
+        (user.otherNames || user.firstName || user.name) &&
         user.phone && 
         user.state && 
         user.passportUrl && 
         user.signatureUrl &&
-        user.profileCompleted === true;
+        user.profileCompleted === true; // Keep this check
 
-      console.log('Google OAuth callback:', {
+      console.log('Google OAuth callback - DETAILED CHECK:', {
         userId: user._id,
         email: user.email,
+        name: user.name,
+        surname: user.surname,
+        lastName: user.lastName,
+        otherNames: user.otherNames,
+        firstName: user.firstName,
+        phone: user.phone,
+        state: user.state,
+        passportUrl: !!user.passportUrl,
+        signatureUrl: !!user.signatureUrl,
+        profileCompleted: user.profileCompleted,
         isProfileComplete,
-        source: req.session.googleAuthSource
+        source: req.session.googleAuthSource,
+        // Individual field checks
+        nameCheck: !!(user.surname || user.lastName || user.name),
+        otherNamesCheck: !!(user.otherNames || user.firstName || user.name),
+        phoneCheck: !!user.phone,
+        stateCheck: !!user.state,
+        passportCheck: !!user.passportUrl,
+        signatureCheck: !!user.signatureUrl,
+        profileCompletedCheck: user.profileCompleted === true
       });
 
-      // Determine redirect based on source and profile completeness
-      const source = req.session.googleAuthSource || 'login';
-      
+      // Determine redirect based on profile completeness
       if (isProfileComplete) {
         console.log('✅ Complete profile detected → Dashboard');
         res.redirect(`/member/dashboard.php?token=${token}&google_auth=success`);
@@ -196,7 +212,7 @@ router.get('/google/callback',
   }
 );
 
-// Debug route to check user profile data
+
 router.get('/debug-user/:id', async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
@@ -204,20 +220,24 @@ router.get('/debug-user/:id', async (req, res) => {
       return res.json({ error: 'User not found' });
     }
     
+    // Use the SAME logic as the OAuth callback
     const isProfileComplete = 
       (user.surname || user.lastName || user.name) &&
       (user.otherNames || user.firstName || user.name) &&
       user.phone && 
       user.state && 
       user.passportUrl && 
-      user.signatureUrl;
+      user.signatureUrl &&
+      user.profileCompleted === true; // Add this back
 
     res.json({
       id: user._id,
       email: user.email,
       name: user.name,
       surname: user.surname,
+      lastName: user.lastName,
       otherNames: user.otherNames,
+      firstName: user.firstName,
       phone: user.phone,
       state: user.state,
       passportUrl: user.passportUrl,
@@ -225,14 +245,14 @@ router.get('/debug-user/:id', async (req, res) => {
       profileCompleted: user.profileCompleted,
       isProfileComplete: isProfileComplete,
       hasGoogleAuth: !!user.googleId,
-      missingFields: {
-        name: !user.name,
-        surname: !(user.surname || user.lastName || user.name),
-        otherNames: !(user.otherNames || user.firstName || user.name),
-        phone: !user.phone,
-        state: !user.state,
-        passportUrl: !user.passportUrl,
-        signatureUrl: !user.signatureUrl
+      individualChecks: {
+        nameCheck: !!(user.surname || user.lastName || user.name),
+        otherNamesCheck: !!(user.otherNames || user.firstName || user.name),
+        phoneCheck: !!user.phone,
+        stateCheck: !!user.state,
+        passportCheck: !!user.passportUrl,
+        signatureCheck: !!user.signatureUrl,
+        profileCompletedCheck: user.profileCompleted === true
       }
     });
   } catch (error) {
