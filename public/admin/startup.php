@@ -14,25 +14,86 @@
   <link href="/css/bootstrap.min.css" rel="stylesheet">
   <style>
     :root{
-      --brand:#0a7f41; --brand-700:#086d37; --ink:#0b1220; --muted:#6b7280; --surface:#fff;
-    }
-    html,body{height:100%}
-    body{font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, 'Helvetica Neue', Arial; background:#f6f8fa; color:var(--ink)}
-    .page{min-height:100vh; display:flex; align-items:center; justify-content:center; padding:32px}
-    .chooser{ width:100%; max-width:980px }
-    .header{ text-align:center; margin-bottom:22px }
-    .header img{ width:72px; height:auto; margin-bottom:8px }
-    .header h1{ font-weight:700; margin:0 0 6px }
-    .header .sub{ color:var(--muted) }
-    .role-card{ background:var(--surface); border-radius:18px; padding:24px; box-shadow:0 10px 30px rgba(16,24,40,.08); transition: transform .12s ease, box-shadow .12s ease; height:100% }
-    .role-card:hover{ transform: translateY(-2px); box-shadow:0 14px 34px rgba(16,24,40,.12) }
-    .role-icon{ width:64px; height:64px; display:flex; align-items:center; justify-content:center; border-radius:14px; background:#eaf7f0; color:var(--brand); font-size:28px; margin-bottom:14px }
-    .role-card h3{ font-weight:700; margin-bottom:6px }
-    .role-card p{ color:var(--muted); margin-bottom:18px }
-    .btn-brand{ background:var(--brand); border-color:var(--brand); color:#fff; font-weight:600; border-radius:12px; padding:.7rem 1rem }
-    .btn-outline-brand{ border-color:var(--brand); color:var(--brand); font-weight:600; border-radius:12px; padding:.7rem 1rem }
-    .back{ text-align:center; margin-top:16px }
-    .back a{ color:var(--brand); text-decoration:none; font-weight:600 }
+    --brand:#0a7f41; --brand-700:#086d37; --ink:#0b1220; --muted:#6b7280; --surface:#fff;
+  }
+  html,body{height:100%}
+  body{font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, 'Helvetica Neue', Arial; background:#f6f8fa; color:var(--ink)}
+  .page{min-height:100vh; display:flex; align-items:center; justify-content:center; padding:32px}
+  .chooser{ width:100%; max-width:980px }
+  .header{ text-align:center; margin-bottom:22px }
+  .header img{ width:72px; height:auto; margin-bottom:8px }
+  .header h1{ font-weight:700; margin:0 0 6px }
+  .header .sub{ color:var(--muted) }
+  
+  /* Updated role card styling */
+  .role-card{ 
+    background:var(--surface); 
+    border-radius:18px; 
+    padding:24px; 
+    box-shadow:0 10px 30px rgba(16,24,40,.08); 
+    transition: transform .12s ease, box-shadow .12s ease; 
+    height:100%;
+    text-align: center; /* Center all content in the card */
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center items horizontally */
+  }
+  
+  .role-card:hover{ transform: translateY(-2px); box-shadow:0 14px 34px rgba(16,24,40,.12) }
+  
+  /* Centered icon */
+  .role-icon{ 
+    width:64px; 
+    height:64px; 
+    display:flex; 
+    align-items:center; 
+    justify-content:center; 
+    border-radius:14px; 
+    background:#eaf7f0; 
+    color:var(--brand); 
+    font-size:28px; 
+    margin: 0 auto 14px auto; /* Center the icon and add bottom margin */
+  }
+  
+  /* Centered title */
+  .role-card h3{ 
+    font-weight:700; 
+    margin-bottom:6px;
+    text-align: center; /* Explicitly center the title */
+  }
+  
+  /* Centered description */
+  .role-card p{ 
+    color:var(--muted); 
+    margin-bottom:18px;
+    text-align: center; /* Center the description text */
+  }
+  
+  .btn-brand{ background:var(--brand); border-color:var(--brand); color:#fff; font-weight:600; border-radius:12px; padding:.7rem 1rem; width: 100%; }
+  .btn-outline-brand{ border-color:var(--brand); color:var(--brand); font-weight:600; border-radius:12px; padding:.7rem 1rem; width: 100%; }
+  .back{ text-align:center; margin-top:16px }
+  .back a{ color:var(--brand); text-decoration:none; font-weight:600 }
+  
+  /* Login link styling */
+  .login-link {
+    margin-top: 12px;
+    text-align: center;
+    width: 100%; /* Ensure full width for centering */
+  }
+  .login-link a {
+    color: var(--brand);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: color 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .login-link a:hover {
+    color: var(--brand-700);
+    text-decoration: underline;
+  }
   </style>
 </head>
 <!--Start of Tawk.to Script-->
@@ -68,7 +129,12 @@ s0.parentNode.insertBefore(s1,s0);
            <a href="/register.php" class="btn btn-brand w-100" id="goMember">
               Continue as Member
             </a>
-            <div class="mt-2 small text-muted">Tip: If you moved your member signup to <code>/member/register.php</code>, update the link above.</div>
+            <div class="login-link">
+              <a href="/member/login.php">
+                <i class="fas fa-sign-in-alt me-1"></i>
+                Already have an account? Login here
+              </a>
+            </div>
           </div>
         </div>
 
@@ -81,6 +147,12 @@ s0.parentNode.insertBefore(s1,s0);
             <a href="/admin/register.php" class="btn btn-outline-brand w-100" id="goAdmin">
               Continue as Admin
             </a>
+            <div class="login-link">
+              <a href="/admin/login.php">
+                <i class="fas fa-shield-alt me-1"></i>
+                Already have an admin account? Login here
+              </a>
+            </div>
           </div>
         </div>
       </div>
