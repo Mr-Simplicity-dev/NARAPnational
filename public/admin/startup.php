@@ -143,7 +143,7 @@ s0.parentNode.insertBefore(s1,s0);
           <div class="role-card h-100">
             <div class="role-icon" aria-hidden="true"><i class="fas fa-user-shield"></i></div>
             <h3>Admin</h3>
-            <p>Register an admin account to manage content, users, and system settings in the admin panel.</p>
+            <p>Register an administrator account to manage users, content, settings, and platform operations through the admin dashboard.</p>
             <a href="/admin/register.php" class="btn btn-outline-brand w-100" id="goAdmin">
               Continue as Admin
             </a>
