@@ -155,49 +155,43 @@ router.get('/google', (req, res, next) => {
 });
 
 router.get('/google/callback', 
-  passport.authenticate('google', { failureRedirect: '/register.php?error=google_auth_failed' }),
+  passport.authenticate('google', { failureRedirect: '/member/login.php?error=google_auth_failed' }),
   async (req, res) => {
     try {
       const user = req.user;
       const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET || 'secret', { expiresIn: '7d' });
       
-      // FIXED: Profile completeness check - removed profileCompleted flag requirement
+      // Check if profile is complete
       const isProfileComplete = 
-        (user.surname || user.lastName || user.name) &&
-        (user.otherNames || user.firstName || user.name) &&
+        (user.surname || user.lastName) &&
+        (user.otherNames || user.firstName) &&
         user.phone && 
         user.state && 
         user.passportUrl && 
-        user.signatureUrl;
+        user.signatureUrl &&
+        user.profileCompleted === true;
 
-      console.log('Google OAuth callback - Profile check:', {
+      console.log('Google OAuth callback:', {
         userId: user._id,
         email: user.email,
-        name: user.name,
-        surname: user.surname,
-        otherNames: user.otherNames,
-        phone: user.phone,
-        state: user.state,
-        passportUrl: !!user.passportUrl,
-        signatureUrl: !!user.signatureUrl,
-        profileCompleted: user.profileCompleted,
-        isProfileComplete: isProfileComplete
+        isProfileComplete,
+        source: req.session.googleAuthSource
       });
 
-      // PRIORITY 1: If profile is complete, go to dashboard
+      // Determine redirect based on source and profile completeness
+      const source = req.session.googleAuthSource || 'login';
+      
       if (isProfileComplete) {
         console.log('✅ Complete profile detected → Dashboard');
         res.redirect(`/member/dashboard.php?token=${token}&google_auth=success`);
-        return;
+      } else {
+        console.log('🔧 Incomplete profile → Profile setup');
+        res.redirect(`/member/profile-setup.php?token=${token}&google_auth=success`);
       }
-
-      // PRIORITY 2: If profile is incomplete, go to profile setup
-      console.log('🔧 Incomplete profile → Profile setup');
-      res.redirect(`/member/profile-setup.php?token=${token}&google_auth=success`);
       
     } catch (error) {
       console.error('Token generation error:', error);
-      res.redirect('/register.php?error=token_generation_failed');
+      res.redirect('/member/login.php?error=token_generation_failed');
     }
   }
 );
