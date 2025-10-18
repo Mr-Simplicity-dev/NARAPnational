@@ -1,3 +1,18 @@
+// Add this at the top of admin dashboard JavaScript
+(function() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const token = urlParams.get('token');
+  
+  if (token) {
+    console.log('🔑 Saving admin token from URL to localStorage');
+    localStorage.setItem('jwt', token);
+    
+    // Clean URL for security
+    const newUrl = window.location.pathname;
+    window.history.replaceState({}, document.title, newUrl);
+  }
+})();
+
 // ===== IMAGE UPLOAD FUNCTIONALITY - FIXED VERSION =====
 
 // Global flag to prevent multiple initializations

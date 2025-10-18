@@ -45,6 +45,43 @@
 </style>
 </head>
 <body>
+
+<!-- Add this to the top of your admin dashboard -->
+<div class="row mb-4">
+  <div class="col-md-3">
+    <div class="card text-center">
+      <div class="card-body">
+        <h3 class="text-primary" id="totalMembers">0</h3>
+        <p class="mb-0">Total Members</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card text-center">
+      <div class="card-body">
+        <h3 class="text-success" id="paidMembers">0</h3>
+        <p class="mb-0">Paid Members</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card text-center">
+      <div class="card-body">
+        <h3 class="text-warning" id="unpaidMembers">0</h3>
+        <p class="mb-0">Unpaid Members</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card text-center">
+      <div class="card-body">
+        <h3 class="text-info" id="totalDonations">₦0</h3>
+        <p class="mb-0">Total Donations</p>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="container py-4">
   <div class="d-flex align-items-center justify-content-between mb-4">
     <h1 class="h3 m-0">Admin Dashboard</h1>
