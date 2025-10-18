@@ -27,6 +27,9 @@
     .msg{border-radius:10px;padding:.55rem .8rem;margin:.25rem 0;font-size:.95rem}
     .msg.err{background:#fef2f2;color:#991b1b;border:1px solid #fecaca}
     .msg.ok{background:#ecfdf5;color:#065f46;border:1px solid #a7f3d0}
+    .back-link{margin-top:16px;text-align:center}
+    .back-link a{color:var(--brand);text-decoration:none;font-size:14px}
+    .back-link a:hover{text-decoration:underline}
   </style>
 </head>
 <body>
@@ -54,6 +57,11 @@
     </form>
 
     <div class="hint" style="margin-top:10px;">Forgot password? <a href="/admin/forgot.php">Reset</a></div>
+    
+    <!-- Back to unified login -->
+    <div class="back-link">
+      <a href="/login.php"><i class="fas fa-arrow-left"></i> Back to Login Options</a>
+    </div>
   </main>
 
   <script>
@@ -62,7 +70,6 @@
     try { history.replaceState(null,'',location.pathname); } catch(_) {}
 
     // Clear any existing tokens to prevent auto-redirect issues
-    // Only clear if we're specifically on login page and not redirected from dashboard
     try { 
       if (!document.referrer.includes('/admin/dashboard.php')) {
         const existingToken = localStorage.getItem('jwt');
@@ -76,16 +83,7 @@
       }
     } catch(_) {}
 
-    console.log('🟢 Login page loaded');
-    console.log('📍 Current page:', window.location.pathname);
-    console.log('🔑 Current JWT token:', localStorage.getItem('jwt') ? 'EXISTS' : 'NONE');
-
-    // Check if admin.js is being loaded (it shouldn't be on login page)
-    if (typeof authFetch !== 'undefined') {
-      console.error('❌ admin.js is being loaded on login page - this will cause redirect issues');
-    } else {
-      console.log('✅ admin.js not loaded on login page');
-    }
+    console.log('🟢 Admin login page loaded');
 
     const msg  = document.getElementById('loginMsg');
     const form = document.getElementById('loginForm');
@@ -118,7 +116,7 @@
 
     async function verifyTokenAndRedirect(token) {
       try {
-        console.log('🔍 Verifying token validity...');
+        console.log('🔍 Verifying admin token validity...');
         
         if (!token || token === 'cookie') {
           throw new Error('Invalid token format');
@@ -139,11 +137,16 @@
           const userData = await response.json().catch(() => ({}));
           console.log('✅ Token verified successfully:', userData.email || 'user');
           
-          show('ok', 'Authentication successful. Redirecting to dashboard...');
+          // CRITICAL: Check if user is actually an admin
+          if (userData.role !== 'admin') {
+            throw new Error('Access denied. Admin privileges required.');
+          }
+          
+          show('ok', 'Admin authentication successful. Redirecting to dashboard...');
           
           // Wait for the message to show, then redirect
           setTimeout(() => {
-            console.log('🔄 Redirecting to dashboard...');
+            console.log('🔄 Redirecting to admin dashboard...');
             window.location.href = '/admin/dashboard.php';
           }, 1500);
         } else {
@@ -151,9 +154,10 @@
           throw new Error(errorData.message || `Token verification failed (${response.status})`);
         }
       } catch (error) {
-        console.error('❌ Token verification error:', error);
+        console.error('❌ Admin token verification error:', error);
         show('err', 'Authentication failed: ' + error.message);
         btn.disabled = false;
+        btn.textContent = 'Login';
         
         // Clear the invalid token
         localStorage.removeItem('jwt');
@@ -167,7 +171,7 @@
       clearMsg();
       
       try{
-        console.log('🔄 Attempting login for:', email);
+        console.log('🔄 Attempting admin login for:', email);
         
         const res = await fetch(LOGIN_URL, {
           method: 'POST',
@@ -189,21 +193,25 @@
         // Handle different response formats
         let token = null;
         let success = false;
+        let userRole = null;
 
         // Check for success flag (newer format)
         if (data.hasOwnProperty('success')) {
           success = data.success;
           token = data.token;
+          userRole = data.user?.role;
         } 
         // Check for token directly (older format)
         else if (data.token || data.jwt) {
           success = true;
           token = data.token || data.jwt;
+          userRole = data.user?.role;
         }
         // Check nested data object
         else if (data.data && data.data.token) {
           success = true;
           token = data.data.token;
+          userRole = data.data.user?.role;
         }
 
         if (!success) {
@@ -214,7 +222,12 @@
           throw new Error('No authentication token received from server');
         }
 
-        console.log('✅ Login successful, token received');
+        // CRITICAL: Check if user is admin BEFORE storing token
+        if (userRole !== 'admin') {
+          throw new Error('Access denied. This account does not have admin privileges. Please use member login instead.');
+        }
+
+        console.log('✅ Admin login successful, token received');
         
         // Store the token
         saveJwt(token);
@@ -223,8 +236,8 @@
         await verifyTokenAndRedirect(token);
         
       } catch(e){
-        console.error('❌ Login error:', e);
-        show('err', e.message || 'Login failed');
+        console.error('❌ Admin login error:', e);
+        show('err', e.message || 'Admin login failed');
         btn.disabled = false;
         btn.textContent = 'Login';
       }
@@ -251,53 +264,24 @@
     });
 
     // Check for existing valid token on page load
-    // But only if we're not coming from a logout or fresh visit
     const existingToken = localStorage.getItem('jwt');
     const isFromLogout = sessionStorage.getItem('justLoggedOut') === 'true';
     
     if (existingToken && existingToken !== 'cookie' && !isFromLogout) {
-      console.log('🔍 Found existing token, verifying validity...');
-      show('ok', 'Checking existing session...');
+      console.log('🔍 Found existing token, verifying admin validity...');
+      show('ok', 'Checking existing admin session...');
       verifyTokenAndRedirect(existingToken);
     } else if (isFromLogout) {
-      console.log('ℹ️ User just logged out, clearing logout flag');
+      console.log('ℹ️ Admin just logged out, clearing logout flag');
       sessionStorage.removeItem('justLoggedOut');
     } else {
-      console.log('ℹ️ No existing token found, ready for fresh login');
+      console.log('ℹ️ No existing token found, ready for fresh admin login');
     }
 
     // Focus on email field for better UX
     document.getElementById('loginIdentifier').focus();
 
   })();
-  </script>
-
-  <!-- Debug information script -->
-  <script>
-  // Additional debugging for troubleshooting
-  window.addEventListener('load', function() {
-    console.log('🔧 Debug Info:');
-    console.log('  - Page URL:', window.location.href);
-    console.log('  - Referrer:', document.referrer);
-    console.log('  - LocalStorage JWT:', localStorage.getItem('jwt') ? 'Present' : 'None');
-    console.log('  - SessionStorage items:', Object.keys(sessionStorage));
-    
-    // Check if we're being redirected in a loop
-    const redirectCount = sessionStorage.getItem('loginRedirectCount') || '0';
-    const newCount = parseInt(redirectCount) + 1;
-    sessionStorage.setItem('loginRedirectCount', newCount.toString());
-    
-    if (newCount > 3) {
-      console.warn('⚠️ Multiple redirects detected - possible redirect loop');
-      sessionStorage.removeItem('loginRedirectCount');
-      localStorage.removeItem('jwt');
-    } else {
-      // Clear redirect count after successful page load
-      setTimeout(() => {
-        sessionStorage.removeItem('loginRedirectCount');
-      }, 5000);
-    }
-  });
   </script>
 </body>
 </html>
