@@ -9,7 +9,6 @@ import passport from 'passport';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 const router = express.Router();
 
-
 // Configure Google OAuth Strategy
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
@@ -88,23 +87,30 @@ router.get('/google/callback',
       const user = req.user;
       const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET || 'secret', { expiresIn: '7d' });
       
-      // Check if profile is complete FIRST
+      // FIXED: Profile completeness check - removed profileCompleted flag requirement
       const isProfileComplete = 
-        (user.surname || user.lastName) &&
-        (user.otherNames || user.firstName) &&
+        (user.surname || user.lastName || user.name) &&
+        (user.otherNames || user.firstName || user.name) &&
         user.phone && 
         user.state && 
         user.passportUrl && 
-        user.signatureUrl &&
-        user.profileCompleted === true;
+        user.signatureUrl;
 
-      console.log('Google OAuth callback:', {
+      console.log('Google OAuth callback - Profile check:', {
         userId: user._id,
         email: user.email,
-        isProfileComplete
+        name: user.name,
+        surname: user.surname,
+        otherNames: user.otherNames,
+        phone: user.phone,
+        state: user.state,
+        passportUrl: !!user.passportUrl,
+        signatureUrl: !!user.signatureUrl,
+        profileCompleted: user.profileCompleted,
+        isProfileComplete: isProfileComplete
       });
 
-      // PRIORITY 1: If profile is complete, always go to dashboard
+      // PRIORITY 1: If profile is complete, go to dashboard
       if (isProfileComplete) {
         console.log('✅ Complete profile detected → Dashboard');
         res.redirect(`/member/dashboard.php?token=${token}&google_auth=success`);
@@ -122,50 +128,49 @@ router.get('/google/callback',
   }
 );
 
-// Temporary debug route - add this after your Google callback
-router.get('/debug-user/:email', async (req, res) => {
+// Debug route to check user profile data
+router.get('/debug-user/:id', async (req, res) => {
   try {
-    const user = await User.findOne({ email: req.params.email });
+    const user = await User.findById(req.params.id);
     if (!user) {
       return res.json({ error: 'User not found' });
     }
     
     const isProfileComplete = 
-      (user.surname || user.lastName) &&
-      (user.otherNames || user.firstName) &&
+      (user.surname || user.lastName || user.name) &&
+      (user.otherNames || user.firstName || user.name) &&
       user.phone && 
       user.state && 
       user.passportUrl && 
-      user.signatureUrl &&
-      user.profileCompleted === true;
+      user.signatureUrl;
 
     res.json({
+      id: user._id,
       email: user.email,
+      name: user.name,
+      surname: user.surname,
+      otherNames: user.otherNames,
+      phone: user.phone,
+      state: user.state,
+      passportUrl: user.passportUrl,
+      signatureUrl: user.signatureUrl,
       profileCompleted: user.profileCompleted,
-      isComplete: isProfileComplete,
-      fields: {
-        surname: user.surname || null,
-        lastName: user.lastName || null,
-        otherNames: user.otherNames || null,
-        firstName: user.firstName || null,
-        phone: user.phone || null,
-        state: user.state || null,
-        passportUrl: user.passportUrl || null,
-        signatureUrl: user.signatureUrl || null
-      },
-      missing: {
-        name: !(user.surname || user.lastName),
-        otherNames: !(user.otherNames || user.firstName),
+      isProfileComplete: isProfileComplete,
+      hasGoogleAuth: !!user.googleId,
+      missingFields: {
+        name: !user.name,
+        surname: !(user.surname || user.lastName || user.name),
+        otherNames: !(user.otherNames || user.firstName || user.name),
         phone: !user.phone,
         state: !user.state,
         passportUrl: !user.passportUrl,
-        signatureUrl: !user.signatureUrl,
-        profileCompleted: user.profileCompleted !== true
+        signatureUrl: !user.signatureUrl
       }
     });
   } catch (error) {
     res.json({ error: error.message });
   }
+});
 
 /* --------------------------------- uploads -------------------------------- */
 const memberPassportDir = path.join(process.cwd(), 'public', 'admin', 'uploads', 'passports');

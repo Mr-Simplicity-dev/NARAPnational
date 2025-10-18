@@ -136,14 +136,19 @@ async function checkProfileAndRedirect(token) {
     if (profileRes.ok) {
       const profile = await profileRes.json();
       
+      // FIXED: Profile completeness check - removed profileCompleted flag requirement
       const isProfileComplete = 
         (profile.surname || profile.lastName || profile.name) &&
         (profile.otherNames || profile.firstName || profile.name) &&
         profile.phone && 
         profile.state && 
         profile.passportUrl && 
-        profile.signatureUrl &&
-        profile.profileCompleted === true;
+        profile.signatureUrl;
+
+      console.log('Frontend profile check:', {
+        isComplete: isProfileComplete,
+        profile: profile
+      });
 
       if (isProfileComplete) {
         window.location.href = '/member/dashboard.php';
