@@ -1553,120 +1553,153 @@
         </div>
 
         <!-- Enhanced PAID MEMBERS -->
-        <div id="members-paid" class="content-tab-pane">
-            <div class="filter-section">
-                <div class="row g-3 align-items-end">
-                    <div class="col-md-3">
-                        <label class="form-label">Search (name/email/member ID/state)</label>
-                        <input id="paidSearch" class="form-control" placeholder="Search…">
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label">Filter by State:</label>
-                        <select id="stateFilterPaid" class="form-select">
-                            <option value="">All States</option>
-                            <!-- State options here -->
-                        </select>
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label">Count as "Paid" if…</label>
-                        <div class="d-flex gap-3 flex-wrap">
-                            <div class="form-check"><input class="form-check-input" type="checkbox" id="paidFeeMembership" checked><label class="form-check-label" for="paidFeeMembership">Membership fee</label></div>
-                            <div class="form-check"><input class="form-check-input" type="checkbox" id="paidFeeCertificate" checked><label class="form-check-label" for="paidFeeCertificate">Certificate</label></div>
-                            <div class="form-check"><input class="form-check-input" type="checkbox" id="paidFeeIdcard" checked><label class="form-check-label" for="paidFeeIdcard">ID card</label></div>
-                        </div>
-                        <div class="form-check mt-2">
-                            <input class="form-check-input" type="checkbox" id="paidLogicAll">
-                            <label class="form-check-label" for="paidLogicAll">Require <strong>all selected</strong> fees (unchecked = any one)</label>
-                        </div>
-                    </div>
-                    <div class="col-md-2 text-md-end">
-                        <button class="btn btn-modern" id="btnReloadPaid">Reload</button>
-                        <button class="btn btn-outline-modern" id="btnExportPaid">Export CSV</button>
-                    </div>
+<div id="members-paid" class="content-tab-pane">
+    <div class="filter-section">
+        <div class="row g-3 align-items-end">
+            <div class="col-md-3">
+                <label class="form-label">Search (name/email/member ID/state)</label>
+                <input id="paidSearch" class="form-control" placeholder="Search…">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Filter by State:</label>
+                <select id="stateFilterPaid" class="form-select">
+                    <option value="">All States</option>
+                    <!-- State options here -->
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Count as "Paid" if…</label>
+                <div class="d-flex gap-3 flex-wrap">
+                    <div class="form-check"><input class="form-check-input" type="checkbox" id="paidFeeMembership" checked><label class="form-check-label" for="paidFeeMembership">Membership fee</label></div>
+                    <div class="form-check"><input class="form-check-input" type="checkbox" id="paidFeeCertificate" checked><label class="form-check-label" for="paidFeeCertificate">Certificate</label></div>
+                    <div class="form-check"><input class="form-check-input" type="checkbox" id="paidFeeIdcard" checked><label class="form-check-label" for="paidFeeIdcard">ID card</label></div>
+                </div>
+                <div class="form-check mt-2">
+                    <input class="form-check-input" type="checkbox" id="paidLogicAll">
+                    <label class="form-check-label" for="paidLogicAll">Require <strong>all selected</strong> fees (unchecked = any one)</label>
                 </div>
             </div>
-            
-            <div class="modern-card">
-                <div class="card-body">
-                    <h5>Paid Members</h5>
-                    <div class="table-responsive">
-                        <table class="table table-modern align-middle">
-                            <thead>
-                                <tr>
-                                    <th>S/N</th>
-                                    <th>Name</th>
-                                    <th>Email</th>
-                                    <th>Member ID</th>
-                                    <th>State</th>
-                                    <th>Paid</th>
-                                </tr>
-                            </thead>
-                            <tbody id="list-members-paid"></tbody>
-                        </table>
-                    </div>
-                    <div class="d-flex justify-content-between align-items-center mt-3">
-                        <small class="text-muted" id="paidCount"></small>
-                        <div class="btn-group">
-                            <button class="btn btn-sm btn-outline-secondary" id="paidPrev">Prev</button>
-                            <button class="btn btn-sm btn-outline-secondary" id="paidNext">Next</button>
-                        </div>
-                    </div>
-                                </div>
-                </div>
+            <div class="col-md-2 text-md-end">
+                <button class="btn btn-modern" id="btnReloadPaid">Reload</button>
+                <button class="btn btn-outline-modern" id="btnExportPaid">Export CSV</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modern-card">
+        <div class="card-body">
+            <h5>Paid Members</h5>
+            <div class="table-responsive">
+                <table class="table table-modern align-middle">
+                    <thead>
+                        <tr>
+                            <th>S/N</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Member ID</th>
+                            <th>State</th>
+                            <th>Paid</th>
+                        </tr>
+                    </thead>
+                    <tbody id="list-members-paid"></tbody>
+                </table>
+            </div>
+            <div class="d-flex justify-content-between align-items-center mt-3">
+                <small class="text-muted" id="paidCount"></small>
+                <div class="btn-group">
+                    <button class="btn btn-sm btn-outline-secondary" id="paidPrev">Prev</button>
+                    <button class="btn btn-sm btn-outline-secondary" id="paidNext">Next</button>
                 </div>
             </div>
+        </div>
+    </div>
+</div>
 
-            <!-- Enhanced UNPAID MEMBERS -->
-            <div id="members-unpaid" class="content-tab-pane">
-                <div class="filter-section">
-                    <div class="row g-3 align-items-end">
-                        <div class="col-md-4">
-                            <label class="form-label">Search (name/email/member ID/state)</label>
-                            <input id="unpaidSearch" class="form-control" placeholder="Search…">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Filter by State:</label>
-                            <select id="stateFilterUnpaid" class="form-select">
-                                <option value="">All States</option>
-                                <!-- State options here -->
-                            </select>
-                        </div>
-                        <div class="col-md-4 text-md-end">
-                            <button class="btn btn-modern" id="btnReloadUnpaid">Reload</button>
-                            <button class="btn btn-outline-modern" id="btnExportUnpaid">Export CSV</button>
-                        </div>
-                    </div>
-                    <small class="text-muted d-block mt-2">Shows users who completed signup (have dashboards) but have not paid membership, certificate, or ID card fees.</small>
-                </div>
-                
-                <div class="modern-card">
-                    <div class="card-body">
-                        <h5>Unpaid Members</h5>
-                        <div class="table-responsive">
-                            <table class="table table-modern align-middle">
-                                <thead>
-                                    <tr>
-                                        <th>S/N</th>
-                                        <th>Name</th>
-                                        <th>Email</th>
-                                        <th>Member ID</th>
-                                        <th>State</th>
-                                        <th>Unpaid Fees</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="list-members-unpaid"></tbody>
-                            </table>
-                        </div>
-                        <div class="d-flex justify-content-between align-items-center mt-3">
-                            <small class="text-muted" id="unpaidCount"></small>
-                            <div class="btn-group">
-                                <button class="btn btn-sm btn-outline-secondary" id="unpaidPrev">Prev</button>
-                                <button class="btn btn-sm btn-outline-secondary" id="unpaidNext">Next</button>
-                            </div>
-                        </div>
-                    </div>
+           <!-- Enhanced UNPAID MEMBERS -->
+<div id="members-unpaid" class="content-tab-pane">
+    <div class="filter-section">
+        <div class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label">Search (name/email/member ID/state)</label>
+                <input id="unpaidSearch" class="form-control" placeholder="Search…">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Filter by State:</label>
+                <select id="stateFilterUnpaid" class="form-select">
+                    <option value="">All States</option>
+                    <!-- State options here -->
+                </select>
+            </div>
+            <div class="col-md-4 text-md-end">
+                <button class="btn btn-modern" id="btnReloadUnpaid">Reload</button>
+                <button class="btn btn-outline-modern" id="btnExportUnpaid">Export CSV</button>
+            </div>
+        </div>
+        <small class="text-muted d-block mt-2">Shows users who completed signup (have dashboards) but have not paid membership, certificate, or ID card fees.</small>
+    </div>
+    
+    <div class="modern-card">
+        <div class="card-body">
+            <h5>Unpaid Members</h5>
+            <div class="table-responsive">
+                <table class="table table-modern align-middle">
+                    <thead>
+                        <tr>
+                            <th>S/N</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Member ID</th>
+                            <th>State</th>
+                            <th>Unpaid Fees</th>
+                        </tr>
+                    </thead>
+                    <tbody id="list-members-unpaid"></tbody>
+                </table>
+            </div>
+            <div class="d-flex justify-content-between align-items-center mt-3">
+                <small class="text-muted" id="unpaidCount"></small>
+                <div class="btn-group">
+                    <button class="btn btn-sm btn-outline-secondary" id="unpaidPrev">Prev</button>
+                    <button class="btn btn-sm btn-outline-secondary" id="unpaidNext">Next</button>
                 </div>
             </div>
+        </div>
+    </div>
+</div>
+3. Video Upload Section for Sliders
+Replace the video section in your slider form (around line where you have the video URL field) with this enhanced version:
+
+<div class="form-section">
+    <h6>Video Configuration</h6>
+    <div class="row g-3">
+        <div class="col-md-6">
+            <label class="form-label">CTA1 Video URL</label>
+            <input name="cta1.videoUrl" class="form-control" placeholder="https://youtube.com/watch?v=... or https://vimeo.com/...">
+            <div class="form-text">YouTube, Vimeo, or direct video URL</div>
+        </div>
+        <div class="col-md-6">
+            <label class="form-label">Or Upload Video File</label>
+            <div class="image-upload-container" data-target="sliderVideo">
+                <div class="upload-placeholder">
+                    <i class="fas fa-video fa-2x mb-2"></i>
+                    <p>Click to upload video or drag and drop</p>
+                    <p class="small">MP4, WEBM, OGV up to 50MB</p>
+                </div>
+                <video class="image-preview" id="sliderVideoPreview" controls style="display:none; max-width:200px; max-height:150px;"></video>
+                <input type="file" class="d-none" accept="video/*" id="sliderVideoUpload">
+                <input type="hidden" name="cta1.videoFile" id="sliderVideoUrl">
+            </div>
+            <div class="d-flex mt-2 gap-2">
+                <button type="button" class="btn btn-outline-modern btn-sm" data-action="choose-video" data-target="sliderVideo">
+                    <i class="fas fa-upload me-1"></i> Choose Video
+                </button>
+                <button type="button" class="btn btn-outline-danger btn-sm" data-action="clear-video" data-target="sliderVideo">
+                    <i class="fas fa-times me-1"></i> Clear
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 
             <!-- Enhanced DONATIONS -->
             <div id="donations" class="content-tab-pane">
@@ -1960,6 +1993,62 @@
             this.closest('.col-md-6, .col-md-4, .col-md-8, .col-12')?.classList.remove('focused');
         });
     });
+
+    // Enhanced video upload handling
+document.querySelectorAll('[data-action="choose-video"]').forEach(button => {
+    button.addEventListener('click', function() {
+        const target = this.getAttribute('data-target');
+        const fileInput = document.getElementById(target + 'Upload');
+        if (fileInput) {
+            fileInput.click();
+        }
+    });
+});
+
+document.querySelectorAll('[data-action="clear-video"]').forEach(button => {
+    button.addEventListener('click', function() {
+        const target = this.getAttribute('data-target');
+        const fileInput = document.getElementById(target + 'Upload');
+        const preview = document.getElementById(target + 'Preview');
+        const hiddenInput = document.getElementById(target.replace('Video', '') + 'VideoUrl');
+        
+        if (fileInput) fileInput.value = '';
+        if (preview) {
+            preview.style.display = 'none';
+            preview.src = '';
+        }
+        if (hiddenInput) hiddenInput.value = '';
+    });
+});
+
+// Video file upload preview
+document.querySelectorAll('input[type="file"][accept="video/*"]').forEach(input => {
+    input.addEventListener('change', function() {
+        const file = this.files[0];
+        const targetName = this.id.replace('Upload', '');
+        const preview = document.getElementById(targetName + 'Preview');
+        
+        if (file && preview) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+});
+
+// Enhanced image upload container click handling for videos
+document.querySelectorAll('.image-upload-container[data-target*="Video"]').forEach(container => {
+    container.addEventListener('click', function() {
+        const target = this.getAttribute('data-target');
+        const fileInput = document.getElementById(target + 'Upload');
+        if (fileInput) {
+            fileInput.click();
+        }
+    });
+});
     </script>
     
     <script src="/admin/admin.js"></script>
