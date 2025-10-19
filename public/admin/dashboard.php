@@ -217,6 +217,7 @@
             border-radius: 20px;
             box-shadow: var(--shadow-sm);
             transition: all 0.3s ease;
+            margin-bottom: 1.5rem;
         }
 
         .modern-card:hover {
@@ -510,43 +511,801 @@
                 </div>
             </div>
 
-            <!-- Content Management Sections -->
-            <!-- These will be populated with the actual content from dashboard copy 2 -->
+            <!-- HOME SETTINGS -->
             <div id="home-settings" class="content-tab-pane">
-                <div class="modern-card p-4">
-                    <h4>Home Settings</h4>
-                    <p class="text-muted">Configure homepage content and sections</p>
-                    <!-- Home settings content from copy 2 will go here -->
+                <div class="modern-card">
+                    <div class="card-body">
+                        <h5 class="mb-3">About Section</h5>
+                        <form id="form-home-about" class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label req">About Title</label>
+                                <input name="about.title" class="form-control" placeholder="About Us">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label req">About Headline</label>
+                                <input name="about.headline" class="form-control" placeholder="Keeping you Cool, in Every Step">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Paragraphs (one per line)</label>
+                                <textarea name="about.paragraphs" class="form-control" rows="4" placeholder="Line 1&#10;Line 2"></textarea>
+                                <div class="form-text text-muted">Each line becomes a paragraph on the homepage.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">About Image</label>
+                                <div class="image-upload-container" data-target="aboutImage">
+                                    <div class="upload-placeholder">
+                                        <i class="fas fa-cloud-upload-alt fa-2x mb-2"></i>
+                                        <p>Click to upload or drag and drop</p>
+                                        <p class="small">PNG, JPG, GIF up to 5MB</p>
+                                    </div>
+                                    <img class="image-preview img-fluid rounded" id="aboutImagePreview">
+                                    <input type="file" class="d-none" accept="image/*" id="aboutImageUpload">
+                                    <input type="hidden" name="about.image" id="aboutImageUrl">
+                                </div>
+                                <div class="d-flex mt-2 gap-2">
+                                    <button type="button" class="btn btn-outline-primary btn-sm" data-action="choose-image" data-target="aboutImage">
+                                        <i class="fas fa-upload me-1"></i> Choose Image
+                                    </button>
+                                    <button type="button" class="btn btn-outline-danger btn-sm" data-action="clear-image" data-target="aboutImage">
+                                        <i class="fas fa-times me-1"></i> Clear
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-12 sticky-actions">
+                                <button class="btn btn-modern" type="submit">Save About</button>
+                                <small class="ms-2 text-muted" id="aboutStatus"></small>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="modern-card">
+                    <div class="card-body">
+                        <h5 class="mb-3">Section Titles & Subtitles</h5>
+                        <form id="form-home-sections" class="row g-3">
+                            <div class="col-md-4"><label class="form-label req">Services Title</label><input name="services.title" class="form-control" placeholder="What We Do"></div>
+                            <div class="col-md-8"><label class="form-label">Services Subtitle</label><input name="services.subtitle" class="form-control"></div>
+                            <div class="col-md-4"><label class="form-label req">Projects Title</label><input name="projects.title" class="form-control" placeholder="Our Projects"></div>
+                            <div class="col-md-8"><label class="form-label">Projects Subtitle</label><input name="projects.subtitle" class="form-control"></div>
+                            <div class="col-md-4"><label class="form-label req">Features Title</label><input name="features.title" class="form-control" placeholder="Why Choose Us"></div>
+                            <div class="col-md-8"><label class="form-label">Features Headline</label><input name="features.headline" class="form-control"></div>
+                            <div class="col-md-4"><label class="form-label">Offer Title</label><input name="offer.title" class="form-control"></div>
+                            <div class="col-md-4"><label class="form-label">Blog Title</label><input name="blog.title" class="form-control" placeholder="Our Blog & News"></div>
+                            <div class="col-md-4"><label class="form-label">Blog Show Count</label><input name="blog.showCount" type="number" min="1" max="12" class="form-control" placeholder="3"></div>
+                            <div class="col-md-4"><label class="form-label">FAQs Title</label><input name="faqs.title" class="form-control" placeholder="Frequently Asked Questions"></div>
+                            <div class="col-md-8">
+                                <label class="form-label">FAQs Side Image</label>
+                                <div class="image-upload-container" data-target="faqsImage">
+                                    <div class="upload-placeholder">
+                                        <i class="fas fa-cloud-upload-alt fa-2x mb-2"></i>
+                                        <p>Click to upload or drag and drop</p>
+                                        <p class="small">PNG, JPG, GIF up to 5MB</p>
+                                    </div>
+                                    <img class="image-preview img-fluid rounded" id="faqsImagePreview">
+                                    <input type="file" class="d-none" accept="image/*" id="faqsImageUpload">
+                                    <input type="hidden" name="faqs.image" id="faqsImageUrl">
+                                </div>
+                                <div class="d-flex mt-2 gap-2">
+                                    <button type="button" class="btn btn-outline-primary btn-sm" data-action="choose-image" data-target="faqsImage">
+                                        <i class="fas fa-upload me-1"></i> Choose Image
+                                    </button>
+                                    <button type="button" class="btn btn-outline-danger btn-sm" data-action="clear-image" data-target="faqsImage">
+                                        <i class="fas fa-times me-1"></i> Clear
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-md-4"><label class="form-label">Team Title</label><input name="team.title" class="form-control" placeholder="Meet Our Executive"></div>
+                            <div class="col-12 sticky-actions">
+                                <button class="btn btn-modern" type="submit">Save Sections</button>
+                                <small class="ms-2 text-muted" id="sectionsStatus"></small>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
 
+            <!-- SLIDERS -->
             <div id="sliders" class="content-tab-pane">
-                <div class="modern-card p-4">
-                    <h4>Sliders Management</h4>
-                    <p class="text-muted">Manage homepage sliders and banners</p>
-                    <!-- Sliders content from copy 2 will go here -->
+                <div class="modern-card">
+                    <div class="card-body">
+                        <h5 class="mb-3">Add / Edit Slider</h5>
+                        <form id="form-slider" class="row g-3">
+                            <input type="hidden" name="_id">
+                            <div class="col-md-4"><label class="form-label req">Kicker</label><input name="kicker" class="form-control" placeholder="Providing Comfort"></div>
+                            <div class="col-md-8"><label class="form-label req">Headline</label><input name="headline" class="form-control" placeholder="Across Sectors"></div>
+                            <div class="col-12"><label class="form-label">Text</label><textarea name="text" class="form-control" rows="3"></textarea></div>
+                            
+                            <!-- CTA1 Fields -->
+                            <div class="col-md-6"><label class="form-label">CTA1 Label</label><input name="cta1.label" class="form-control" placeholder="Watch Video"></div>
+                            <div class="col-md-6"><label class="form-label">CTA1 Href</label><input name="cta1.href" class="form-control" placeholder="#video"></div>
+                            
+                            <!-- Video Fields -->
+                            <div class="col-md-6">
+                                <label class="form-label">CTA1 Video URL</label>
+                                <input name="cta1.videoUrl" class="form-control" placeholder="https://youtube.com/watch?v=... or https://vimeo.com/...">
+                                <div class="form-text">YouTube, Vimeo, or direct video URL</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Or Upload Video File</label>
+                                <div class="image-upload-container" data-target="sliderVideo">
+                                    <div class="upload-placeholder">
+                                        <i class="fas fa-video fa-2x mb-2"></i>
+                                        <p>Click to upload video or drag and drop</p>
+                                        <p class="small">MP4, WEBM, OGV up to 50MB</p>
+                                    </div>
+                                    <video class="image-preview" id="sliderVideoPreview" controls style="display:none; max-width:200px; max-height:150px;"></video>
+                                    <input type="file" class="d-none" accept="video/*" id="sliderVideoUpload">
+                                    <input type="hidden" name="cta1.videoFile" id="sliderVideoUrl">
+                                </div>
+                                <div class="d-flex mt-2 gap-2">
+                                    <button type="button" class="btn btn-outline-primary btn-sm" data-action="choose-video" data-target="sliderVideo">
+                                        <i class="fas fa-upload me-1"></i> Choose Video
+                                    </button>
+                                    <button type="button" class="btn btn-outline-danger btn-sm" data-action="clear-video" data-target="sliderVideo">
+                                        <i class="fas fa-times me-1"></i> Clear
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- CTA2 Fields -->
+                            <div class="col-md-6"><label class="form-label">CTA2 Label</label><input name="cta2.label" class="form-control" placeholder="Contact Us"></div>
+                            <div class="col-md-6"><label class="form-label">CTA2 Href</label><input name="cta2.href" class="form-control" placeholder="#contact"></div>
+                            
+                            <!-- Slider Image -->
+                            <div class="col-md-8">
+                                <label class="form-label req">Slider Image</label>
+                                <div class="image-upload-container" data-target="sliderImage">
+                                    <div class="upload-placeholder">
+                                        <i class="fas fa-cloud-upload-alt fa-2x mb-2"></i>
+                                        <p>Click to upload or drag and drop</p>
+                                        <p class="small">PNG, JPG, GIF up to 5MB</p>
+                                    </div>
+                                    <img class="image-preview img-fluid rounded" id="sliderImagePreview">
+                                    <input type="file" class="d-none" accept="image/*" id="sliderImageUpload">
+                                    <input type="hidden" name="image" id="sliderImageUrl">
+                                </div>
+                                <div class="d-flex mt-2 gap-2">
+                                    <button type="button" class="btn btn-outline-primary btn-sm" data-action="choose-image" data-target="sliderImage">
+                                        <i class="fas fa-upload me-1"></i> Choose Image
+                                    </button>
+                                    <button type="button" class="btn btn-outline-danger btn-sm" data-action="clear-image" data-target="sliderImage">
+                                        <i class="fas fa-times me-1"></i> Clear
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Order Field -->
+                            <div class="col-md-4"><label class="form-label">Order</label><input name="order" type="number" class="form-control" placeholder="1"></div>
+                            
+                            <!-- Form Actions -->
+                            <div class="col-12 sticky-actions">
+                                <button class="btn btn-modern" type="submit">Save Slider</button>
+                                <button class="btn btn-outline-secondary" type="button" id="resetSliderForm">Reset</button>
+                                <small class="ms-2 text-muted" id="sliderStatus"></small>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- All Slides Table -->
+                <div class="modern-card">
+                    <div class="card-body">
+                        <h5 class="mb-3">All Slides</h5>
+                        <div class="table-responsive">
+                            <table class="table align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Preview</th>
+                                        <th>Kicker</th>
+                                        <th>Headline</th>
+                                        <th>Buttons</th>
+                                        <th>Video</th>
+                                        <th>Order</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="list-sliders"></tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Add other content sections similarly -->
-            <div id="services" class="content-tab-pane"><div class="modern-card p-4"><h4>Services</h4></div></div>
-            <div id="projects" class="content-tab-pane"><div class="modern-card p-4"><h4>Projects</h4></div></div>
-            <div id="features" class="content-tab-pane"><div class="modern-card p-4"><h4>Features</h4></div></div>
-            <div id="offers" class="content-tab-pane"><div class="modern-card p-4"><h4>Offers</h4></div></div>
-            <div id="blogs" class="content-tab-pane"><div class="modern-card p-4"><h4>Blogs</h4></div></div>
-            <div id="faqs" class="content-tab-pane"><div class="modern-card p-4"><h4>FAQs</h4></div></div>
-            <div id="team" class="content-tab-pane"><div class="modern-card p-4"><h4>Team</h4></div></div>
+            <!-- SERVICES -->
+            <div id="services" class="content-tab-pane">
+                <div class="modern-card">
+                    <div class="card-body">
+                        <h5 class="mb-3">Service</h5>
+                        <form id="form-service" class="row g-3">
+                            <input type="hidden" name="_id">
+                            <div class="col-md-6"><label class="form-label req">Title</label><input name="title" class="form-control"></div>
+                            <div class="col-md-6">
+                                <label class="form-label">Service Image</label>
+                                <div class="image-upload-container" data-target="serviceImage">
+                                    <div class="upload-placeholder">
+                                        <i class="fas fa-cloud-upload-alt fa-2x mb-2"></i>
+                                        <p>Click to upload or drag and drop</p>
+                                        <p class="small">PNG, JPG, GIF up to 5MB</p>
+                                    </div>
+                                    <img class="image-preview img-fluid rounded" id="serviceImagePreview">
+                                    <input type="file" class="d-none" accept="image/*" id="serviceImageUpload">
+                                    <input type="hidden" name="image" id="serviceImageUrl">
+                                </div>
+                                <div class="d-flex mt-2 gap-2">
+                                    <button type="button" class="btn btn-outline-primary btn-sm" data-action="choose-image" data-target="serviceImage">
+                                        <i class="fas fa-upload me-1"></i> Choose Image
+                                    </button>
+                                    <button type="button" class="btn btn-outline-danger btn-sm" data-action="clear-image" data-target="serviceImage">
+                                        <i class="fas fa-times me-1"></i> Clear
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-12"><label class="form-label">Description</label><textarea name="description" class="form-control" rows="3"></textarea></div>
+                            <div class="col-md-6"><label class="form-label">Link (optional)</label><input name="link" class="form-control" placeholder="/services#install"></div>
+                            <div class="col-12 sticky-actions">
+                                <button class="btn btn-modern" type="submit">Save Service</button>
+                                <button class="btn btn-outline-secondary" type="button" data-reset="#form-service">Reset</button>
+                                <small class="ms-2 text-muted" id="serviceStatus"></small>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="modern-card">
+                    <div class="card-body">
+                        <h5 class="mb-3">All Services</h5>
+                        <div class="table-responsive">
+                            <table class="table align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Preview</th>
+                                        <th>Title</th>
+                                        <th>Description</th>
+                                        <th>Link</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="list-services"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-            <!-- Members Management Sections -->
-            <div id="members-all" class="content-tab-pane"><div class="modern-card p-4"><h4>All Members</h4></div></div>
-            <div id="members-paid" class="content-tab-pane"><div class="modern-card p-4"><h4>Paid Members</h4></div></div>
-            <div id="members-unpaid" class="content-tab-pane"><div class="modern-card p-4"><h4>Unpaid Members</h4></div></div>
+            <!-- Add other sections similarly... -->
 
-            <!-- Donations Section -->
-            <div id="donations" class="content-tab-pane"><div class="modern-card p-4"><h4>Donations</h4></div></div>
+             <!-- PROJECTS -->
+            <div id="projects" class="content-tab-pane">
+                <div class="modern-card">
+                    <div class="card-body">
+                        <h5 class="mb-3">Project</h5>
+                        <form id="form-project" class="row g-3">
+                            <input type="hidden" name="_id">
+                            <div class="col-md-6"><label class="form-label req">Title</label><input name="title" class="form-control"></div>
+                            <div class="col-md-6"><label class="form-label">Category</label><input name="category" class="form-control" placeholder="HVAC"></div>
+                            <div class="col-md-6">
+                                <label class="form-label">Project Image</label>
+                                <div class="image-upload-container" data-target="projectImage">
+                                    <div class="upload-placeholder">
+                                        <i class="fas fa-cloud-upload-alt fa-2x mb-2"></i>
+                                        <p>Click to upload or drag and drop</p>
+                                        <p class="small">PNG, JPG, GIF up to 5MB</p>
+                                    </div>
+                                    <img class="image-preview img-fluid rounded" id="projectImagePreview">
+                                    <input type="file" class="d-none" accept="image/*" id="projectImageUpload">
+                                    <input type="hidden" name="image" id="projectImageUrl">
+                                </div>
+                                <div class="d-flex mt-2 gap-2">
+                                    <button type="button" class="btn btn-outline-primary btn-sm" data-action="choose-image" data-target="projectImage">
+                                        <i class="fas fa-upload me-1"></i> Choose Image
+                                    </button>
+                                    <button type="button" class="btn btn-outline-danger btn-sm" data-action="clear-image" data-target="projectImage">
+                                        <i class="fas fa-times me-1"></i> Clear
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-md-6"><label class="form-label">Link</label><input name="link" class="form-control" placeholder="/projects/slug"></div>
+                            <div class="col-12"><label class="form-label">Description</label><textarea name="description" class="form-control" rows="3"></textarea></div>
+                            <div class="col-12 sticky-actions">
+                                <button class="btn btn-modern" type="submit">Save Project</button>
+                                <button class="btn btn-outline-secondary" type="button" data-reset="#form-project">Reset</button>
+                                <small class="ms-2 text-muted" id="projectStatus"></small>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="modern-card">
+                    <div class="card-body">
+                        <h5 class="mb-3">All Projects</h5>
+                        <div class="table-responsive">
+                            <table class="table align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Preview</th>
+                                        <th>Title</th>
+                                        <th>Category</th>
+                                        <th>Link</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="list-projects"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-            <!-- Settings Section -->
-            <div id="settings" class="content-tab-pane"><div class="modern-card p-4"><h4>Settings</h4></div></div>
+             <!-- FEATURES -->
+            <div id="features" class="content-tab-pane">
+                <div class="modern-card">
+                    <div class="card-body">
+                        <h5 class="mb-3">Feature</h5>
+                        <form id="form-feature" class="row g-3">
+                            <input type="hidden" name="_id">
+                            <div class="col-md-6"><label class="form-label req">Title</label><input name="title" class="form-control"></div>
+                            <div class="col-md-6"><label class="form-label">Subtitle</label><input name="subtitle" class="form-control"></div>
+                            <div class="col-md-6"><label class="form-label">Icon (class or URL)</label><input name="icon" class="form-control" placeholder="fa-solid fa-snowflake"></div>
+                            <div class="col-12"><label class="form-label">Description</label><textarea name="description" class="form-control" rows="3"></textarea></div>
+                            <div class="col-12 sticky-actions">
+                                <button class="btn btn-modern" type="submit">Save Feature</button>
+                                <button class="btn btn-outline-secondary" type="button" data-reset="#form-feature">Reset</button>
+                                <small class="ms-2 text-muted" id="featureStatus"></small>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="modern-card">
+                    <div class="card-body">
+                        <h5 class="mb-3">All Features</h5>
+                        <div class="table-responsive">
+                            <table class="table align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Icon</th>
+                                        <th>Title</th>
+                                        <th>Subtitle</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="list-features"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+             <!-- OFFERS -->
+            <div id="offers" class="content-tab-pane">
+                <div class="modern-card">
+                    <div class="card-body">
+                        <h5 class="mb-3">Offer</h5>
+                        <form id="form-offer" class="row g-3">
+                            <input type="hidden" name="_id">
+                            <div class="col-md-6"><label class="form-label req">Title</label><input name="title" class="form-control"></div>
+                            <div class="col-md-6">
+                                <label class="form-label">Offer Image</label>
+                                <div class="image-upload-container" data-target="offerImage">
+                                    <div class="upload-placeholder">
+                                        <i class="fas fa-cloud-upload-alt fa-2x mb-2"></i>
+                                        <p>Click to upload or drag and drop</p>
+                                        <p class="small">PNG, JPG, GIF up to 5MB</p>
+                                    </div>
+                                    <img class="image-preview img-fluid rounded" id="offerImagePreview">
+                                    <input type="file" class="d-none" accept="image/*" id="offerImageUpload">
+                                    <input type="hidden" name="image" id="offerImageUrl">
+                                </div>
+                                <div class="d-flex mt-2 gap-2">
+                                    <button type="button" class="btn btn-outline-primary btn-sm" data-action="choose-image" data-target="offerImage">
+                                        <i class="fas fa-upload me-1"></i> Choose Image
+                                    </button>
+                                    <button type="button" class="btn btn-outline-danger btn-sm" data-action="clear-image" data-target="offerImage">
+                                        <i class="fas fa-times me-1"></i> Clear
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-12"><label class="form-label">Description</label><textarea name="description" class="form-control" rows="3"></textarea></div>
+                            <div class="col-12 sticky-actions">
+                                <button class="btn btn-modern" type="submit">Save Offer</button>
+                                <button class="btn btn-outline-secondary" type="button" data-reset="#form-offer">Reset</button>
+                                <small class="ms-2 text-muted" id="offerStatus"></small>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="modern-card">
+                    <div class="card-body">
+                        <h5 class="mb-3">All Offers</h5>
+                        <div class="table-responsive">
+                            <table class="table align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Preview</th>
+                                        <th>Title</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="list-offers"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- BLOGS -->
+            <div id="blogs" class="content-tab-pane">
+                <div class="modern-card">
+                    <div class="card-body">
+                        <h5 class="mb-3">Blog</h5>
+                        <form id="form-blog" class="row g-3">
+                            <input type="hidden" name="_id">
+                            <div class="col-md-6"><label class="form-label req">Title</label><input name="title" class="form-control"></div>
+                            <div class="col-md-6"><label class="form-label">Slug</label><input name="slug" class="form-control" placeholder="auto-generated if blank"></div>
+                            <div class="col-12"><label class="form-label">Excerpt</label><textarea name="excerpt" class="form-control" rows="2"></textarea></div>
+                            <div class="col-12"><label class="form-label">Content (HTML or Markdown)</label><textarea name="content" class="form-control" rows="6"></textarea></div>
+                            <div class="col-md-6">
+                                <label class="form-label">Blog Image</label>
+                                <div class="image-upload-container" data-target="blogImage">
+                                    <div class="upload-placeholder">
+                                        <i class="fas fa-cloud-upload-alt fa-2x mb-2"></i>
+                                        <p>Click to upload or drag and drop</p>
+                                        <p class="small">PNG, JPG, GIF up to 5MB</p>
+                                    </div>
+                                    <img class="image-preview img-fluid rounded" id="blogImagePreview">
+                                    <input type="file" class="d-none" accept="image/*" id="blogImageUpload">
+                                    <input type="hidden" name="image" id="blogImageUrl">
+                                </div>
+                                <div class="d-flex mt-2 gap-2">
+                                    <button type="button" class="btn btn-outline-primary btn-sm" data-action="choose-image" data-target="blogImage">
+                                        <i class="fas fa-upload me-1"></i> Choose Image
+                                    </button>
+                                    <button type="button" class="btn btn-outline-danger btn-sm" data-action="clear-image" data-target="blogImage">
+                                        <i class="fas fa-times me-1"></i> Clear
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-12 sticky-actions">
+                                <button class="btn btn-modern" type="submit">Save Blog</button>
+                                <button class="btn btn-outline-secondary" type="button" data-reset="#form-blog">Reset</button>
+                                <small class="ms-2 text-muted" id="blogStatus"></small>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="modern-card">
+                    <div class="card-body">
+                        <h5 class="mb-3">All Blogs</h5>
+                        <div class="table-responsive">
+                            <table class="table align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Preview</th>
+                                        <th>Title</th>
+                                        <th>Slug</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="list-blogs"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+          <!-- FAQS -->
+            <div id="faqs" class="content-tab-pane">
+                <div class="modern-card">
+                    <div class="card-body">
+                        <h5 class="mb-3">FAQ</h5>
+                        <form id="form-faq" class="row g-3">
+                            <input type="hidden" name="_id">
+                            <div class="col-md-6"><label class="form-label req">Question</label><input name="question" class="form-control"></div>
+                            <div class="col-md-6"><label class="form-label">Keywords (for search)</label><input name="keywords" class="form-control" placeholder="e.g., membership benefits"></div>
+                            <div class="col-12"><label class="form-label req">Answer</label><textarea name="answer" class="form-control" rows="3"></textarea></div>
+                            <div class="col-12 sticky-actions">
+                                <button class="btn btn-modern" type="submit">Save FAQ</button>
+                                <button class="btn btn-outline-secondary" type="button" data-reset="#form-faq">Reset</button>
+                                <small class="ms-2 text-muted" id="faqStatus"></small>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="modern-card">
+                    <div class="card-body">
+                        <h5 class="mb-3">All FAQs</h5>
+                        <div class="table-responsive">
+                            <table class="table align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Question</th>
+                                        <th>Answer</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="list-faqs"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TEAM -->
+            <div id="team" class="content-tab-pane">
+                <div class="modern-card">
+                    <div class="card-body">
+                        <h5 class="mb-3">Team Member</h5>
+                        <form id="form-team" class="row g-3">
+                            <input type="hidden" name="_id">
+                            
+                            <!-- Basic Information -->
+                            <div class="col-12"><h6 class="text-primary border-bottom pb-2 mb-3">Basic Information</h6></div>
+                            <div class="col-md-4"><label class="form-label req">Name</label><input name="name" class="form-control" required></div>
+                            <div class="col-md-4"><label class="form-label req">Role</label><input name="role" class="form-control" required></div>
+                            <div class="col-md-4"><label class="form-label">Department</label><input name="department" class="form-control" placeholder="e.g., Executive, Technical"></div>
+
+
+
+                            <!-- Profile Image -->
+                            <div class="col-12">
+                                <label class="form-label">Team Member Image</label>
+                                <div class="image-upload-container" data-target="teamImage">
+                                    <div class="upload-placeholder">
+                                        <i class="fas fa-cloud-upload-alt fa-2x mb-2"></i>
+                                        <p>Click to upload or drag and drop</p>
+                                        <p class="small">PNG, JPG, GIF up to 5MB</p>
+                                    </div>
+                                    <img class="image-preview img-fluid rounded" id="teamImagePreview">
+                                    <input type="file" class="d-none" accept="image/*" id="teamImageUpload">
+                                    <input type="hidden" name="image" id="teamImageUrl">
+                                </div>
+                                <div class="d-flex mt-2 gap-2">
+                                    <button type="button" class="btn btn-outline-primary btn-sm" data-action="choose-image" data-target="teamImage">
+                                        <i class="fas fa-upload me-1"></i> Choose Image
+                                    </button>
+                                    <button type="button" class="btn btn-outline-danger btn-sm" data-action="clear-image" data-target="teamImage">
+                                        <i class="fas fa-times me-1"></i> Clear
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Biography -->
+                            <div class="col-12">
+                                <label class="form-label">Biography</label>
+                                <textarea name="biography" class="form-control" rows="4" placeholder="Write a detailed biography about this team member..."></textarea>
+                            </div>
+
+                            <!-- Contact Information -->
+                            <div class="col-12"><h6 class="text-primary border-bottom pb-2 mb-3 mt-4">Contact Information</h6></div>
+                            <div class="col-md-6"><label class="form-label">Email</label><input name="email" type="email" class="form-control" placeholder="member@narapnational.org.ng"></div>
+                            <div class="col-md-6"><label class="form-label">Phone</label><input name="phone" class="form-control" placeholder="+234 xxx xxx xxxx"></div>
+
+                            <!-- Professional Information -->
+                            <div class="col-12"><h6 class="text-primary border-bottom pb-2 mb-3 mt-4">Professional Information</h6></div>
+                            <div class="col-md-6"><label class="form-label">Experience</label><input name="experience" class="form-control" placeholder="e.g., 10+ years in HVAC"></div>
+                            <div class="col-md-6"><label class="form-label">Education</label><input name="education" class="form-control" placeholder="e.g., B.Sc Mechanical Engineering"></div>
+                            
+                            <!-- Specializations -->
+                            <div class="col-12">
+                                <label class="form-label">Specializations</label>
+                                <input name="specializations" class="form-control" placeholder="Enter specializations separated by commas (e.g., HVAC Design, Refrigeration Systems, Energy Efficiency)">
+                                <small class="form-text text-muted">Separate multiple specializations with commas</small>
+                            </div>
+
+                            <!-- Achievements -->
+                            <div class="col-12">
+                                <label class="form-label">Achievements</label>
+                                <textarea name="achievements" class="form-control" rows="3" placeholder="Enter achievements separated by commas (e.g., Certified HVAC Professional, Best Engineer Award 2023, Published 15+ Research Papers)"></textarea>
+                                <small class="form-text text-muted">Separate multiple achievements with commas</small>
+                            </div>
+
+                            <!-- Social Media -->
+                            <div class="col-12"><h6 class="text-primary border-bottom pb-2 mb-3 mt-4">Social Media</h6></div>
+                            <div class="col-md-4"><label class="form-label">Facebook</label><input name="facebook" class="form-control" placeholder="https://facebook.com/..."></div>
+                            <div class="col-md-4"><label class="form-label">Twitter</label><input name="twitter" class="form-control" placeholder="https://twitter.com/..."></div>
+                            <div class="col-md-4"><label class="form-label">LinkedIn</label><input name="linkedin" class="form-control" placeholder="https://linkedin.com/in/..."></div>
+                            <div class="col-md-4"><label class="form-label">Instagram</label><input name="instagram" class="form-control" placeholder="https://instagram.com/..."></div>
+
+                            <!-- Display Settings -->
+                            <div class="col-12"><h6 class="text-primary border-bottom pb-2 mb-3 mt-4">Display Settings</h6></div>
+                            <div class="col-md-6">
+                                <label class="form-label">Display Order</label>
+                                <input name="displayOrder" type="number" class="form-control" placeholder="0" min="0">
+                                <small class="form-text text-muted">Lower numbers appear first</small>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check mt-4">
+                                    <input name="isActive" type="checkbox" class="form-check-input" id="teamIsActive" checked>
+                                    <label class="form-check-label" for="teamIsActive">Active (Show on website)</label>
+                                </div>
+                            </div>
+
+                            <!-- Submit Buttons -->
+                            <div class="col-12 sticky-actions">
+                                <button class="btn btn-modern" type="submit">Save Member</button>
+                                <button class="btn btn-outline-secondary" type="button" data-reset="#form-team">Reset</button>
+                                <small class="ms-2 text-muted" id="teamStatus"></small>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- Team Members List -->
+                <div class="modern-card">
+                    <div class="card-body">
+                        <h5 class="mb-3">All Team</h5>
+                        <div class="table-responsive">
+                            <table class="table align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Preview</th>
+                                        <th>Name</th>
+                                        <th>Role</th>
+                                        <th>Department</th>
+                                        <th>Status</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="list-team"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MEMBERS SECTIONS -->
+            <div id="members-all" class="content-tab-pane">
+                <div class="modern-card">
+                    <div class="card-body">
+                        <div class="row g-3 align-items-end">
+                            <div class="col-md-4">
+                                <label class="form-label">Search (name/email/member ID/state)</label>
+                                <input id="allSearch" class="form-control" placeholder="Search…">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Filter by State:</label>
+                                <select id="stateFilter" class="form-select">
+                                    <option value="">All States</option>
+                                    <!-- State options here -->
+                                </select>
+                            </div>
+                            <div class="col-md-4 text-md-end">
+                                <button class="btn btn-modern" id="btnReloadAll">Reload</button>
+                                <button class="btn btn-outline-secondary" id="btnExportAll">Export CSV</button>
+                            </div>
+                        </div>
+                        <small class="text-muted d-block mt-2">Shows everyone who completed signup and has a dashboard.</small>
+                    </div>
+                </div>
+                <div class="modern-card">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>S/N</th>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Member ID</th>
+                                        <th>State</th>
+                                        <th>Created</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="list-members-all"></tbody>
+                            </table>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mt-2">
+                            <small class="text-muted" id="allCount"></small>
+                            <div class="btn-group">
+                                <button class="btn btn-sm btn-outline-secondary" id="allPrev">Prev</button>
+                                <button class="btn btn-sm btn-outline-secondary" id="allNext">Next</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add other member sections similarly... -->
+
+            <!-- DONATIONS -->
+            <div id="donations" class="content-tab-pane">
+                <div class="modern-card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h5 class="mb-0">Donation Management</h5>
+                            <div>
+                                <button class="btn btn-outline-secondary btn-sm" id="exportDonations">
+                                    <i class="fas fa-download"></i> Export
+                                </button>
+                                <button class="btn btn-modern btn-sm" id="refreshDonations">
+                                    <i class="fas fa-sync-alt"></i> Refresh
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Donation Statistics -->
+                        <div class="row mb-4">
+                            <div class="col-md-3">
+                                <div class="stats-card">
+                                    <div class="stats-icon" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                                        <i class="fas fa-donate"></i>
+                                    </div>
+                                    <div class="stats-number" id="totalDonationsAmount">₦0</div>
+                                    <div class="text-muted">Total Raised</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="stats-card">
+                                    <div class="stats-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                                        <i class="fas fa-users"></i>
+                                    </div>
+                                    <div class="stats-number" id="totalDonors">0</div>
+                                    <div class="text-muted">Total Donors</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="stats-card">
+                                    <div class="stats-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                                        <i class="fas fa-chart-line"></i>
+                                    </div>
+                                    <div class="stats-number" id="avgDonation">₦0</div>
+                                    <div class="text-muted">Average Donation</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="stats-card">
+                                    <div class="stats-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                                        <i class="fas fa-calendar"></i>
+                                    </div>
+                                    <div class="stats-number" id="monthlyDonations">₦0</div>
+                                    <div class="text-muted">This Month</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Donations Table -->
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Donor Name</th>
+                                        <th>Email</th>
+                                        <th>Type</th>
+                                        <th>Amount</th>
+                                        <th>Reference</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="donationsTableBody">
+                                    <tr>
+                                        <td colspan="8" class="text-center text-muted">
+                                            <i class="fas fa-spinner fa-spin"></i> Loading donations...
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SETTINGS -->
+            <div id="settings" class="content-tab-pane">
+                <div class="modern-card p-4">
+                    <h4>Settings</h4>
+                    <p class="text-muted">System configuration and preferences</p>
+                    <!-- Settings content will go here -->
+                </div>
+            </div>
         </div>
     </main>
 
