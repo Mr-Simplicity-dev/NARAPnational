@@ -132,6 +132,12 @@ app.use(helmet({
         "https://*.tawk.to",
         "https://pagead2.googlesyndication.com"
       ],
+      // ADD THIS NEW SECTION FOR VIDEO CONTENT
+      "media-src": [
+        "'self'",
+        "data:",
+        "blob:"
+      ],
       "font-src": [
   "'self'",
   "data:",

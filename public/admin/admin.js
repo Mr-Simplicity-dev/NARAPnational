@@ -483,7 +483,7 @@ function handleVideoSelection(file, target) {
     return;
   }
   
-  // Validate file size (1GB) - UPDATED FROM 50MB
+  // Validate file size (1GB)
   const maxSize = 1024 * 1024 * 1024; // 1GB in bytes
   if (file.size > maxSize) {
     const fileSizeGB = (file.size / 1024 / 1024 / 1024).toFixed(2);
@@ -491,14 +491,14 @@ function handleVideoSelection(file, target) {
     return;
   }
   
-  // Show video preview
+  // Show video preview immediately
   showVideoPreview(file, target);
   
   // Upload the video
   uploadVideo(file, target);
 }
 
-// Show video preview
+// Show video preview - ENHANCED VERSION
 function showVideoPreview(file, target) {
   const preview = document.getElementById(`${target}Preview`);
   const container = document.querySelector(`[data-target="${target}"]`);
@@ -509,6 +509,20 @@ function showVideoPreview(file, target) {
   reader.onload = function(e) {
     preview.src = e.target.result;
     preview.style.display = 'block';
+    preview.style.maxWidth = '300px';
+    preview.style.maxHeight = '200px';
+    preview.controls = true; // Ensure controls are visible
+    preview.preload = 'metadata'; // Load video metadata for better performance
+    
+    // Add error handling for video loading
+    preview.onerror = function() {
+      showNotification('Error loading video preview', 'error');
+    };
+    
+    // Add event listener for when video can play
+    preview.onloadedmetadata = function() {
+      console.log(`Video loaded: ${preview.duration.toFixed(2)}s duration`);
+    };
     
     const placeholder = container.querySelector('.upload-placeholder');
     if (placeholder) {
@@ -518,7 +532,7 @@ function showVideoPreview(file, target) {
   reader.readAsDataURL(file);
 }
 
-// Upload video file
+// Upload video file - ENHANCED VERSION
 async function uploadVideo(file, target) {
   try {
     const formData = new FormData();
@@ -550,7 +564,10 @@ async function uploadVideo(file, target) {
         urlInput.value = result.url;
       }
       
-      showNotification('Video uploaded successfully!', 'success');
+      // Update the video preview to show the uploaded file instead of local file
+      updateVideoPreviewAfterUpload(result.url, target);
+      
+      showNotification('Video uploaded successfully! You can now preview the uploaded video.', 'success');
     } else {
       throw new Error(result.error || 'Upload failed');
     }
@@ -560,7 +577,35 @@ async function uploadVideo(file, target) {
   }
 }
 
-// Clear video upload
+// NEW FUNCTION: Update video preview to show uploaded file
+function updateVideoPreviewAfterUpload(videoUrl, target) {
+  const preview = document.getElementById(`${target}Preview`);
+  if (preview) {
+    // Switch from local file preview to uploaded file URL
+    preview.src = videoUrl;
+    preview.style.display = 'block';
+    preview.controls = true;
+    preview.preload = 'metadata';
+    
+    // Add a visual indicator that this is the uploaded version
+    preview.style.border = '2px solid #28a745'; // Green border to indicate successful upload
+    preview.title = 'Uploaded video - Click to play';
+    
+    // Add event listener for successful load of uploaded video
+    preview.onloadedmetadata = function() {
+      console.log('Uploaded video loaded successfully');
+      showNotification('Video is ready for preview!', 'info');
+    };
+    
+    // Handle errors loading the uploaded video
+    preview.onerror = function() {
+      showNotification('Error loading uploaded video. Please try uploading again.', 'error');
+      preview.style.border = '2px solid #dc3545'; // Red border for error
+    };
+  }
+}
+
+// Clear video upload - ENHANCED VERSION
 function clearVideoUpload(target) {
   const preview = document.getElementById(`${target}Preview`);
   const urlInput = document.getElementById(`${target}Url`);
@@ -570,6 +615,10 @@ function clearVideoUpload(target) {
   if (preview) {
     preview.src = '';
     preview.style.display = 'none';
+    preview.style.border = 'none'; // Remove any border styling
+    preview.title = '';
+    preview.onloadedmetadata = null;
+    preview.onerror = null;
   }
   
   if (urlInput) {
@@ -586,6 +635,8 @@ function clearVideoUpload(target) {
       placeholder.style.display = 'block';
     }
   }
+  
+  showNotification('Video upload cleared', 'info');
 }
 
 // ===== BASIC AUTHENTICATION CHECK =====
