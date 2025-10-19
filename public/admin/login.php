@@ -30,6 +30,26 @@
     .back-link{margin-top:16px;text-align:center}
     .back-link a{color:var(--brand);text-decoration:none;font-size:14px}
     .back-link a:hover{text-decoration:underline}
+
+    /* Page fade-in transition */
+body {
+    opacity: 0;
+    animation: fadeIn 0.5s ease-in forwards;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Link click transition */
+.page-transition {
+    transition: opacity 0.3s ease-out;
+}
+
+.page-transition.fade-out {
+    opacity: 0;
+}
   </style>
 </head>
 <body>
@@ -282,6 +302,34 @@
     document.getElementById('loginIdentifier').focus();
 
   })();
+
+  // Add to each PHP file or in a shared JS file
+document.addEventListener('DOMContentLoaded', function() {
+    // Fade in current page
+    document.body.style.opacity = '0';
+    setTimeout(() => {
+        document.body.style.transition = 'opacity 0.5s ease-in';
+        document.body.style.opacity = '1';
+    }, 50);
+
+    // Handle navigation links
+    const navLinks = document.querySelectorAll('a[href$=".php"]');
+    navLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const href = this.getAttribute('href');
+            
+            // Fade out current page
+            document.body.style.transition = 'opacity 0.3s ease-out';
+            document.body.style.opacity = '0';
+            
+            // Navigate after fade out
+            setTimeout(() => {
+                window.location.href = href;
+            }, 300);
+        });
+    });
+});
   </script>
 </body>
 </html>
