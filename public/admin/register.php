@@ -83,5 +83,35 @@ document.getElementById('adminForm').addEventListener('submit', async (e) => {
 });
 </script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+// Add to each PHP file or in a shared JS file
+document.addEventListener('DOMContentLoaded', function() {
+    // Fade in current page
+    document.body.style.opacity = '0';
+    setTimeout(() => {
+        document.body.style.transition = 'opacity 0.5s ease-in';
+        document.body.style.opacity = '1';
+    }, 50);
+
+    // Handle navigation links
+    const navLinks = document.querySelectorAll('a[href$=".php"]');
+    navLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const href = this.getAttribute('href');
+            
+            // Fade out current page
+            document.body.style.transition = 'opacity 0.3s ease-out';
+            document.body.style.opacity = '0';
+            
+            // Navigate after fade out
+            setTimeout(() => {
+                window.location.href = href;
+            }, 300);
+        });
+    });
+});
+</script>
 </body>
 </html>

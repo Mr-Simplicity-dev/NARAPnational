@@ -125,6 +125,26 @@
     .instructions{background:#f8faf9; border-left:4px solid var(--brand); padding:16px 20px; border-radius:8px; margin-bottom:24px}
     .instructions ul{margin:8px 0; padding-left:20px}
     .instructions li{margin-bottom:6px; font-size:0.9rem; line-height:1.5}
+
+    /* Page fade-in transition */
+body {
+    opacity: 0;
+    animation: fadeIn 0.5s ease-in forwards;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Link click transition */
+.page-transition {
+    transition: opacity 0.3s ease-out;
+}
+
+.page-transition.fade-out {
+    opacity: 0;
+}
   </style>
 </head>
 <body>
@@ -747,6 +767,34 @@ if (userData && userData.profileCompleted === true) {
       }
     });
   })();
+
+  // Add to each PHP file or in a shared JS file
+document.addEventListener('DOMContentLoaded', function() {
+    // Fade in current page
+    document.body.style.opacity = '0';
+    setTimeout(() => {
+        document.body.style.transition = 'opacity 0.5s ease-in';
+        document.body.style.opacity = '1';
+    }, 50);
+
+    // Handle navigation links
+    const navLinks = document.querySelectorAll('a[href$=".php"]');
+    navLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const href = this.getAttribute('href');
+            
+            // Fade out current page
+            document.body.style.transition = 'opacity 0.3s ease-out';
+            document.body.style.opacity = '0';
+            
+            // Navigate after fade out
+            setTimeout(() => {
+                window.location.href = href;
+            }, 300);
+        });
+    });
+});
   </script>
 
 </body>

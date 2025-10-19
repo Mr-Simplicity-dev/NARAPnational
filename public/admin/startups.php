@@ -192,6 +192,26 @@
       .role-card { padding: 20px; }
       .header h1 { font-size: 1.5rem; }
     }
+
+    /* Page fade-in transition */
+body {
+    opacity: 0;
+    animation: fadeIn 0.5s ease-in forwards;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Link click transition */
+.page-transition {
+    transition: opacity 0.3s ease-out;
+}
+
+.page-transition.fade-out {
+    opacity: 0;
+}
   </style>
 </head>
 <!--Start of Tawk.to Script-->
@@ -359,6 +379,34 @@ s0.parentNode.insertBefore(s1,s0);
       googleBtn.addEventListener('click', initiateGoogleSignIn);
     }
   });
+
+  // Add to each PHP file or in a shared JS file
+document.addEventListener('DOMContentLoaded', function() {
+    // Fade in current page
+    document.body.style.opacity = '0';
+    setTimeout(() => {
+        document.body.style.transition = 'opacity 0.5s ease-in';
+        document.body.style.opacity = '1';
+    }, 50);
+
+    // Handle navigation links
+    const navLinks = document.querySelectorAll('a[href$=".php"]');
+    navLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const href = this.getAttribute('href');
+            
+            // Fade out current page
+            document.body.style.transition = 'opacity 0.3s ease-out';
+            document.body.style.opacity = '0';
+            
+            // Navigate after fade out
+            setTimeout(() => {
+                window.location.href = href;
+            }, 300);
+        });
+    });
+});
   </script>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
