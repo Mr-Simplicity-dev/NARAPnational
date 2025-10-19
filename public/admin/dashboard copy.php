@@ -1690,40 +1690,7 @@
         </div>
     </div>
 </div>
-3. Video Upload Section for Sliders
-Replace the video section in your slider form (around line where you have the video URL field) with this enhanced version:
 
-<div class="form-section">
-    <h6>Video Configuration</h6>
-    <div class="row g-3">
-        <div class="col-md-6">
-            <label class="form-label">CTA1 Video URL</label>
-            <input name="cta1.videoUrl" class="form-control" placeholder="https://youtube.com/watch?v=... or https://vimeo.com/...">
-            <div class="form-text">YouTube, Vimeo, or direct video URL</div>
-        </div>
-        <div class="col-md-6">
-            <label class="form-label">Or Upload Video File</label>
-            <div class="image-upload-container" data-target="sliderVideo">
-                <div class="upload-placeholder">
-                    <i class="fas fa-video fa-2x mb-2"></i>
-                    <p>Click to upload video or drag and drop</p>
-                    <p class="small">MP4, WEBM, OGV up to 50MB</p>
-                </div>
-                <video class="image-preview" id="sliderVideoPreview" controls style="display:none; max-width:200px; max-height:150px;"></video>
-                <input type="file" class="d-none" accept="video/*" id="sliderVideoUpload">
-                <input type="hidden" name="cta1.videoFile" id="sliderVideoUrl">
-            </div>
-            <div class="d-flex mt-2 gap-2">
-                <button type="button" class="btn btn-outline-modern btn-sm" data-action="choose-video" data-target="sliderVideo">
-                    <i class="fas fa-upload me-1"></i> Choose Video
-                </button>
-                <button type="button" class="btn btn-outline-danger btn-sm" data-action="clear-video" data-target="sliderVideo">
-                    <i class="fas fa-times me-1"></i> Clear
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
 
             <!-- Enhanced DONATIONS -->
             <div id="donations" class="content-tab-pane">
