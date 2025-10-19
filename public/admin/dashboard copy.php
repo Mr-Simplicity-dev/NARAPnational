@@ -2018,6 +2018,49 @@ Replace the video section in your slider form (around line where you have the vi
         });
     });
 
+
+    // Video upload handling
+document.querySelectorAll('[data-action="choose-video"]').forEach(button => {
+    button.addEventListener('click', function() {
+        const target = this.getAttribute('data-target');
+        const fileInput = document.getElementById(target + 'Upload');
+        if (fileInput) fileInput.click();
+    });
+});
+
+document.querySelectorAll('[data-action="clear-video"]').forEach(button => {
+    button.addEventListener('click', function() {
+        const target = this.getAttribute('data-target');
+        const fileInput = document.getElementById(target + 'Upload');
+        const preview = document.getElementById(target + 'Preview');
+        const hiddenInput = document.getElementById(target.replace('Video', '') + 'VideoUrl');
+        
+        if (fileInput) fileInput.value = '';
+        if (preview) {
+            preview.style.display = 'none';
+            preview.src = '';
+        }
+        if (hiddenInput) hiddenInput.value = '';
+    });
+});
+
+// Video file upload preview
+document.querySelectorAll('input[type="file"][accept="video/*"]').forEach(input => {
+    input.addEventListener('change', function() {
+        const file = this.files[0];
+        const targetName = this.id.replace('Upload', '');
+        const preview = document.getElementById(targetName + 'Preview');
+        
+        if (file && preview) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+});
     
     </script>
     
