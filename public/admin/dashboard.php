@@ -529,7 +529,8 @@
         <form id="form-faq" class="row g-3">
           <input type="hidden" name="_id">
           <div class="col-md-6"><label class="form-label req">Question</label><input name="question" class="form-control"></div>
-          <div class="col-12"><label class="form-label req">Answer</label><textarea name="answer" class="form-control" rows="3"></textarea></div>
+<div class="col-md-6"><label class="form-label">Keywords (for search)</label><input name="keywords" class="form-control" placeholder="e.g., membership benefits"></div>
+<div class="col-12"><label class="form-label req">Answer</label><textarea name="answer" class="form-control" rows="3"></textarea></div>
           <div class="col-12 sticky-actions">
             <button class="btn btn-brand" type="submit">Save FAQ</button>
             <button class="btn btn-outline-secondary" type="button" data-reset="#form-faq">Reset</button>

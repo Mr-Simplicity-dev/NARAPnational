@@ -340,26 +340,28 @@
         ];
 
         async function loadFAQs() {
-            try {
-                const response = await fetch('/api/faqs');
-                
-                if (!response.ok) {
-                    throw new Error(`API returned ${response.status}`);
-                }
-                
-                const faqs = await response.json();
-                
-                if (faqs && faqs.length > 0) {
-                    renderFAQs(faqs);
-                } else {
-                    throw new Error('No FAQs returned from API');
-                }
-                
-            } catch (error) {
-                console.warn('Using static FAQs as fallback:', error.message);
-                renderFAQs(staticFAQs);
-            }
+    try {
+        const response = await fetch('/api/faqs');
+        
+        if (!response.ok) {
+            throw new Error(`API returned ${response.status}`);
         }
+        
+        const result = await response.json();
+        // Handle the {data: [...], count: N} format
+        const faqs = result.data || result; // Support both formats
+        
+        if (faqs && faqs.length > 0) {
+            renderFAQs(faqs);
+        } else {
+            throw new Error('No FAQs returned from API');
+        }
+        
+    } catch (error) {
+        console.warn('Using static FAQs as fallback:', error.message);
+        renderFAQs(staticFAQs);
+    }
+}
 
         function renderFAQs(faqs) {
             const accordion = document.getElementById('faqAccordion');

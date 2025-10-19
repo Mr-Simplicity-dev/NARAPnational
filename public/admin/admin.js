@@ -1434,11 +1434,16 @@ const resources = {
   },
   faqs: {
     endpoint: '/faqs', listEl: '#list-faqs', form: '#form-faq', status: '#faqStatus',
-    toPayload: (fd) => ({ question: fd.get('question') || '', answer: fd.get('answer') || '' }),
-    renderRow: (item, i) => `<tr><td>${i + 1}</td><td>${item.question || ''}</td><td>${item.answer || ''}</td>
+    toPayload: (fd) => ({ 
+        question: fd.get('question') || '', 
+        answer: fd.get('answer') || '',
+        keywords: fd.get('keywords') || ''
+    }),
+    renderRow: (item, i) => `<tr><td>${i + 1}</td><td>${item.question || ''}</td><td>${item.answer || ''}</td><td>${item.keywords || ''}</td>
     <td class="text-end"><button class="btn btn-sm btn-outline-primary" data-edit="faqs" data-id="${item._id}">Edit</button>
     <button class="btn btn-sm btn-outline-danger" data-del="faqs" data-id="${item._id}">Delete</button></td></tr>`
-  },
+},
+  
   team: {
     endpoint: '/team', listEl: '#list-team', form: '#form-team', status: '#teamStatus',
     toPayload: (fd) => ({ 
