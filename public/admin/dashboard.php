@@ -547,52 +547,109 @@
     </div>
 
     <!-- TEAM -->
-    <div class="tab-pane fade" id="pane-team" role="tabpanel">
-      <div class="card mb-4"><div class="card-body">
-        <h5 class="mb-3">Team Member</h5>
-        <form id="form-team" class="row g-3">
-          <input type="hidden" name="_id">
-          <div class="col-md-4"><label class="form-label req">Name</label><input name="name" class="form-control"></div>
-          <div class="col-md-4"><label class="form-label req">Role</label><input name="role" class="form-control"></div>
-          <div class="col-md-4">
-            <label class="form-label">Team Member Image</label>
-            <div class="image-upload-container" data-target="teamImage">
-              <div class="upload-placeholder">
-                <i class="fas fa-cloud-upload-alt fa-2x mb-2"></i>
-                <p>Click to upload or drag and drop</p>
-                <p class="small">PNG, JPG, GIF up to 5MB</p>
-              </div>
-              <img class="image-preview img-fluid rounded" id="teamImagePreview">
-              <input type="file" class="d-none" accept="image/*" id="teamImageUpload">
-              <input type="hidden" name="image" id="teamImageUrl">
-            </div>
-            <div class="d-flex mt-2 gap-2">
-              <button type="button" class="btn btn-outline-primary btn-sm" data-action="choose-image" data-target="teamImage">
-  <i class="fas fa-upload me-1"></i> Choose Image
-</button>
-
-<button type="button" class="btn btn-outline-danger btn-sm" data-action="clear-image" data-target="teamImage">
-  <i class="fas fa-times me-1"></i> Clear
-</button>
-            </div>
+<div class="tab-pane fade" id="pane-team" role="tabpanel">
+  <div class="card mb-4"><div class="card-body">
+    <h5 class="mb-3">Team Member</h5>
+    <form id="form-team" class="row g-3">
+      <input type="hidden" name="_id">
+      
+      <!-- Basic Information -->
+      <div class="col-12"><h6 class="text-primary border-bottom pb-2 mb-3">Basic Information</h6></div>
+      <div class="col-md-4"><label class="form-label req">Name</label><input name="name" class="form-control" required></div>
+      <div class="col-md-4"><label class="form-label req">Role</label><input name="role" class="form-control" required></div>
+      <div class="col-md-4"><label class="form-label">Department</label><input name="department" class="form-control" placeholder="e.g., Executive, Technical"></div>
+      
+      <!-- Profile Image -->
+      <div class="col-12">
+        <label class="form-label">Team Member Image</label>
+        <div class="image-upload-container" data-target="teamImage">
+          <div class="upload-placeholder">
+            <i class="fas fa-cloud-upload-alt fa-2x mb-2"></i>
+            <p>Click to upload or drag and drop</p>
+            <p class="small">PNG, JPG, GIF up to 5MB</p>
           </div>
-          <div class="col-md-4"><label class="form-label">Facebook</label><input name="facebook" class="form-control" placeholder="https://facebook.com/..."></div>
-          <div class="col-md-4"><label class="form-label">Twitter</label><input name="twitter" class="form-control" placeholder="https://twitter.com/..."></div>
-          <div class="col-md-4"><label class="form-label">LinkedIn</label><input name="linkedin" class="form-control" placeholder="https://linkedin.com/in/..."></div>
-          <div class="col-12 sticky-actions">
-            <button class="btn btn-brand" type="submit">Save Member</button>
-            <button class="btn btn-outline-secondary" type="button" data-reset="#form-team">Reset</button>
-            <small class="ms-2 text-muted" id="teamStatus"></small>
-          </div>
-        </form>
-      </div></div>
-      <div class="card"><div class="card-body">
-        <h5 class="mb-3">All Team</h5>
-        <div class="table-responsive">
-          <table class="table align-middle"><thead><tr><th>#</th><th>Preview</th><th>Name</th><th>Role</th><th></th></tr></thead><tbody id="list-team"></tbody></table>
+          <img class="image-preview img-fluid rounded" id="teamImagePreview">
+          <input type="file" class="d-none" accept="image/*" id="teamImageUpload">
+          <input type="hidden" name="image" id="teamImageUrl">
         </div>
-      </div></div>
+        <div class="d-flex mt-2 gap-2">
+          <button type="button" class="btn btn-outline-primary btn-sm" data-action="choose-image" data-target="teamImage">
+            <i class="fas fa-upload me-1"></i> Choose Image
+          </button>
+          <button type="button" class="btn btn-outline-danger btn-sm" data-action="clear-image" data-target="teamImage">
+            <i class="fas fa-times me-1"></i> Clear
+          </button>
+        </div>
+      </div>
+
+      <!-- Biography -->
+      <div class="col-12">
+        <label class="form-label">Biography</label>
+        <textarea name="biography" class="form-control" rows="4" placeholder="Write a detailed biography about this team member..."></textarea>
+      </div>
+
+      <!-- Contact Information -->
+      <div class="col-12"><h6 class="text-primary border-bottom pb-2 mb-3 mt-4">Contact Information</h6></div>
+      <div class="col-md-6"><label class="form-label">Email</label><input name="email" type="email" class="form-control" placeholder="member@narapnational.org.ng"></div>
+      <div class="col-md-6"><label class="form-label">Phone</label><input name="phone" class="form-control" placeholder="+234 xxx xxx xxxx"></div>
+
+      <!-- Professional Information -->
+      <div class="col-12"><h6 class="text-primary border-bottom pb-2 mb-3 mt-4">Professional Information</h6></div>
+      <div class="col-md-6"><label class="form-label">Experience</label><input name="experience" class="form-control" placeholder="e.g., 10+ years in HVAC"></div>
+      <div class="col-md-6"><label class="form-label">Education</label><input name="education" class="form-control" placeholder="e.g., B.Sc Mechanical Engineering"></div>
+      
+      <!-- Specializations -->
+      <div class="col-12">
+        <label class="form-label">Specializations</label>
+        <input name="specializations" class="form-control" placeholder="Enter specializations separated by commas (e.g., HVAC Design, Refrigeration Systems, Energy Efficiency)">
+        <small class="form-text text-muted">Separate multiple specializations with commas</small>
+      </div>
+
+      <!-- Achievements -->
+      <div class="col-12">
+        <label class="form-label">Achievements</label>
+        <textarea name="achievements" class="form-control" rows="3" placeholder="Enter achievements separated by commas (e.g., Certified HVAC Professional, Best Engineer Award 2023, Published 15+ Research Papers)"></textarea>
+        <small class="form-text text-muted">Separate multiple achievements with commas</small>
+      </div>
+
+      <!-- Social Media -->
+      <div class="col-12"><h6 class="text-primary border-bottom pb-2 mb-3 mt-4">Social Media</h6></div>
+      <div class="col-md-4"><label class="form-label">Facebook</label><input name="facebook" class="form-control" placeholder="https://facebook.com/..."></div>
+      <div class="col-md-4"><label class="form-label">Twitter</label><input name="twitter" class="form-control" placeholder="https://twitter.com/..."></div>
+      <div class="col-md-4"><label class="form-label">LinkedIn</label><input name="linkedin" class="form-control" placeholder="https://linkedin.com/in/..."></div>
+      <div class="col-md-4"><label class="form-label">Instagram</label><input name="instagram" class="form-control" placeholder="https://instagram.com/..."></div>
+
+      <!-- Display Settings -->
+      <div class="col-12"><h6 class="text-primary border-bottom pb-2 mb-3 mt-4">Display Settings</h6></div>
+      <div class="col-md-6">
+        <label class="form-label">Display Order</label>
+        <input name="displayOrder" type="number" class="form-control" placeholder="0" min="0">
+        <small class="form-text text-muted">Lower numbers appear first</small>
+      </div>
+      <div class="col-md-6">
+        <div class="form-check mt-4">
+          <input name="isActive" type="checkbox" class="form-check-input" id="teamIsActive" checked>
+          <label class="form-check-label" for="teamIsActive">Active (Show on website)</label>
+        </div>
+      </div>
+
+      <!-- Submit Buttons -->
+      <div class="col-12 sticky-actions">
+        <button class="btn btn-brand" type="submit">Save Member</button>
+        <button class="btn btn-outline-secondary" type="button" data-reset="#form-team">Reset</button>
+        <small class="ms-2 text-muted" id="teamStatus"></small>
+      </div>
+    </form>
+  </div></div>
+  
+  <!-- Team Members List -->
+  <div class="card"><div class="card-body">
+    <h5 class="mb-3">All Team</h5>
+    <div class="table-responsive">
+      <table class="table align-middle"><thead><tr><th>#</th><th>Preview</th><th>Name</th><th>Role</th><th>Department</th><th>Status</th><th></th></tr></thead><tbody id="list-team"></tbody></table>
     </div>
+  </div></div>
+</div>
 
     <!-- REGISTRATIONS (ALL MEMBERS) -->
     <div class="tab-pane fade" id="pane-members-all" role="tabpanel">

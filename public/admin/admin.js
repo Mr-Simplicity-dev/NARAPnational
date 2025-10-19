@@ -1445,19 +1445,33 @@ const resources = {
 },
   
   team: {
-    endpoint: '/team', listEl: '#list-team', form: '#form-team', status: '#teamStatus',
-    toPayload: (fd) => ({ 
-      name: fd.get('name') || '', 
-      role: fd.get('role') || '', 
-      image: document.getElementById('teamImageUrl')?.value || '', 
-      facebook: fd.get('facebook') || '', 
-      twitter: fd.get('twitter') || '', 
-      linkedin: fd.get('linkedin') || '' 
-    }),
-    renderRow: (item, i) => `<tr><td>${i + 1}</td><td>${item.image ? '<img class="img-thumb" src="' + item.image + '">' : ''}</td><td>${item.name || ''}</td><td>${item.role || ''}</td>
-    <td class="text-end"><button class="btn btn-sm btn-outline-primary" data-edit="team" data-id="${item._id}">Edit</button>
-    <button class="btn btn-sm btn-outline-danger" data-del="team" data-id="${item._id}">Delete</button></td></tr>`
-  }
+  endpoint: '/team', 
+  listEl: '#list-team', 
+  form: '#form-team', 
+  status: '#teamStatus',
+  toPayload: (fd) => ({ 
+    name: fd.get('name') || '', 
+    role: fd.get('role') || '', 
+    department: fd.get('department') || '',
+    image: document.getElementById('teamImageUrl')?.value || '',
+    biography: fd.get('biography') || '',
+    email: fd.get('email') || '',
+    phone: fd.get('phone') || '',
+    experience: fd.get('experience') || '',
+    education: fd.get('education') || '',
+    specializations: fd.get('specializations') ? fd.get('specializations').split(',').map(s => s.trim()).filter(s => s) : [],
+    achievements: fd.get('achievements') ? fd.get('achievements').split(',').map(s => s.trim()).filter(s => s) : [],
+    facebook: fd.get('facebook') || '', 
+    twitter: fd.get('twitter') || '', 
+    linkedin: fd.get('linkedin') || '',
+    instagram: fd.get('instagram') || '',
+    displayOrder: parseInt(fd.get('displayOrder')) || 0,
+    isActive: fd.get('isActive') ? true : false
+  }),
+  renderRow: (item, i) => `<tr><td>${i + 1}</td><td>${item.image ? '<img class="img-thumb" src="' + item.image + '">' : ''}</td><td>${item.name || ''}</td><td>${item.role || ''}</td><td>${item.department || ''}</td><td>${item.isActive !== false ? '<span class="badge bg-success">Active</span>' : '<span class="badge bg-secondary">Inactive</span>'}</td>
+  <td class="text-end"><button class="btn btn-sm btn-outline-primary" data-edit="team" data-id="${item._id}">Edit</button>
+  <button class="btn btn-sm btn-outline-danger" data-del="team" data-id="${item._id}">Delete</button></td></tr>`
+}
 };
 
 async function loadList(key) {
