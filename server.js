@@ -34,6 +34,7 @@ import membersRoutes from './src/routes/members.js'; // plural - admin member ma
 import paidRoutes from './src/routes/paid.js';
 import unpaidRoutes from './src/routes/unpaid.js';
 import donationsRoutes from './src/routes/donations.js';
+import testimonialRoutes from './src/routes/testimonials.js';
 
 
 const uploadDirs = [
@@ -231,6 +232,7 @@ app.use('/api/uploads', uploadsRoutes); // Member uploads
 app.use('/api/events', eventRoutes);
 app.use('/api/comments', commentRoutes);
 app.use('/api/payments', paymentRoutes);
+app.use('/api/testimonials', testimonialRoutes);
 
 // Member routes - Individual member operations (authentication required but not admin)
 app.use('/api/member', memberRoutes); // This handles /api/member/profile
