@@ -1217,25 +1217,72 @@
                 <div class="card-body">
                     <h5>Blog Management</h5>
                     <form id="form-blog" class="row g-3">
-                        <input type="hidden" name="_id">
-                        
-                        <div class="form-section">
-                            <h6>Blog Information</h6>
-                            <div class="row g-3">
-                                <div class="col-md-6"><label class="form-label req">Title</label><input name="title" class="form-control"></div>
-                                <div class="col-md-6"><label class="form-label">Slug</label><input name="slug" class="form-control" placeholder="auto-generated if blank"></div>
-                                <div class="col-12"><label class="form-label">Excerpt</label><textarea name="excerpt" class="form-control" rows="2"></textarea></div>
-                                <div class="col-12"><label class="form-label">Content (HTML or Markdown)</label><textarea name="content" class="form-control" rows="6"></textarea></div>
-                                <div class="col-md-6">
-                                    <label
+    <input type="hidden" name="_id">
+    
+    <div class="form-section">
+        <h6>Blog Information</h6>
+        <div class="row g-3">
+            <div class="col-md-6"><label class="form-label req">Title</label><input name="title" class="form-control"></div>
+            <div class="col-md-6"><label class="form-label">Slug</label><input name="slug" class="form-control" placeholder="auto-generated if blank"></div>
+            <div class="col-12"><label class="form-label">Excerpt</label><textarea name="excerpt" class="form-control" rows="2"></textarea></div>
+            <div class="col-12"><label class="form-label">Content (HTML or Markdown)</label><textarea name="content" class="form-control" rows="6"></textarea></div>
+            <div class="col-md-6">
+                <label class="form-label">Blog Image</label>
+                <div class="image-upload-container" data-target="blogImage">
+                    <div class="upload-placeholder">
+                        <i class="fas fa-cloud-upload-alt fa-2x mb-2"></i>
+                        <p>Click to upload or drag and drop</p>
+                        <p class="small">PNG, JPG, GIF up to 5MB</p>
+                    </div>
+                    <img class="image-preview img-fluid rounded" id="blogImagePreview">
+                    <input type="file" class="d-none" accept="image/*" id="blogImageUpload">
+                    <input type="hidden" name="image" id="blogImageUrl">
+                </div>
+                <div class="d-flex mt-2 gap-2">
+                    <button type="button" class="btn btn-outline-modern btn-sm" data-action="choose-image" data-target="blogImage">
+                        <i class="fas fa-upload me-1"></i> Choose Image
+                    </button>
+                    <button type="button" class="btn btn-outline-danger btn-sm" data-action="clear-image" data-target="blogImage">
+                        <i class="fas fa-times me-1"></i> Clear
+                    </button>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Category</label>
+                <input name="category" class="form-control" placeholder="e.g., News, Updates, Technical">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Author</label>
+                <input name="author" class="form-control" placeholder="Author name">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Tags</label>
+                <input name="tags" class="form-control" placeholder="Separate tags with commas">
+                <small class="form-text text-muted">e.g., HVAC, refrigeration, news</small>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Status</label>
+                <select name="status" class="form-select">
+                    <option value="draft">Draft</option>
+                    <option value="published" selected>Published</option>
+                    <option value="archived">Archived</option>
+                </select>
+            </div>
+            <div class="col-md-6">
+                <div class="form-check mt-4">
+                    <input name="featured" type="checkbox" class="form-check-input" id="blogFeatured">
+                    <label class="form-check-label" for="blogFeatured">Featured Article</label>
+                </div>
+            </div>
+        </div>
+    </div>
 
-
-                                    <div class="sticky-actions">
-                            <button class="btn btn-modern" type="submit">Save Blog</button>
-                            <button class="btn btn-outline-secondary" type="button" data-reset="#form-blog">Reset</button>
-                            <small class="ms-2 text-muted" id="blogStatus"></small>
-                        </div>
-                    </form>
+    <div class="sticky-actions">
+        <button class="btn btn-modern" type="submit">Save Blog</button>
+        <button class="btn btn-outline-secondary" type="button" data-reset="#form-blog">Reset</button>
+        <small class="ms-2 text-muted" id="blogStatus"></small>
+    </div>
+</form>
                 </div>
             </div>
             
@@ -1564,7 +1611,7 @@
                             <button class="btn btn-sm btn-outline-secondary" id="paidNext">Next</button>
                         </div>
                     </div>
-                </div
+                                </div>
                 </div>
                 </div>
             </div>
