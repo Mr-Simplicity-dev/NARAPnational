@@ -551,7 +551,120 @@
         list.innerHTML = paginationHTML;
     }
 
-    // Load recent posts for sidebar
-    async function loadRecentPosts() {
-        try {
-            const response = await fetch('/api/blogs?limit=5');
+     // Load recent posts for sidebar
+        async function loadRecentPosts() {
+            try {
+                const response = await fetch('/api/blogs?limit=5');
+                
+                if (!response.ok) {
+                    throw new Error(`API returned ${response.status}`);
+                }
+                
+                const result = await response.json();
+                const blogs = result.data || result;
+                
+                const recentPostsContainer = document.getElementById('recentPosts');
+                
+                if (!blogs || blogs.length === 0) {
+                    recentPostsContainer.innerHTML = `
+                        <p class="text-muted">No recent posts available.</p>
+                    `;
+                    return;
+                }
+                
+                recentPostsContainer.innerHTML = blogs.map(blog => `
+                    <div class="recent-post">
+                        ${blog.imageUrl ? `
+                            <div class="recent-post-image">
+                                <img src="${blog.imageUrl}" alt="${blog.title}" loading="lazy">
+                            </div>
+                        ` : ''}
+                        <div class="recent-post-content">
+                            <h6><a href="post.php?slug=${blog.slug}">${blog.title}</a></h6>
+                            <div class="recent-post-date">${formatDate(blog.publishedAt || blog.createdAt)}</div>
+                        </div>
+                    </div>
+                `).join('');
+                
+            } catch (error) {
+                console.error('Error loading recent posts:', error);
+                document.getElementById('recentPosts').innerHTML = `
+                    <p class="text-muted">Unable to load recent posts.</p>
+                `;
+            }
+        }
+
+        // Search functionality
+        function searchBlogs() {
+            const searchTerm = document.getElementById('blogSearch').value.toLowerCase().trim();
+            
+            if (searchTerm === '') {
+                filteredBlogs = allBlogs;
+            } else {
+                filteredBlogs = allBlogs.filter(blog => 
+                    blog.title.toLowerCase().includes(searchTerm) ||
+                    (blog.excerpt && blog.excerpt.toLowerCase().includes(searchTerm)) ||
+                    (blog.content && blog.content.toLowerCase().includes(searchTerm)) ||
+                    (blog.author && blog.author.toLowerCase().includes(searchTerm))
+                );
+            }
+            
+            renderBlogs(filteredBlogs);
+            
+            // Hide pagination during search
+            const wrapper = document.getElementById('paginationWrapper');
+            if (searchTerm !== '') {
+                wrapper.style.display = 'none';
+            } else {
+                renderPagination();
+            }
+        }
+
+        // Error state
+        function renderErrorState() {
+            const container = document.getElementById('blogContainer');
+            const spinner = document.getElementById('loadingSpinner');
+            
+            if (spinner) spinner.style.display = 'none';
+            
+            container.innerHTML = `
+                <div class="no-results">
+                    <i class="fas fa-exclamation-triangle fa-3x mb-3 text-warning"></i>
+                    <h5>Unable to Load Blog Posts</h5>
+                    <p>There was an error loading the blog posts. Please try again later.</p>
+                    <button class="btn btn-brand" onclick="loadBlogs(1)">
+                        <i class="fas fa-refresh me-2"></i>Try Again
+                    </button>
+                </div>
+            `;
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            loadBlogs(1);
+            
+            // Clear search when input is emptied
+            document.getElementById('blogSearch').addEventListener('input', function(e) {
+                if (e.target.value === '') {
+                    searchBlogs();
+                }
+            });
+        });
+
+        // Smooth scroll to top when pagination is clicked
+        function scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+
+        // Add scroll to top for pagination clicks
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.pagination .page-link')) {
+                setTimeout(scrollToTop, 100);
+            }
+        });
+    </script>
+</body>
+</html>
