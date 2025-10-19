@@ -902,7 +902,7 @@
                 <div class="upload-placeholder">
                     <i class="fas fa-video fa-2x mb-2"></i>
                     <p>Click to upload video or drag and drop</p>
-                    <p class="small">MP4, WEBM, OGV up to 50MB</p>
+                    <p class="small">MP4, WEBM, OGV up to 1GB</p>
                 </div>
                 <video class="image-preview" id="sliderVideoPreview" controls style="display:none; max-width:200px; max-height:150px;"></video>
                 <input type="file" class="d-none" accept="video/*" id="sliderVideoUpload">

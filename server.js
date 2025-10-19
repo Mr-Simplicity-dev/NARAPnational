@@ -186,7 +186,7 @@ app.use(passport.session());
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(cors({ origin: process.env.CORS_ORIGIN?.split(',') || '*'}));
-app.use(express.json({ limit: '2mb' }));
+app.use(express.json({ limit: '1gb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan('dev'));
 

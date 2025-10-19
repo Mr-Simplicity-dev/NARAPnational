@@ -483,10 +483,11 @@ function handleVideoSelection(file, target) {
     return;
   }
   
-  // Validate file size (50MB)
-  const maxSize = 50 * 1024 * 1024;
+  // Validate file size (1GB) - UPDATED FROM 50MB
+  const maxSize = 1024 * 1024 * 1024; // 1GB in bytes
   if (file.size > maxSize) {
-    showNotification(`Video must be less than 50MB (current: ${(file.size / 1024 / 1024).toFixed(2)}MB)`, 'error');
+    const fileSizeGB = (file.size / 1024 / 1024 / 1024).toFixed(2);
+    showNotification(`Video must be less than 1GB (current: ${fileSizeGB}GB)`, 'error');
     return;
   }
   
@@ -528,6 +529,9 @@ async function uploadVideo(file, target) {
     if (!token) {
       throw new Error('Not authenticated. Please log in again.');
     }
+
+    // Show upload progress notification for large files
+    showNotification('Uploading video... This may take a while for large files.', 'info');
 
     const response = await fetch('/api/upload/video', {
       method: 'POST',

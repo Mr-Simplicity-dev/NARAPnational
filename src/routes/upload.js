@@ -63,11 +63,11 @@ router.post('/video', requireAuth, requireAdmin, videoUpload.single('file'), asy
       return res.status(400).json({ error: 'Invalid video format. Use MP4, WEBM, OGV, AVI, or MOV' });
     }
 
-    // Check file size (50MB limit)
-    const maxSize = 50 * 1024 * 1024;
-    if (req.file.size > maxSize) {
-      return res.status(400).json({ error: 'Video file too large. Maximum 50MB allowed.' });
-    }
+    // Check file size (1GB limit) - UPDATED FROM 50MB
+const maxSize = 1024 * 1024 * 1024; // 1GB in bytes
+if (req.file.size > maxSize) {
+  return res.status(400).json({ error: 'Video file too large. Maximum 1GB allowed.' });
+}
 
     const videoUrl = `/admin/uploads/videos/${req.file.filename}`;
     res.json({ 
