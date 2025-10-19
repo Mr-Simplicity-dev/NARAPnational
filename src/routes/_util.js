@@ -12,7 +12,7 @@ export function buildCRUDRoutes({router, Model, resource}){
     const { page=1, limit=50, sort='-createdAt' } = req.query;
     const docs = await Model.find({}).sort(sort).skip((page-1)*limit).limit(Number(limit));
     const count = await Model.countDocuments({});
-    res.json(docs); // Return simple array instead of {data: docs, count}
+    res.json(docs); // ✅ Fixed: return simple array
   }catch(e){ res.status(400).json({message:e.message}); }
 });
   // Detail by id
