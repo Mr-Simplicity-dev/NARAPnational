@@ -2032,5 +2032,6 @@ document.querySelectorAll('input[type="file"][accept="video/*"]').forEach(input 
     </script>
     
     <script src="/admin/admin.js"></script>
+    <script src="/js/dropdown.js"></script>
 </body>
 </html>

@@ -1647,6 +1647,180 @@ document.addEventListener('DOMContentLoaded', function() {
    // Initialize video uploads
   initializeVideoUploads();
 
+  // Listen for dropdown selections
+document.addEventListener('dropdownItemSelected', function(event) {
+    const { target } = event.detail;
+    
+    // Handle your existing navigation
+    switch(target) {
+        // Members Management dropdown
+        case 'members-all':
+            showSection('members-all');
+            break;
+        case 'members-paid':
+            showSection('members-paid');
+            break;
+        case 'members-unpaid':
+            showSection('members-unpaid');
+            break;
+            
+        // Content Management dropdown
+        case 'home-settings':
+            showSection('home-settings');
+            break;
+        case 'sliders':
+            showSection('sliders');
+            break;
+        case 'services':
+            showSection('services');
+            break;
+        case 'projects':
+            showSection('projects');
+            break;
+        case 'features':
+            showSection('features');
+            break;
+        case 'offers':
+            showSection('offers');
+            break;
+        case 'blogs':
+            showSection('blogs');
+            break;
+        case 'faqs':
+            showSection('faqs');
+            break;
+        case 'team':
+            showSection('team');
+            break;
+            
+        // Direct navigation items
+        case 'dashboard':
+            showSection('dashboard');
+            break;
+        case 'donations':
+            showSection('donations');
+            break;
+        case 'settings':
+            showSection('settings');
+            break;
+            
+        default:
+            console.log('Unknown target:', target);
+            break;
+    }
+});
+
+// Section switching function
+function showSection(sectionId) {
+    console.log('Switching to section:', sectionId);
+    
+    // Hide all content sections
+    document.querySelectorAll('.content-tab-pane').forEach(section => {
+        section.classList.remove('active');
+    });
+    
+    // Show the target section
+    const targetSection = document.getElementById(sectionId);
+    if (targetSection) {
+        targetSection.classList.add('active');
+        
+        // Update page title
+        updatePageTitle(sectionId);
+        
+        // Load data for specific sections
+        loadSectionData(sectionId);
+    } else {
+        console.warn('Section not found:', sectionId);
+    }
+}
+
+// Update page title based on section
+function updatePageTitle(sectionId) {
+    const titleElement = document.getElementById('pageTitle');
+    if (!titleElement) return;
+    
+    const titles = {
+        'dashboard': 'Dashboard Overview',
+        'members-all': 'All Registrations',
+        'members-paid': 'Paid Members',
+        'members-unpaid': 'Unpaid Members',
+        'donations': 'Donations Management',
+        'home-settings': 'Home Settings',
+        'sliders': 'Slider Management',
+        'services': 'Services Management',
+        'projects': 'Projects Management',
+        'features': 'Features Management',
+        'offers': 'Offers Management',
+        'blogs': 'Blog Management',
+        'faqs': 'FAQ Management',
+        'team': 'Team Management',
+        'settings': 'System Settings'
+    };
+    
+    titleElement.textContent = titles[sectionId] || 'Admin Dashboard';
+}
+
+// Load data for specific sections
+function loadSectionData(sectionId) {
+    switch(sectionId) {
+        case 'members-all':
+            loadAllMembers();
+            break;
+        case 'members-paid':
+            loadPaidMembers();
+            break;
+        case 'members-unpaid':
+            loadUnpaidMembers();
+            break;
+        case 'donations':
+            loadDonations();
+            break;
+        case 'home-settings':
+            loadHomeSettings();
+            break;
+        case 'sliders':
+            loadList('sliders');
+            break;
+        case 'services':
+            loadList('services');
+            break;
+        case 'projects':
+            loadList('projects');
+            break;
+        case 'features':
+            loadList('features');
+            break;
+        case 'offers':
+            loadList('offers');
+            break;
+        case 'blogs':
+            loadList('blogs');
+            break;
+        case 'faqs':
+            loadList('faqs');
+            break;
+        case 'team':
+            loadList('team');
+            break;
+    }
+}
+
+// Handle direct nav-link clicks (non-dropdown items)
+document.addEventListener('click', function(e) {
+    const navLink = e.target.closest('.nav-link:not(.dropdown-toggle)');
+    if (navLink && navLink.hasAttribute('data-target')) {
+        e.preventDefault();
+        const target = navLink.getAttribute('data-target');
+        
+        // Update active states
+        document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+        navLink.classList.add('active');
+        
+        // Show section
+        showSection(target);
+    }
+});
+
   // Search functionality
   $('#allSearch')?.addEventListener('input', () => {
     allPage = 1; // Reset to page 1 when searching
