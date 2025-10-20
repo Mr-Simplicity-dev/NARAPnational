@@ -1484,24 +1484,7 @@ async function loadDynamicContent() {
 </script>
 
 <script>
-// Load dynamic content from admin dashboard
-async function loadDynamicContent() {
-  try {
-    // Load all sections
-    await Promise.all([
-      loadSliders(),
-      loadServices(), 
-      loadTeam(),
-      loadBlogs()
-    ]);
-    
-    console.log('All dynamic content loaded successfully');
-    
-  } catch (error) {
-    console.error('Failed to load dynamic content:', error);
-    // Fallback to static content (current behavior)
-  }
-}
+
 
 async function loadBlogs() {
   try {
