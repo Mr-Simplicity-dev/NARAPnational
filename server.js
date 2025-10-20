@@ -10,7 +10,6 @@ import fs from 'fs';
 import session from 'express-session';
 import passport from 'passport';
 
-
 import authRoutes from './src/routes/auth.js';
 import blogRoutes from './src/routes/blogs.js';
 import serviceRoutes from './src/routes/services.js';
@@ -36,7 +35,6 @@ import unpaidRoutes from './src/routes/unpaid.js';
 import donationsRoutes from './src/routes/donations.js';
 import testimonialRoutes from './src/routes/testimonials.js';
 
-
 const uploadDirs = [
   'public/admin/uploads/services',
   'public/admin/uploads/portfolio', 
@@ -44,7 +42,8 @@ const uploadDirs = [
   'public/admin/uploads/sections',
   'public/admin/uploads/team',
   'public/admin/uploads/partners',
-  'public/admin/uploads/passports'
+  'public/admin/uploads/passports',
+  'public/admin/uploads/videos' // Added videos directory
 ];
 
 uploadDirs.forEach(dir => {
@@ -54,6 +53,7 @@ uploadDirs.forEach(dir => {
     console.log(`Directory ${dir} already exists or couldn't be created`);
   }
 });
+
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -64,7 +64,6 @@ if (!MONGO_URI) {
   console.error('MONGO_URI environment variable is required');
   process.exit(1);
 }
-
 
 mongoose.connect(MONGO_URI).then(() => {
   console.log('✅ Mongo connected');
@@ -81,32 +80,32 @@ app.use(helmet({
     directives: {
       "default-src": ["'self'"],
       "script-src": [
-  "'self'",
-  "'unsafe-inline'",
-  "https://code.jquery.com",
-  "https://ajax.googleapis.com",
-  "https://accounts.google.com",
-  "https://apis.google.com",
-  "https://www.gstatic.com",           // ⚠️ ADD THIS
-  "https://ssl.gstatic.com",           // ⚠️ ADD THIS
-  "https://cdnjs.cloudflare.com",
-  "https://cdn.jsdelivr.net",
-  "https://static.whatsapp.net",
-  "https://wa.me",
-  "https://api.whatsapp.com",
-  "https://connect.facebook.net",
-  "https://www.facebook.com",
-  "https://embed.tawk.to",
-  "https://cdn.tawk.to",
-  "https://tawk.to",
-  "https://*.tawk.to",
-  "https://fonts.googleapis.com",
-  "https://pagead2.googlesyndication.com",
-  "https://googleads.g.doubleclick.net",
-  "https://d2mpatx37cqexb.cloudfront.net",
-  "https://use.fontawesome.com",
-  "https://js.paystack.co"
-],
+        "'self'",
+        "'unsafe-inline'",
+        "https://code.jquery.com",
+        "https://ajax.googleapis.com",
+        "https://accounts.google.com",
+        "https://apis.google.com",
+        "https://www.gstatic.com",
+        "https://ssl.gstatic.com",
+        "https://cdnjs.cloudflare.com",
+        "https://cdn.jsdelivr.net",
+        "https://static.whatsapp.net",
+        "https://wa.me",
+        "https://api.whatsapp.com",
+        "https://connect.facebook.net",
+        "https://www.facebook.com",
+        "https://embed.tawk.to",
+        "https://cdn.tawk.to",
+        "https://tawk.to",
+        "https://*.tawk.to",
+        "https://fonts.googleapis.com",
+        "https://pagead2.googlesyndication.com",
+        "https://googleads.g.doubleclick.net",
+        "https://d2mpatx37cqexb.cloudfront.net",
+        "https://use.fontawesome.com",
+        "https://js.paystack.co"
+      ],
       "style-src": [
         "'self'",
         "'unsafe-inline'",
@@ -118,7 +117,6 @@ app.use(helmet({
         "https://embed.tawk.to",
         "https://cdn.tawk.to",
         "https://*.tawk.to"
-        
       ],
       "img-src": [
         "'self'",
@@ -132,22 +130,21 @@ app.use(helmet({
         "https://*.tawk.to",
         "https://pagead2.googlesyndication.com"
       ],
-      // ADD THIS NEW SECTION FOR VIDEO CONTENT
       "media-src": [
         "'self'",
         "data:",
         "blob:"
       ],
       "font-src": [
-  "'self'",
-  "data:",
-  "https://fonts.gstatic.com",
-  "https://use.fontawesome.com",
-  "https://cdn.jsdelivr.net",
-  "https://cdn.tawk.to",
-  "https://*.tawk.to",
-  "https://cdnjs.cloudflare.com"  // Add this line for FontAwesome
-],
+        "'self'",
+        "data:",
+        "https://fonts.gstatic.com",
+        "https://use.fontawesome.com",
+        "https://cdn.jsdelivr.net",
+        "https://cdn.tawk.to",
+        "https://*.tawk.to",
+        "https://cdnjs.cloudflare.com"
+      ],
       "frame-src": [
         "'self'",
         "https://www.facebook.com",
@@ -157,26 +154,29 @@ app.use(helmet({
         "https://*.tawk.to",
         "https://pagead2.googlesyndication.com",
         "https://googleads.g.doubleclick.net",
-        "https://js.paystack.co"],
+        "https://js.paystack.co",
+        "https://www.youtube.com",
+        "https://player.vimeo.com"
+      ],
       "connect-src": [
-  "'self'",
-  "https://tawk.to",
-  "https://embed.tawk.to",
-  "https://cdn.tawk.to",
-  "https://va.tawk.to",
-  "https://*.tawk.to",
-  "wss://*.tawk.to",
-  "https://ep1.adtrafficquality.google",
-  "https://accounts.google.com",
-  "https://apis.google.com",
-  "https://www.googleapis.com",
-  "https://api.paystack.co",
-  "https://cdn.jsdelivr.net"
-]
+        "'self'",
+        "https://tawk.to",
+        "https://embed.tawk.to",
+        "https://cdn.tawk.to",
+        "https://va.tawk.to",
+        "https://*.tawk.to",
+        "wss://*.tawk.to",
+        "https://ep1.adtrafficquality.google",
+        "https://accounts.google.com",
+        "https://apis.google.com",
+        "https://www.googleapis.com",
+        "https://api.paystack.co",
+        "https://cdn.jsdelivr.net"
+      ]
     }
   }
 }));
-// Add after other middleware (around line 145)
+
 // Session configuration for Passport
 app.use(session({
   secret: process.env.SESSION_SECRET || '507d337f93fe5e3663bcf9917a2355e4a66bc71a55430c6ae1822ccb35fa607761f99af13ce5f990c67481bb8735381e61a9a00aefd570942c3add407f0fa928',
@@ -189,13 +189,15 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.use(passport.initialize());
-app.use(passport.session());
 app.use(cors({ origin: process.env.CORS_ORIGIN?.split(',') || '*'}));
 app.use(express.json({ limit: '1gb' }));
 app.use(express.urlencoded({ extended: true, limit: '1gb' }));
-app.use(express.urlencoded({ extended: true }));
 app.use(morgan('dev'));
+
+// Static file serving - FIXED ORDER
+app.use(express.static('public'));
+app.use('/admin/uploads', express.static(path.join(__dirname, 'public/admin/uploads')));
+app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
 
 // Serve real .php files as HTML (no PHP engine needed)
 app.get(/\.php$/, (req, res, next) => {
@@ -213,12 +215,6 @@ app.get(['/index.php', '/home.php', '/default.php'], (_req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// Static (serve your HTML/CSS/JS exactly)
-app.use(express.static(path.join(__dirname, 'public')));
-// Make uploads accessible at the same paths the HTML expects:
-app.use('/admin/uploads', express.static(path.join(__dirname, 'public/admin/uploads')));
-app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
-
 // Map legacy PHP links to single-page anchors
 app.get('/about.php', (req, res) => res.redirect('/#about'));
 
@@ -227,6 +223,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/blogs', blogRoutes);
 app.use('/api/services', serviceRoutes);
 app.use('/api/portfolio', portfolioRoutes);
+app.use('/api/projects', portfolioRoutes); // Added projects route mapping to portfolio
 app.use('/api/sliders', sliderRoutes);
 app.use('/api/team', teamRoutes);
 app.use('/api/faqs', faqRoutes);
