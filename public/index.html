@@ -1557,6 +1557,17 @@ async function loadSliders() {
     const data = await response.json();
     const sliders = data.data || data;
     
+    // ADD THIS DEBUG CODE:
+console.log('Slider data from API:', sliders);
+sliders.forEach((slider, index) => {
+  console.log(`Slider ${index}:`, {
+    primaryBtnVideoFile: slider.primaryBtnVideoFile,
+    primaryBtnVideoUrl: slider.primaryBtnVideoUrl,
+    'cta1.videoFile': slider.cta1?.videoFile,
+    'cta1.videoUrl': slider.cta1?.videoUrl
+  });
+});
+
     if (sliders && sliders.length > 0) {
       updateSliders(sliders);
     }
@@ -1631,15 +1642,25 @@ async function loadSliders() {
                     <p class="mb-5 fs-5">${slider.paragraph || slider.text || ''}</p>
                     
                     <div class="d-flex justify-content-center justify-content-md-end flex-shrink-0 mb-4">
-                      ${slider.primaryBtnText || slider.cta1?.label ? `<a class="btn btn-light rounded-pill py-3 px-4 px-md-5 me-2" 
-                        href="${slider.primaryBtnLink || slider.cta1?.href || '#'}"
-                        ${slider.cta1?.videoUrl ? `data-video-url="${slider.cta1.videoUrl}"` : ''}
-                        ${slider.cta1?.videoFile ? `data-video-file="${slider.cta1.videoFile}"` : ''}
-                        ${slider.primaryBtnVideoUrl ? `data-video-url="${slider.primaryBtnVideoUrl}"` : ''}
-                        ${slider.primaryBtnVideoFile ? `data-video-file="${slider.primaryBtnVideoFile}"` : ''}
-                        ${slider.video_link ? `data-video-url="${slider.video_link}"` : ''}>
-                        <i class="fas fa-play-circle me-2"></i> ${slider.primaryBtnText || slider.cta1?.label || 'Watch Video'}
-                      </a>` : ''}
+                      ${slider.primaryBtnText || slider.cta1?.label ? (() => {
+                        // Check if video data exists
+                        const hasVideo = slider.cta1?.videoUrl || slider.cta1?.videoFile || 
+                                       slider.primaryBtnVideoUrl || slider.primaryBtnVideoFile || 
+                                       slider.video_link;
+                        
+                        // If video exists, use # as href, otherwise use the original link
+                        const href = hasVideo ? '#' : (slider.primaryBtnLink || slider.cta1?.href || '#');
+                        
+                        return `<a class="btn btn-light rounded-pill py-3 px-4 px-md-5 me-2" 
+                          href="${href}"
+                          ${slider.cta1?.videoUrl ? `data-video-url="${slider.cta1.videoUrl}"` : ''}
+                          ${slider.cta1?.videoFile ? `data-video-file="${slider.cta1.videoFile}"` : ''}
+                          ${slider.primaryBtnVideoUrl ? `data-video-url="${slider.primaryBtnVideoUrl}"` : ''}
+                          ${slider.primaryBtnVideoFile ? `data-video-file="${slider.primaryBtnVideoFile}"` : ''}
+                          ${slider.video_link ? `data-video-url="${slider.video_link}"` : ''}>
+                          <i class="fas fa-play-circle me-2"></i> ${slider.primaryBtnText || slider.cta1?.label || 'Watch Video'}
+                        </a>`;
+                      })() : ''}
                       
                       ${slider.secondaryBtnText || slider.cta2?.label ? `<a class="btn btn-primary rounded-pill py-3 px-4 px-md-5 ms-2" 
                         href="${slider.secondaryBtnLink || slider.cta2?.href || slider.link || '/#about'}">
