@@ -1381,6 +1381,11 @@ const resources = {
       const image = document.getElementById('sliderImageUrl')?.value || '';
       const order = Number(fd.get('order') || 0) || 0;
       
+       // ADD THIS VALIDATION CODE HERE (after line 1383, before the return statement)
+      if (!image && !c1VideoUrl && !c1VideoFile) {
+        throw new Error('Please provide either an image or a video');
+      }
+      
       return {
         kicker, headline, text,
         cta1: c1Label || c1Href || c1VideoUrl || c1VideoFile ? { 
