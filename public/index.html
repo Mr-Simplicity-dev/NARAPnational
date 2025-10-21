@@ -1563,22 +1563,7 @@ sliders.forEach((slider, index) => {
 }
 
 
-  async function loadServices() {
-  try {
-    const response = await fetch('/api/services');
-    if (!response.ok) throw new Error('Failed to fetch services');
-    
-    const data = await response.json();
-    const services = data.data || data;
-    
-    if (services && services.length > 0) {
-      updateServices(services);
-    }
-  } catch (error) {
-    console.error('Failed to load services:', error);
-    // Hardcoded services remain
-  }
-}
+  
     
 
 
