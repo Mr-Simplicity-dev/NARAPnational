@@ -1481,6 +1481,8 @@ async function loadDynamicContent() {
   }
 }
 
+
+
 </script>
 
 <script>
@@ -1561,6 +1563,7 @@ sliders.forEach((slider, index) => {
 }
 
 
+  async function loadServices() {
   try {
     const response = await fetch('/api/services');
     if (!response.ok) throw new Error('Failed to fetch services');
@@ -1575,6 +1578,8 @@ sliders.forEach((slider, index) => {
     console.error('Failed to load services:', error);
     // Hardcoded services remain
   }
+}
+    
 
 
 async function loadTeam() {

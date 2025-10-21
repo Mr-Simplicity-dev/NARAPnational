@@ -35,15 +35,20 @@ import unpaidRoutes from './src/routes/unpaid.js';
 import donationsRoutes from './src/routes/donations.js';
 import testimonialRoutes from './src/routes/testimonials.js';
 
+// Update upload directories to match your actual structure
 const uploadDirs = [
-  'public/admin/uploads/services',
-  'public/admin/uploads/portfolio', 
-  'public/admin/uploads/blogs',
-  'public/admin/uploads/sections',
-  'public/admin/uploads/team',
-  'public/admin/uploads/partners',
-  'public/admin/uploads/passports',
-  'public/admin/uploads/videos' // Added videos directory
+  'public/uploads/services',
+  'public/uploads/portfolio', 
+  'public/uploads/blogs',
+  'public/uploads/sections',
+  'public/uploads/team',
+  'public/uploads/partners',
+  'public/uploads/passports',
+  'public/uploads/videos',
+  'public/uploads/signatures',
+  'public/uploads/profile',
+  'public/uploads/offer',
+  'public/uploads/slider'
 ];
 
 uploadDirs.forEach(dir => {
@@ -194,9 +199,15 @@ app.use(express.json({ limit: '1gb' }));
 app.use(express.urlencoded({ extended: true, limit: '1gb' }));
 app.use(morgan('dev'));
 
-// Static file serving - FIXED ORDER
+// CRITICAL FIX: Redirect admin/uploads to uploads (add BEFORE static file serving)
+app.use('/admin/uploads', (req, res) => {
+  const redirectPath = `/uploads${req.path}`;
+  console.log(`🔄 Redirecting /admin/uploads${req.path} to ${redirectPath}`);
+  res.redirect(301, redirectPath);
+});
+
+// Static file serving
 app.use(express.static('public'));
-app.use('/admin/uploads', express.static(path.join(__dirname, 'public/admin/uploads')));
 app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
 
 // Serve real .php files as HTML (no PHP engine needed)
