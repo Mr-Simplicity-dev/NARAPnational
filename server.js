@@ -211,24 +211,24 @@ app.use(express.static('public'));
 app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
 
 // Serve real .php files as HTML (no PHP engine needed)
-app.get(/\.php$/, (req, res, next) => {
-  const filePath = path.join(__dirname, 'public', req.path);
-  fs.access(filePath, fs.constants.F_OK, (err) => {
-    if (err) return next();
-    res.type('html');
-    res.sendFile(filePath, (e) => (e ? next(e) : null));
-  });
-});
+// app.get(/\.php$/, (req, res, next) => {
+//   const filePath = path.join(__dirname, 'public', req.path);
+//   fs.access(filePath, fs.constants.F_OK, (err) => {
+//     if (err) return next();
+//     res.type('html');
+//     res.sendFile(filePath, (e) => (e ? next(e) : null));
+//   });
+// });
 
-// Serve real .php files as HTML (no PHP engine needed)
-app.get(/\.php$/, (req, res, next) => {
-  const filePath = path.join(__dirname, 'public', req.path);
-  fs.access(filePath, fs.constants.F_OK, (err) => {
-    if (err) return next();
-    res.type('html');
-    res.sendFile(filePath, (e) => (e ? next(e) : null));
-  });
-});
+// // Serve real .php files as HTML (no PHP engine needed)
+// app.get(/\.php$/, (req, res, next) => {
+//   const filePath = path.join(__dirname, 'public', req.path);
+//   fs.access(filePath, fs.constants.F_OK, (err) => {
+//     if (err) return next();
+//     res.type('html');
+//     res.sendFile(filePath, (e) => (e ? next(e) : null));
+//   });
+// });
 
 // ADD THIS: Serve .html files explicitly
 app.get(/\.html$/, (req, res, next) => {
@@ -241,7 +241,7 @@ app.get(/\.html$/, (req, res, next) => {
 });
 
 // Aliases: route index.php-like URLs to index.html
-app.get(['/index.php', '/home.html', '/default.html'], (_req, res) => {
+app.get(['/index.html', '/home.php', '/default.php'], (_req, res) => {
   res.type('html');
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
