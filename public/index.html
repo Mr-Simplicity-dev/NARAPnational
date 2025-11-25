@@ -113,8 +113,8 @@
                 <div class="col-lg-4 text-center text-lg-end">
                     <div class="d-inline-flex align-items-center" style="height: 45px;">
                         <a href="https://narapdb.com.ng" target="_blank"><small class="me-3 text-dark"><i class="fa fa-database text-primary me-2"></i>Database</small></a>
-                        <a href="admin/startup.php"><small class="me-3 text-dark"><i class="fa fa-user text-primary me-2"></i>Register</small></a>
-                        <a href="admin/startups.php"><small class="me-3 text-dark"><i class="fa fa-sign-in-alt text-primary me-2"></i>Login</small></a>
+                        <a href="admin/startup.html"><small class="me-3 text-dark"><i class="fa fa-user text-primary me-2"></i>Register</small></a>
+                        <a href="admin/startups.html"><small class="me-3 text-dark"><i class="fa fa-sign-in-alt text-primary me-2"></i>Login</small></a>
                         <div class="dropdown">
                             <a href="#" class="dropdown-toggle text-dark" data-bs-toggle="dropdown"><small><i class="fa fa-home text-primary me-2"></i> My Dashboard</small></a>
                             <div class="dropdown-menu rounded">
@@ -143,7 +143,7 @@
                 </button>
                 <div class="collapse navbar-collapse" id="navbarCollapse">
                     <div class="navbar-nav ms-auto py-0">
-                        <a href="index.php" class="nav-item nav-link active">Home</a>
+                        <a href="index.html" class="nav-item nav-link active">Home</a>
                         <a href="/#about" class="nav-item nav-link">About</a>
                         <a href="/#what-we-do" class="nav-item nav-link">Services</a>
                         <a href="/#projects" class="nav-item nav-link">Products</a>
@@ -197,7 +197,7 @@
                                 <div class="d-flex align-items-center justify-content-center justify-content-md-end">
                                     <h2 class="text-white me-2">Follow Us:</h2>
                                     <div class="d-flex justify-content-end ms-2">
-                                        <a class="btn btn-md-square btn-light rounded-circle me-2" href=" https://www.facebook.com/time360 farms"><i class="fab fa-facebook-f"></i></a>
+                                        <a class="btn btn-md-square btn-light rounded-circle me-2" href=" https://www.facebook.com/"><i class="fab fa-facebook-f"></i></a>
                                         <a class="btn btn-md-square btn-light rounded-circle mx-2" href=" https://twitter.com/yourpage"><i class="fab fa-twitter"></i></a>
                                         <a class="btn btn-md-square btn-light rounded-circle mx-2" href=" https://instagram.com/yourpage"><i class="fab fa-instagram"></i></a>
                                         <a class="btn btn-md-square btn-light rounded-circle ms-2" href=" www.linkedin.com/in/times-farms-247322380"><i class="fab fa-linkedin-in"></i></a>
@@ -211,7 +211,7 @@
             </div>
         </div>
             <div class="header-carousel-item">
-            <img src="uploads/slider/1756318605_carousel-2.jpg" class="img-fluid w-100" alt="Slide">
+            <img src="/uploads/slider/1756318605_carousel-2.jpg" class="img-fluid w-100" alt="Slide">
             <div class="carousel-caption">
                 <div class="container">
                     <div class="row gy-0 gx-5">
@@ -237,10 +237,10 @@
                                 <div class="d-flex align-items-center justify-content-center justify-content-md-end">
                                     <h2 class="text-white me-2">Follow Us:</h2>
                                     <div class="d-flex justify-content-end ms-2">
-                                        <a class="btn btn-md-square btn-light rounded-circle me-2" href=" https://www.facebook.com/time360 farms"><i class="fab fa-facebook-f"></i></a>
+                                        <a class="btn btn-md-square btn-light rounded-circle me-2" href=" https://www.facebook.com/"><i class="fab fa-facebook-f"></i></a>
                                         <a class="btn btn-md-square btn-light rounded-circle mx-2" href=" https://twitter.com/yourpage"><i class="fab fa-twitter"></i></a>
                                         <a class="btn btn-md-square btn-light rounded-circle mx-2" href=" https://instagram.com/yourpage"><i class="fab fa-instagram"></i></a>
-                                        <a class="btn btn-md-square btn-light rounded-circle ms-2" href=" www.linkedin.com/in/times-farms-247322380"><i class="fab fa-linkedin-in"></i></a>
+                                        <a class="btn btn-md-square btn-light rounded-circle ms-2" href=" www.linkedin.com/"><i class="fab fa-linkedin-in"></i></a>
                                     </div>
                                 </div>
 
@@ -1467,7 +1467,7 @@ async function loadDynamicContent() {
   try {
     // Load all sections
     await Promise.all([
-      loadSliders(),
+      // loadSliders(),
       loadServices(), 
       loadTeam(),
       loadBlogs()
@@ -1534,35 +1534,81 @@ async function loadBlogs() {
 }
 
 // Add the missing functions with fallback logic
+// async function loadSliders() {
+//   try {
+//     const response = await fetch('/api/sliders');
+//     if (!response.ok) throw new Error('Failed to fetch sliders');
+    
+//     const data = await response.json();
+//     const sliders = data.data || data;
+    
+//     // ADD THIS DEBUG CODE:
+// console.log('Slider data from API:', sliders);
+// sliders.forEach((slider, index) => {
+//   console.log(`Slider ${index}:`, {
+//     primaryBtnVideoFile: slider.primaryBtnVideoFile,
+//     primaryBtnVideoUrl: slider.primaryBtnVideoUrl,
+//     'cta1.videoFile': slider.cta1?.videoFile,
+//     'cta1.videoUrl': slider.cta1?.videoUrl
+//   });
+// });
+
+//     if (sliders && sliders.length > 0) {
+//       updateSliders(sliders);
+//     }
+//   } catch (error) {
+//     console.error('Failed to load sliders:', error);
+//     // Hardcoded sliders remain
+//   }
+// }
+
 async function loadSliders() {
   try {
     const response = await fetch('/api/sliders');
-    if (!response.ok) throw new Error('Failed to fetch sliders');
+    if (!response.ok) {
+      console.log('Using static sliders - API not available');
+      return; // Keep static HTML
+    }
     
     const data = await response.json();
     const sliders = data.data || data;
     
-    // ADD THIS DEBUG CODE:
-console.log('Slider data from API:', sliders);
-sliders.forEach((slider, index) => {
-  console.log(`Slider ${index}:`, {
-    primaryBtnVideoFile: slider.primaryBtnVideoFile,
-    primaryBtnVideoUrl: slider.primaryBtnVideoUrl,
-    'cta1.videoFile': slider.cta1?.videoFile,
-    'cta1.videoUrl': slider.cta1?.videoUrl
-  });
-});
-
-    if (sliders && sliders.length > 0) {
-      updateSliders(sliders);
+    // Only replace if we have valid data
+    if (!sliders || sliders.length === 0) {
+      console.log('Using static sliders - no API data');
+      return; // Keep static HTML
     }
+    
+    const carousel = document.querySelector('.header-carousel');
+    if (!carousel) return;
+    
+    // Destroy existing carousel first
+    $('.header-carousel').trigger('destroy.owl.carousel');
+    
+    carousel.innerHTML = ''; // Clear existing
+    
+    sliders.forEach(slider => {
+      // ... rest of your code
+    });
+    
+    // Reinitialize carousel
+    $('.header-carousel').owlCarousel({
+      loop: true,
+      margin: 0,
+      nav: true,
+      autoplay: true,
+      autoplayTimeout: 5000,
+      items: 1,
+      animateOut: 'fadeOut',
+      animateIn: 'fadeIn',
+      navText: ["<i class='fas fa-chevron-left'></i>","<i class='fas fa-chevron-right'></i>"]
+    });
+    
   } catch (error) {
     console.error('Failed to load sliders:', error);
-    // Hardcoded sliders remain
+    // Keep static content - don't clear carousel
   }
 }
-
-
   
     
 
